@@ -198,27 +198,33 @@ const USECASES = {
         quote: 'Survey the Chinese LLM application market and turn it into a formal HTML white paper.',
         title: 'Work Document Generation',
         image: 'img/usecase/document.svg',
+        href: '/docs/en/showcase/ppt-whitepaper',
       },
       {
         tag: 'Mobile · AR',
         quote: 'Walk me through building an iOS AR mini-game Ball Finder in Vibe Coding mode.',
         title: 'Mini-Game Development',
         image: 'img/usecase/game.svg',
+        href: '/docs/en/showcase/mini-game',
       },
       {
         tag: 'Engineering',
         quote: 'Build a low-code embedding fine-tuning platform from scratch.',
         title: 'AI Engineering Platform',
         image: 'img/usecase/aiplatform.svg',
+        href: '/docs/en/showcase/model-training',
       },
       {
         tag: 'Media',
         quote: 'Push this English podcast to a global audience in Chinese / Japanese / French / Korean / Spanish / Arabic.',
         title: 'Audio-Video & Social Ops',
         image: 'img/usecase/podcast.svg',
+        href: '/docs/en/showcase/podcast-multilingual',
       },
     ],
     seeMore: 'See full workflow →',
+    seeAll: 'Explore the full Case Showcase →',
+    seeAllHref: '/showcase/',
   },
   zh: {
     title: '应用场景',
@@ -229,27 +235,33 @@ const USECASES = {
         quote: '调研中国 LLM 应用市场，并生成一份正式的 HTML 白皮书。',
         title: '办公文档生成',
         image: 'img/usecase/document.svg',
+        href: '/docs/showcase/ppt-whitepaper',
       },
       {
         tag: '移动 · AR',
         quote: '用 Vibe Coding 模式，带我从零搭一个 iOS AR 小游戏 Ball Finder。',
         title: '小游戏开发',
         image: 'img/usecase/game.svg',
+        href: '/docs/showcase/mini-game',
       },
       {
         tag: '工程化',
         quote: '从零搭一个低代码的 Embedding 微调平台。',
         title: 'AI 工程平台搭建',
         image: 'img/usecase/aiplatform.svg',
+        href: '/docs/showcase/model-training',
       },
       {
         tag: '媒体运营',
         quote: '把这期英文播客同步推给中 / 日 / 法 / 韩 / 西 / 阿语全球听众。',
         title: '音视频与社媒运营',
         image: 'img/usecase/podcast.svg',
+        href: '/docs/showcase/podcast-multilingual',
       },
     ],
     seeMore: '查看完整流程 →',
+    seeAll: '探索完整案例广场 →',
+    seeAllHref: '/showcase/',
   },
 };
 
@@ -386,7 +398,7 @@ function HeroSection() {
             <Link className={styles.btnSecondary} to="#quick-start">
               {t.quickStart}
             </Link>
-            <Link className={styles.btnSecondary} to="https://github.com/Gucc111/PilotDeck#-installation--quick-start">
+            <Link className={styles.btnSecondary} to={isZh ? '/docs/introduction' : '/docs/en/introduction'}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                 <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
@@ -554,8 +566,16 @@ function UseCasesSection() {
         <p className={styles.sectionDesc}>{t.desc}</p>
       </div>
       <div className={styles.useCasesGrid}>
-        {t.items.map((item, idx) => (
-          <Link key={idx} to="/use-cases" className={styles.useCaseCard}>
+        {t.items.map((item, idx) => {
+          // Showcase microsite is a static HTML app under static/showcase/;
+          // bypass Docusaurus' Link prefetch/validation with a plain anchor.
+          const isStaticShowcase = !item.href || item.href.startsWith('/showcase');
+          const LinkEl = isStaticShowcase ? 'a' : Link;
+          const linkProps = isStaticShowcase
+            ? { href: item.href || '/showcase/' }
+            : { to: item.href };
+          return (
+          <LinkEl key={idx} {...linkProps} className={styles.useCaseCard}>
             <div className={styles.useCaseImageWrapper}>
               <img src={useBaseUrl(item.image)} alt={item.title} className={styles.useCaseImage} />
             </div>
@@ -565,9 +585,17 @@ function UseCasesSection() {
               <p className={styles.useCaseQuote}>"{item.quote}"</p>
               <div className={styles.useCaseMore}>{t.seeMore}</div>
             </div>
-          </Link>
-        ))}
+          </LinkEl>
+          );
+        })}
       </div>
+      {t.seeAllHref && (
+        <div className={styles.useCasesFooter}>
+          <a href={t.seeAllHref} className={styles.useCasesFooterLink}>
+            {t.seeAll}
+          </a>
+        </div>
+      )}
     </section>
   );
 }

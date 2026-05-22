@@ -1,0 +1,241 @@
+---
+title: "CLI 命令参考"
+description: "PilotDeck 命令行工具完整参考"
+icon: "terminal"
+---
+
+# CLI 命令参考
+
+PilotDeck 提供 `pilotdeck` 命令行工具，支持多种运行模式和子命令。
+
+## 全局入口
+
+```bash
+pilotdeck [command] [options]
+```
+
+如果不指定子命令，默认进入 **CLI Channel** 模式，直接将参数作为用户输入发送给 Agent。
+
+## 命令总览
+
+| 命令 | 说明 | 需要 Server |
+|------|------|:-----------:|
+| `pilotdeck "<message>"` | CLI 单次交互 | 否 |
+| `pilotdeck server` | 启动 Gateway 常驻服务 | — |
+| `pilotdeck tui` | 进入交互式终端 UI | 否 |
+| `pilotdeck cron list` | 列出定时任务 | 是 |
+| `pilotdeck cron create` | 创建定时任务 | 是 |
+| `pilotdeck cron delete` | 删除定时任务 | 是 |
+| `pilotdeck cron stop` | 停止运行中的任务 | 是 |
+
+---
+
+## pilotdeck (直接使用)
+
+直接在命令行中与 Agent 进行一次对话：
+
+```bash
+pilotdeck "帮我分析当前项目的目录结构"
+```
+
+行为说明：
+- 自动在当前目录创建 In-Process Gateway
+- 创建临时 CLI Channel 会话
+- 输出 Agent 响应后退出
+
+<Tip>
+CLI 模式适合脚本化和自动化场景。如果需要多轮交互，请使用 `pilotdeck tui`。
+</Tip>
+
+---
+
+## pilotdeck server
+
+启动 Gateway 常驻服务，接受 WebSocket 和 HTTP 连接。
+
+```bash
+pilotdeck server [--port <port>]
+```
+
+### 参数
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--port <port>` | 监听端口 | `18789` |
+
+### 环境变量
+
+| 变量 | 说明 |
+|------|------|
+| `PILOTDECK_GATEWAY_PORT` | 等效于 `--port`，优先级低于命令行参数 |
+
+### 输出示例
+
+```
+PilotDeck server listening: http://127.0.0.1:18789
+WebSocket: ws://127.0.0.1:18789/ws
+Token: /Users/me/.pilotdeck/server-token
+```
+
+### 启动时加载的模块
+
+Server 模式下会根据配置自动初始化：
+
+| 模块 | 条件 |
+|------|------|
+| Gateway + SessionRouter | 始终加载 |
+| Web UI 静态资源 | 始终加载（从 `ui/dist`） |
+| Always-On Manager | `alwaysOn.enabled: true` |
+| Cron Runtime | `cron` 段存在 |
+| Feishu Channel | 始终加载 |
+
+### 信号处理
+
+| 信号 | 行为 |
+|------|------|
+| `SIGINT` (Ctrl+C) | 优雅关闭：停止 Always-On、Cron，销毁 Gateway |
+| `SIGTERM` | 同 SIGINT |
+
+---
+
+## pilotdeck tui
+
+进入交互式终端 UI (基于 Ink/React)。
+
+```bash
+pilotdeck tui
+```
+
+### 要求
+
+- 必须在交互式终端（TTY）中运行
+- 非 TTY 环境会报错退出
+
+### 行为
+
+1. 加载项目配置
+2. 尝试创建本地 Gateway
+3. 如果本地 Gateway 创建失败，尝试连接已运行的 Server
+4. 启动 TUI 渲染循环
+
+### 连接逻辑
+
+```
+尝试创建 In-Process Gateway
+        │
+        ├── 成功 → 使用本地 Gateway
+        │
+        └── 失败 → 探测 http://127.0.0.1:<port>
+                     │
+                     ├── 有运行中的 Server → 连接远端 Gateway
+                     │
+                     └── 没有 → 使用 Fallback Gateway（有限功能）
+```
+
+---
+
+## pilotdeck cron
+
+管理定时任务。所有 cron 子命令都需要连接到运行中的 `pilotdeck server`。
+
+### pilotdeck cron list
+
+列出所有定时任务。
+
+```bash
+pilotdeck cron list [--history] [--limit <n>]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `--history` | 包含历史执行记录 |
+| `--limit <n>` | 限制返回条数 |
+
+### pilotdeck cron create
+
+创建新的定时任务。
+
+```bash
+pilotdeck cron create \
+  --session <sessionKey> \
+  --message <text> \
+  [--once <iso-datetime> | --cron <expression>] \
+  [--channel <channelKey>] \
+  [--project <projectKey>] \
+  [--timezone <tz>]
+```
+
+| 参数 | 必填 | 说明 |
+|------|:----:|------|
+| `--session` | ✅ | 目标会话的 sessionKey |
+| `--message` | ✅ | 要执行的消息内容 |
+| `--once` | ✅* | 一次性执行的 ISO 时间 |
+| `--cron` | ✅* | Cron 表达式（周期执行） |
+| `--channel` | ❌ | Channel Key，默认从 sessionKey 推断 |
+| `--project` | ❌ | 项目路径，默认为当前目录 |
+| `--timezone` | ❌ | 时区 |
+
+<Note>
+`--once` 和 `--cron` 必须二选一。
+</Note>
+
+**示例：**
+
+```bash
+# 每周一上午 9 点运行测试
+pilotdeck cron create \
+  --session "cli:project=/Users/me/app:s_main" \
+  --message "运行所有测试并报告失败的用例" \
+  --cron "0 9 * * 1"
+
+# 明天下午 3 点执行一次
+pilotdeck cron create \
+  --session "cli:project=/Users/me/app:s_main" \
+  --message "生成本周代码审查报告" \
+  --once "2025-06-01T15:00:00+08:00"
+```
+
+### pilotdeck cron delete
+
+删除定时任务。
+
+```bash
+pilotdeck cron delete <taskId> [--stop-running]
+```
+
+| 参数 | 说明 |
+|------|------|
+| `<taskId>` | 任务 ID（位置参数或 `--task` 指定） |
+| `--stop-running` | 同时停止正在执行的实例 |
+
+### pilotdeck cron stop
+
+停止运行中的任务实例。
+
+```bash
+# 通过 taskId 停止
+pilotdeck cron stop <taskId>
+
+# 通过 runId 停止
+pilotdeck cron stop --run <runId>
+```
+
+---
+
+## 环境变量参考
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `PILOT_HOME` | PilotHome 目录 | `~/.pilotdeck` |
+| `PILOT_AGENT_MODEL` | 覆盖 `agent.model` 配置 | — |
+| `PILOTDECK_GATEWAY_PORT` | Server 监听端口 | `18789` |
+| `PILOTDECK_CONFIG_PATH` | 配置文件路径覆盖 | — |
+| `ANTHROPIC_API_KEY` | Anthropic API Key | — |
+| `OPENAI_API_KEY` | OpenAI API Key | — |
+
+## 退出码
+
+| 退出码 | 说明 |
+|--------|------|
+| `0` | 正常完成 |
+| `1` | 错误退出（参数错误、配置错误、运行时错误等） |

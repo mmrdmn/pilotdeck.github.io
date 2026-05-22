@@ -1,0 +1,143 @@
+---
+title: "WorkSpace"
+description: "One deck per project: dedicated files, memory, and skills"
+icon: "cubes"
+---
+
+# WorkSpace
+
+**PilotDeck starts from the WorkSpace. Every other capability grows around it.**
+
+A WorkSpace is the complete operating deck for one project. It includes:
+
+- **Dedicated file scope:** the folders the agent can access and modify are clearly bounded, and generated files remain attributable to that project
+- **Dedicated memory:** Project Memory records goals and progress, while Feedback Memory records your preferences and requirements without leaking across decks
+- **Dedicated skills:** skills can be installed into the right WorkSpace and grow with the work
+
+Without WorkSpace isolation, multiple tasks share one context, memory becomes globally polluted, and cost attribution is unclear. With WorkSpace isolation, projects can run in parallel, retrieval stays focused, and memory can still be migrated intentionally when needed.
+
+## WorkSpace Concept
+
+Each WorkSpace is identified by a **project root directory**. When you run PilotDeck from a directory, that directory becomes the current WorkSpace.
+
+```bash
+# Use WorkSpace A
+cd ~/projects/my-web-app
+pilotdeck "Refactor this component"
+
+# Use WorkSpace B, with independent sessions and memory
+cd ~/projects/my-api-server
+pilotdeck "Optimize database queries"
+```
+
+## WorkSpace ID Generation
+
+The absolute project root path is normalized into a readable WorkSpace ID:
+
+```
+/Users/me/projects/my-web-app
+→ project id: Users-me-projects-my-web-app
+```
+
+Rules:
+- Replace `/`, spaces, colons, and other special characters with `-`
+- Keep the ID readable instead of hashing it
+- Generate the same ID for the same directory every time
+
+<Info>
+**Git worktree support:** if you use Git worktrees, PilotDeck detects them and resolves multiple worktrees back to the same main repository WorkSpace ID, sharing session history and memory.
+</Info>
+
+## Data Storage
+
+Each WorkSpace stores data under a dedicated directory inside `PilotHome`:
+
+```
+~/.pilotdeck/
+├── projects/
+│   ├── Users-me-projects-my-web-app/
+│   │   └── chats/               # All sessions in this WorkSpace
+│   │       ├── web:s_abc123/    # Web channel session
+│   │       │   ├── transcript.jsonl
+│   │       │   └── metadata.json
+│   │       └── cli:s_def456/    # CLI channel session
+│   │           ├── transcript.jsonl
+│   │           └── metadata.json
+│   └── Users-me-projects-my-api/
+│       └── chats/
+└── memory/                       # Global memory across WorkSpaces
+```
+
+## Session Management
+
+### Session Lifecycle
+
+```
+new → active → idle → closed
+```
+
+- **new:** created through `newSession`
+- **active:** a turn is currently running
+- **idle:** no active work, but the session can still be resumed
+- **closed:** explicitly closed through `closeSession`
+
+### Resume a Session
+
+PilotDeck can resume historical sessions and rebuild the conversation context:
+
+```bash
+# In the Web UI, use the sidebar session list to resume a session
+
+# Gateway API
+resumeSession({ sessionKey: "web:project=/Users/me/app:s_abc123" })
+```
+
+When resuming, the system:
+1. Reads the `transcript.jsonl` file from disk
+2. Replays the conversation history to rebuild the agent context
+3. Finds the latest compaction boundary to reduce token cost
+
+### Transcript
+
+Each session persists the full conversation as JSONL:
+
+| Record type | Description |
+|-------------|-------------|
+| `accepted_input` | User input |
+| `message` | Agent message, including text and tool calls |
+| `turn_result` | Turn completion event |
+| `control_boundary` | Control boundary such as compaction markers |
+| `subagent_started` | Subagent start event |
+| `subagent_completed` | Subagent completion event |
+
+## WorkSpace-Level Configuration
+
+PilotDeck reserves a WorkSpace-level configuration layout:
+
+```
+<project-root>/.pilotdeck/
+├── pilotdeck.yaml    # WorkSpace-level config, planned
+├── plugins/          # WorkSpace-level plugins
+└── skills/           # WorkSpace-level skills
+```
+
+<Note>
+In the current version, WorkSpace-level YAML config is reserved. Runtime config is managed through the global `~/.pilotdeck/pilotdeck.yaml`. WorkSpace-level plugin and skill directories are already usable.
+</Note>
+
+## Multiple WorkSpaces
+
+Use the Gateway API to list known WorkSpaces:
+
+```typescript
+// List all WorkSpaces
+const { projects } = await gateway.listProjects();
+
+// Inspect one WorkSpace
+const project = await gateway.describeProject({
+  projectKey: "/Users/me/projects/my-web-app"
+});
+// Returns: { projectKey, name, fullPath, sessionCount }
+```
+
+In the Web UI, the left panel shows WorkSpaces and their sessions, so you can switch quickly.

@@ -1,0 +1,180 @@
+---
+title: "Web Install & Quick Start"
+description: "Install PilotDeck with one script and use it in your browser"
+icon: "globe"
+---
+
+# Web Install & Quick Start
+
+PilotDeck provides a one-line install script that checks dependencies, pulls the code, builds the project, and starts the service.
+
+## Requirements
+
+<CardGroup cols={3}>
+  <Card title="Operating System" icon="apple">
+    macOS only for now
+  </Card>
+  <Card title="Node.js" icon="node-js">
+    v18 or later
+  </Card>
+  <Card title="Git" icon="git-alt">
+    Available from the command line
+  </Card>
+</CardGroup>
+
+## One-Line Install
+
+Open a terminal and run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Gucc111/PilotDeck/main/install.sh | bash
+```
+
+<Tip>
+If Node.js is not installed, the script attempts to install Node.js 22 through fnm (Fast Node Manager).
+</Tip>
+
+The install script will:
+
+<Steps>
+  <Step title="Check the environment">
+    Verify macOS, Node.js version (>=18), and Git availability
+  </Step>
+  <Step title="Clone the repository">
+    Clone PilotDeck into `~/.pilotdeck/app`
+  </Step>
+  <Step title="Install dependencies and build">
+    Install npm dependencies and build the Gateway backend and Web UI frontend
+  </Step>
+  <Step title="Create the CLI command">
+    Link the `pilotdeck` command into `/usr/local/bin` or `~/.local/bin`
+  </Step>
+  <Step title="Start the service">
+    Start PilotDeck so it can be opened from a browser
+  </Step>
+</Steps>
+
+## Manual Install
+
+If you want more control, install manually:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Gucc111/PilotDeck.git ~/.pilotdeck/app
+cd ~/.pilotdeck/app
+
+# 2. Install dependencies and build the backend
+npm install
+npm run build
+
+# 3. Install and build the Web UI
+cd ui
+npm install
+npm run build
+cd ..
+
+# 4. Start the service
+npm run server
+```
+
+## Configure an API Key
+
+Before starting PilotDeck, configure at least one model provider API key. Edit the config file:
+
+```bash
+# Config file location
+vim ~/.pilotdeck/pilotdeck.yaml
+```
+
+Minimal configuration:
+
+```yaml pilotdeck.yaml
+schemaVersion: 1
+
+agent:
+  model: anthropic-main/claude-sonnet-4-5
+
+model:
+  providers:
+    anthropic-main:
+      protocol: anthropic
+      url: https://api.anthropic.com
+      apiKey: ${ANTHROPIC_API_KEY}
+      models:
+        claude-sonnet-4-5:
+          displayName: Claude Sonnet 4.5
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            maxContextTokens: 200000
+            maxOutputTokens: 8192
+```
+
+Then set the environment variable:
+
+```bash
+export ANTHROPIC_API_KEY="your-api-key-here"
+```
+
+<Tip>
+Add the API key to your shell profile, such as `~/.zshrc`, so you do not need to export it every time.
+</Tip>
+
+## Start the Service
+
+```bash
+# Start the Gateway service on the default port 18789
+pilotdeck server
+
+# Or choose a custom port
+pilotdeck server --port 8080
+```
+
+When startup succeeds, you will see:
+
+```
+PilotDeck server listening: http://127.0.0.1:18789
+WebSocket: ws://127.0.0.1:18789/ws
+```
+
+Open `http://127.0.0.1:18789` in your browser to use the Web UI.
+
+## Use CLI / TUI
+
+You can also use PilotDeck directly from the terminal:
+
+```bash
+# CLI mode: ask a single question
+pilotdeck "Analyze the structure of the current project"
+
+# TUI mode: interactive terminal UI
+pilotdeck tui
+```
+
+## File Layout
+
+After installation, files are arranged as follows:
+
+```
+~/.pilotdeck/
+├── app/                    # PilotDeck source and build artifacts
+├── pilotdeck.yaml          # Global config file
+├── server-token             # Gateway auth token
+├── memory/                  # Long-term memory data
+├── projects/                # Session records grouped by WorkSpace
+│   └── <project-id>/
+│       └── chats/
+├── plugins/                 # Global plugin directory
+└── skills/                  # Global skill directory
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Learn Gateway" icon="tower-broadcast" href="/docs/en/features/gateway">
+    Understand how the message gateway works
+  </Card>
+  <Card title="Configure Router" icon="route" href="/docs/en/features/router">
+    Set up model routing to reduce cost
+  </Card>
+</CardGroup>

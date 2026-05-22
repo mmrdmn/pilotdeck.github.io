@@ -1,0 +1,172 @@
+---
+title: "Router"
+description: "Intelligent model routing that reduces cost and improves availability with TokenSaver and Fallback"
+icon: "route"
+---
+
+# Router
+
+Router is PilotDeck's intelligent model routing engine. It chooses the most appropriate and cost-effective model based on task complexity, while providing multi-provider fallback to keep the service available.
+
+## Core Capabilities
+
+<CardGroup cols={2}>
+  <Card title="TokenSaver Tiering" icon="piggy-bank">
+    Analyze request complexity and automatically choose the right model tier
+  </Card>
+  <Card title="Fallback Chain" icon="shield-halved">
+    Switch to backup providers when the primary provider is unavailable
+  </Card>
+  <Card title="Scenario Routing" icon="code-branch">
+    Apply different routing policies for main agents and subagents
+  </Card>
+  <Card title="Custom Router" icon="puzzle-piece">
+    Plug in your own routing logic through custom router extensions
+  </Card>
+</CardGroup>
+
+## Decision Flow
+
+```
+User request
+    │
+    ▼
+┌─────────────────────────┐
+│  1. Custom Router       │ ← if configured
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│  2. Scenario Decision   │ ← explicit/default/subagent
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│  3. TokenSaver Tiering  │ ← choose model tier by complexity
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│  4. Session Sticky      │ ← keep model stable in a session
+└───────────┬─────────────┘
+            │
+            ▼
+     RouterDecision
+  { provider, model, tier }
+```
+
+## TokenSaver
+
+TokenSaver is Router's primary cost-saving capability. It classifies user requests into model tiers.
+
+### How It Works
+
+1. **Judge:** use a lightweight judge model to classify request complexity
+2. **Tier match:** choose the model tier based on the classification
+3. **Sticky binding:** keep later requests in the same session on the same tier unless explicitly changed
+
+### Example Tiers
+
+| Tier | Use case | Example model |
+|------|----------|---------------|
+| high | Architecture design, multi-file refactors | Claude Sonnet 4.5 |
+| medium | Normal coding and bug fixes | Claude Sonnet |
+| low | Simple Q&A and file reading | Claude Haiku |
+
+### Configure TokenSaver
+
+```yaml pilotdeck.yaml
+router:
+  tokenSaver:
+    enabled: true
+    subagent:
+      policy: judge    # skip | judge | always-low
+    tiers:
+      high:
+        provider: anthropic-main
+        model: claude-sonnet-4-5
+      medium:
+        provider: anthropic-main
+        model: claude-sonnet-4-20250514
+      low:
+        provider: anthropic-main
+        model: claude-haiku
+```
+
+## Fallback Chain
+
+When the primary provider returns an error such as timeout, rate limit, server error, or network error, Router switches to the next provider in the fallback chain.
+
+```yaml pilotdeck.yaml
+router:
+  fallback:
+    default:
+      - provider: openai-backup
+        model: gpt-4o
+      - provider: deepseek-backup
+        model: deepseek-chat
+```
+
+## Retry Strategies
+
+<Tabs>
+  <Tab title="Transient Retry">
+    Retry transient errors on the same provider with exponential backoff:
+
+    ```yaml
+    router:
+      transientRetry:
+        enabled: true
+        maxAttempts: 5
+        baseDelayMs: 1000
+        maxDelayMs: 30000
+    ```
+  </Tab>
+  <Tab title="Zero Usage Retry">
+    Retry when the provider returns an empty response:
+
+    ```yaml
+    router:
+      zeroUsageRetry:
+        enabled: true
+        maxAttempts: 5
+    ```
+  </Tab>
+</Tabs>
+
+## Scenario Routing
+
+| Scenario | Description |
+|----------|-------------|
+| `default` | Default flow using `agent.model` |
+| `explicit` | A user or system explicitly selects the model |
+| `subagent` | Subagent calls that may use a dedicated routing policy |
+
+Subagent behavior is controlled by `tokenSaver.subagent.policy`:
+
+- `skip`: bypass TokenSaver and use the default model
+- `judge`: classify subagent requests with the judge model
+- `always-low`: always use the lowest tier for subagents
+
+## Auto-Orchestrate
+
+When TokenSaver is enabled, Router can optimize the system prompt and tool list for lower-tier models:
+
+```yaml pilotdeck.yaml
+router:
+  autoOrchestrate:
+    enabled: true
+    skillExtensionId: "my-skill-extension"
+    subagentMaxTokens: 50000
+```
+
+## Stats and Events
+
+Router records model choices and token usage:
+
+```typescript
+const stats = router.stats;
+// Includes: sessionId, provider, model, tier, role, usage, timestamps
+```
+
+It also emits events such as `pilotdeck_router_decision`, `pilotdeck_router_fallback`, `pilotdeck_router_zero_usage_retry`, and `pilotdeck_router_execute_failed` for monitoring and debugging.

@@ -77,17 +77,31 @@ export default function MegaMenu({ label, labelZh, items, position, to: triggerT
             <div key={idx} className={styles.menuColumn}>
               {column.title && <div className={styles.columnTitle}>{column.title}</div>}
               <ul className={styles.menuList}>
-                {column.items.map((item, itemIdx) => (
-                  <li key={itemIdx} className={styles.menuItem}>
-                    <Link
-                      to={item.to || item.href}
-                      className={styles.menuLink}
-                      target={item.target}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
+                {column.items.map((item, itemIdx) => {
+                  const url = item.to || item.href;
+                  // Static-folder URLs (e.g. /showcase/ microsite) bypass
+                  // Docusaurus' router link check and render as plain anchors.
+                  const isRawHref =
+                    !!url && (item.href !== undefined || url.startsWith('/showcase'));
+                  return (
+                    <li key={itemIdx} className={styles.menuItem}>
+                      {isRawHref ? (
+                        <a
+                          href={url}
+                          className={styles.menuLink}
+                          target={item.target}
+                          rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link to={url} className={styles.menuLink} target={item.target}>
+                          {item.label}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

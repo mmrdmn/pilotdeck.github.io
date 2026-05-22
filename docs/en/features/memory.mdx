@@ -1,0 +1,145 @@
+---
+title: "Memory"
+description: "PilotDeck-based long-term memory across sessions"
+icon: "brain"
+---
+
+# Memory
+
+PilotDeck includes a **PilotDeck Memory Core** long-term memory system. It captures important knowledge from conversations, retrieves relevant context in new sessions, and injects it into prompts so your agent can remember the WorkSpace.
+
+## Core Capabilities
+
+<CardGroup cols={2}>
+  <Card title="Automatic Capture" icon="camera">
+    Extract important information after each conversation turn and store it as memory
+  </Card>
+  <Card title="Smart Retrieval" icon="magnifying-glass">
+    Retrieve relevant context when a new session or turn starts
+  </Card>
+  <Card title="WorkSpace-Aware" icon="folder">
+    Rank memory with the current WorkSpace context in mind
+  </Card>
+  <Card title="Cross-Session" icon="arrows-turn-right">
+    Carry knowledge from earlier sessions into future conversations
+  </Card>
+</CardGroup>
+
+## How It Works
+
+Memory has two stages: **Capture** and **Retrieve**.
+
+```
+                    ┌────────────────────────┐
+  End of each turn ─▶│   Capture              │
+                    │  Extract knowledge      │
+                    │  Add session/timestamp  │
+                    └───────────┬────────────┘
+                                │
+                                ▼
+                    ┌────────────────────────┐
+                    │   PilotDeck Memory     │
+                    │   Persistent storage   │
+                    │   ~/.pilotdeck/memory  │
+                    └───────────┬────────────┘
+                                │
+                                ▲
+  New session/turn ────────────▶│
+                    ┌───────────┴────────────┐
+                    │   Retrieve             │
+                    │  Search by query        │
+                    │  Inject System Context  │
+                    └────────────────────────┘
+```
+
+### Capture
+
+After each turn, Memory:
+1. Converts conversation messages into standardized `ContextMemoryMessage` values
+2. Calls `captureTurn` in PilotDeck Memory to extract knowledge
+3. Stores the result with `sessionKey` and timestamp metadata
+
+### Retrieve
+
+At the start of a new session or turn, Memory:
+1. Builds a query from the latest user message and recent context
+2. Calls `retrieveContext` in PilotDeck Memory
+3. Injects the retrieved result as `systemContext`
+
+## Retrieval Modes
+
+<Tabs>
+  <Tab title="Auto mode (default)">
+    The system decides whether retrieval is needed:
+
+    ```yaml
+    memory:
+      retrievalMode: auto
+    ```
+  </Tab>
+  <Tab title="Explicit mode">
+    Retrieval only happens when the user explicitly asks, such as "remember what we discussed earlier":
+
+    ```yaml
+    memory:
+      retrievalMode: explicit
+    ```
+  </Tab>
+</Tabs>
+
+## Configuration
+
+```yaml pilotdeck.yaml
+memory:
+  enabled: true
+  rootDir: ~/.pilotdeck/memory  # optional, defaults to PilotHome/memory
+  retrievalMode: auto           # auto | explicit
+```
+
+Memory data is stored in `~/.pilotdeck/memory` by default.
+
+## Integration with Context
+
+Memory is part of PilotDeck's Context system. Context manages the full prompt context for each request:
+
+| Component | Responsibility |
+|-----------|----------------|
+| **PromptAssembler** | Build the System Prompt from instructions, skills, memory, and tools |
+| **MessageProjector** | Project conversation history and control context size |
+| **TokenBudgetManager** | Track token budget and avoid context overflow |
+| **CompactionEngine** | Compress old messages when context grows too long |
+| **MemoryResolver** | Retrieve long-term memory from PilotDeck Memory and inject it into context |
+
+### Memory Position in Context
+
+```
+System Prompt
+├── Core instructions
+├── Project instructions
+├── Skills context
+├── Memory context ← injected by MemoryResolver
+└── Tool descriptions
+```
+
+## Attachment Mechanism
+
+Memory retrieval results are converted by **MemoryAttachmentBuilder** into the same attachment structure used by files, images, and other context attachments:
+
+```typescript
+{
+  systemContext: "Based on previous discussions, this project uses React 18 + TypeScript...",
+  diagnostics: [],
+  metadata: { trace: ..., debug: ... }
+}
+```
+
+## Diagnostics
+
+| Diagnostic code | Description |
+|-----------------|-------------|
+| `memory_context_empty` | No relevant memory found, info level |
+| `memory_provider_error` | PilotDeck Memory service error, warning level |
+
+<Tip>
+If Memory quality is poor, inspect `~/.pilotdeck/memory` and verify capture is working.
+</Tip>

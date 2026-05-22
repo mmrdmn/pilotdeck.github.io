@@ -1,0 +1,226 @@
+---
+title: "配置文件参考"
+description: "pilotdeck.yaml 完整字段说明"
+icon: "file-code"
+---
+
+# 配置文件参考
+
+PilotDeck 的配置文件位于 `~/.pilotdeck/pilotdeck.yaml`，采用 YAML 格式。
+
+## 完整 Schema
+
+```yaml
+# ── 版本 ────────────────────────────────
+schemaVersion: 1                    # 必填，当前仅支持 1
+
+# ── Agent 默认模型 ──────────────────────
+agent:
+  model: <provider-id>/<model-id>   # 必填，格式: provider/model
+
+# ── Model Provider 定义 ────────────────
+model:
+  providers:
+    <provider-id>:                  # provider 唯一标识
+      protocol: anthropic | openai  # 必填
+      url: <string>                 # 必填，API 端点 URL
+      apiKey: <string>              # 必填，支持 ${ENV} 引用
+      timeoutMs: <number>           # 可选，请求超时（毫秒）
+      headers:                      # 可选，额外 HTTP 头
+        <key>: <value>
+      models:
+        <model-id>:                 # model 唯一标识
+          displayName: <string>     # 可选，显示名称
+          capabilities:             # 可选，模型能力声明
+            supportsToolUse: <bool>
+            supportsStreaming: <bool>
+            supportsParallelToolCalls: <bool>
+            supportsThinking: <bool>
+            supportsJsonSchema: <bool>
+            supportsPromptCache: <bool>
+            maxContextTokens: <number>
+            maxOutputTokens: <number>
+          multimodal:               # 可选，多模态约束
+            input: [text, image, pdf]
+            maxImagesPerRequest: <number>
+            supportedImageMimeTypes:
+              - <mime-type>
+
+# ── Router 路由配置 ─────────────────────
+router:
+  scenarios:
+    default:                        # 默认场景模型
+      provider: <provider-id>
+      model: <model-id>
+  tokenSaver:
+    enabled: <bool>
+    subagent:
+      policy: skip | judge | always-low
+    tiers:
+      <tier-name>:
+        provider: <provider-id>
+        model: <model-id>
+  fallback:
+    default:
+      - provider: <provider-id>
+        model: <model-id>
+  zeroUsageRetry:
+    enabled: <bool>
+    maxAttempts: <number>
+  transientRetry:
+    enabled: <bool>
+    maxAttempts: <number>
+    baseDelayMs: <number>
+    maxDelayMs: <number>
+  autoOrchestrate:
+    enabled: <bool>
+    skillExtensionId: <string>
+    subagentMaxTokens: <number>
+    mainAgentModel:
+      provider: <provider-id>
+      model: <model-id>
+  customRouter:
+    extensionId: <string>
+  stats:
+    # Token 统计配置
+
+# ── Gateway 配置 ────────────────────────
+gateway:
+  port: <number>                    # 可选，默认 18789
+
+# ── Memory 配置 ─────────────────────────
+memory:
+  enabled: <bool>
+  rootDir: <string>                 # 可选，默认 ~/.pilotdeck/memory
+  retrievalMode: auto | explicit
+
+# ── Always-On 配置 ──────────────────────
+alwaysOn:
+  enabled: <bool>
+  trigger:
+    cooldownMinutes: <number>
+    dailyBudget: <number>
+    schedule:
+      startHour: <number>
+      endHour: <number>
+  execution:
+    maxTokens: <number>
+  workspace:
+    strategy: git-worktree | snapshot-copy
+  dormancy:
+    idleMinutes: <number>
+
+# ── Cron 配置 ───────────────────────────
+cron:
+  enabled: <bool>
+  maxConcurrent: <number>
+  historyRetentionDays: <number>
+
+# ── Extension 配置 ──────────────────────
+extension:
+  # 插件和技能配置
+
+# ── Adapters 配置 ───────────────────────
+adapters:
+  # Channel 适配器配置
+```
+
+## 最小可用配置
+
+以下是一个能正常启动 PilotDeck 的最小配置：
+
+```yaml
+schemaVersion: 1
+
+agent:
+  model: anthropic-main/claude-sonnet-4-5
+
+model:
+  providers:
+    anthropic-main:
+      protocol: anthropic
+      url: https://api.anthropic.com
+      apiKey: ${ANTHROPIC_API_KEY}
+      models:
+        claude-sonnet-4-5:
+          displayName: Claude Sonnet 4.5
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+```
+
+## 多 Provider 配置示例
+
+```yaml
+schemaVersion: 1
+
+agent:
+  model: anthropic-main/claude-sonnet-4-5
+
+model:
+  providers:
+    anthropic-main:
+      protocol: anthropic
+      url: https://api.anthropic.com
+      apiKey: ${ANTHROPIC_API_KEY}
+      timeoutMs: 120000
+      models:
+        claude-sonnet-4-5:
+          displayName: Claude Sonnet 4.5
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            supportsThinking: true
+            maxContextTokens: 200000
+            maxOutputTokens: 8192
+        claude-haiku:
+          displayName: Claude Haiku
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            maxContextTokens: 200000
+            maxOutputTokens: 4096
+
+    openai-backup:
+      protocol: openai
+      url: https://api.openai.com/v1
+      apiKey: ${OPENAI_API_KEY}
+      models:
+        gpt-4o:
+          displayName: GPT-4o
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            maxContextTokens: 128000
+            maxOutputTokens: 4096
+
+router:
+  tokenSaver:
+    enabled: true
+    tiers:
+      high:
+        provider: anthropic-main
+        model: claude-sonnet-4-5
+      low:
+        provider: anthropic-main
+        model: claude-haiku
+  fallback:
+    default:
+      - provider: openai-backup
+        model: gpt-4o
+```
+
+## 合并规则
+
+| 类型 | 规则 |
+|------|------|
+| Map（对象） | 按 key 深度合并 |
+| Scalar（标量） | 高优先级覆盖低优先级 |
+| Array（数组） | **整体替换**，不做去重拼接 |
+| `null` | 按普通值覆盖 |
+
+## 已废弃字段
+
+| 字段 | 替代方案 | 当前行为 |
+|------|----------|----------|
+| `agent.fallbackModel` | `router.fallback.default` | Warning + 忽略 |

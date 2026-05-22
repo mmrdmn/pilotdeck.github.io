@@ -1,0 +1,143 @@
+---
+title: "WorkSpace 工作舱"
+description: "每个项目一个舱——专属文件、专属记忆、专属技能"
+icon: "cubes"
+---
+
+# WorkSpace 工作舱
+
+**PilotDeck 的架构从 WorkSpace 开始，所有其他能力都围绕 WorkSpace 生长。**
+
+一个 WorkSpace = 一个项目的完整操作舱，包含：
+
+- **专属文件系统**：可访问、操作的文件夹范围清晰划定，AI 生成的文件自动标识区分
+- **专属记忆**：Project Memory 记录项目目标和进度，Feedback Memory 记录你的偏好和要求——不同舱之间互不污染
+- **专属技能**：Skill 应用商店一键安装到对应 WorkSpace，随任务增长自动沉淀能力
+
+没有 WorkSpace 隔离：多任务混居一个上下文，记忆全局污染，成本无法归因。有了 WorkSpace：多项目并行无扰，检索空间有限、精度不降，记忆可跨舱迁移。
+
+## WorkSpace 概念
+
+每个 WorkSpace 由一个 **项目根目录** 标识。当你在某个目录下运行 PilotDeck 时，该目录会自动成为当前 WorkSpace。
+
+```bash
+# 在 WorkSpace A 中使用
+cd ~/projects/my-web-app
+pilotdeck "帮我重构这个组件"
+
+# 在 WorkSpace B 中使用（会话和记忆完全独立）
+cd ~/projects/my-api-server
+pilotdeck "优化数据库查询"
+```
+
+## WorkSpace ID 生成
+
+项目根目录的绝对路径会被规范化为一个可读的 WorkSpace ID：
+
+```
+/Users/me/projects/my-web-app
+→ project id: Users-me-projects-my-web-app
+```
+
+规则：
+- 将路径中的 `/`、空格、冒号等特殊字符替换为短横线 `-`
+- 保持可读性，不使用 hash
+- 同一目录始终生成相同的 ID
+
+<Info>
+**Git Worktree 支持：** 如果你使用 Git worktree，PilotDeck 会自动检测并将多个 worktree 解析为同一个主仓库的 WorkSpace ID，共享会话历史和记忆。
+</Info>
+
+## 数据存储结构
+
+每个 WorkSpace 的数据存储在 `PilotHome` 下的独立目录中：
+
+```
+~/.pilotdeck/
+├── projects/
+│   ├── Users-me-projects-my-web-app/
+│   │   └── chats/               # 该 WorkSpace 的所有会话记录
+│   │       ├── web:s_abc123/    # Web 渠道的会话
+│   │       │   ├── transcript.jsonl
+│   │       │   └── metadata.json
+│   │       └── cli:s_def456/    # CLI 渠道的会话
+│   │           ├── transcript.jsonl
+│   │           └── metadata.json
+│   └── Users-me-projects-my-api/
+│       └── chats/
+└── memory/                       # 全局记忆（跨 WorkSpace）
+```
+
+## 会话管理
+
+### 会话生命周期
+
+```
+创建 (new) → 活跃 (active) → 空闲 (idle) → 关闭 (closed)
+```
+
+- **创建**：通过 `newSession` 创建新会话
+- **活跃**：有正在进行的 Turn
+- **空闲**：无活动但仍可恢复
+- **关闭**：通过 `closeSession` 显式关闭
+
+### 会话恢复
+
+PilotDeck 支持恢复历史会话，完整重建对话上下文：
+
+```bash
+# 通过 Web UI 可以在侧边栏看到历史会话列表并点击恢复
+
+# Gateway API
+resumeSession({ sessionKey: "web:project=/Users/me/app:s_abc123" })
+```
+
+恢复时，系统会：
+1. 读取磁盘上的 `transcript.jsonl` 文件
+2. 重放对话历史，重建 Agent 上下文
+3. 找到最近的 Compaction 边界以减少 token 消耗
+
+### Transcript（对话记录）
+
+每个会话的完整对话历史以 JSONL 格式持久化存储：
+
+| 记录类型 | 说明 |
+|----------|------|
+| `accepted_input` | 用户输入 |
+| `message` | Agent 消息（文本、工具调用等） |
+| `turn_result` | Turn 结束事件 |
+| `control_boundary` | 控制边界（Compaction 标记等） |
+| `subagent_started` | 子 Agent 启动 |
+| `subagent_completed` | 子 Agent 完成 |
+
+## WorkSpace 级配置
+
+PilotDeck 支持 WorkSpace 级配置覆盖（预留能力）：
+
+```
+<project-root>/.pilotdeck/
+├── pilotdeck.yaml    # WorkSpace 级配置（规划中）
+├── plugins/          # WorkSpace 级插件
+└── skills/           # WorkSpace 级技能
+```
+
+<Note>
+当前版本中，WorkSpace 级 YAML 配置是预留功能。所有配置通过全局 `~/.pilotdeck/pilotdeck.yaml` 管理。WorkSpace 级插件和技能目录已可使用。
+</Note>
+
+## 多 WorkSpace 概览
+
+通过 Gateway API 可以查看所有已知 WorkSpace：
+
+```typescript
+// 列出所有 WorkSpace
+const { projects } = await gateway.listProjects();
+
+// 查看某个 WorkSpace 详情
+const project = await gateway.describeProject({
+  projectKey: "/Users/me/projects/my-web-app"
+});
+// 返回: { projectKey, name, fullPath, sessionCount }
+```
+
+在 Web UI 中，左侧面板会显示 WorkSpace 列表和每个 WorkSpace 下的会话列表，支持快速切换。

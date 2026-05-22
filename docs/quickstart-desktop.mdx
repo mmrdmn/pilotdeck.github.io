@@ -1,0 +1,75 @@
+---
+title: "桌面安装"
+description: "下载并安装 PilotDeck 桌面应用"
+icon: "desktop"
+---
+
+# 桌面安装
+
+PilotDeck 提供 macOS 原生桌面应用（基于 Electron），支持 Apple Silicon (arm64) 架构。
+
+## 标准安装流程
+
+<Steps>
+  <Step title="下载并打开 DMG">
+    点击下载 <a href="https://github.com/Gucc111/PilotDeck/releases/download/v0.0.4/PilotDeck-0.0.4-arm64.dmg" style={{color: '#2563EB'}}> PilotDeck-0.0.4-arm64.dmg</a>，下载完成后双击打开
+  </Step>
+  <Step title="拖入应用程序">
+    将 `PilotDeck.app` 拖入 `Applications` 文件夹
+  </Step>
+  <Step title="启动">
+    在 Launchpad 或 Finder 中双击 PilotDeck 启动
+  </Step>
+</Steps>
+
+## 通过 IM 软件接收的修复
+
+<Warning>
+如果你通过飞书、微信、QQ 等沙盒 IM 软件收到的 DMG 文件，macOS 14 (Sonoma) 及以上版本会因 `com.apple.provenance` 扩展属性拒绝执行应用——**即使代码签名和公证完全合法**。
+</Warning>
+
+### 方法一：运行修复脚本
+
+```bash
+bash install-pilotdeck.sh
+```
+
+修复脚本会自动：
+1. 找到已安装的 `PilotDeck.app`
+2. 清除 macOS 的隔离/来源扩展属性
+3. 验证代码签名和 Apple 公证
+
+### 方法二：手动修复
+
+```bash
+# 清除扩展属性
+xattr -cr /Applications/PilotDeck.app
+
+# 重新启动
+open /Applications/PilotDeck.app
+```
+
+<Info>
+**技术原因：** macOS Sonoma 引入了 `com.apple.provenance` 扩展属性。沙盒应用（飞书/微信等）下载的文件会被标记该属性，Gatekeeper 会对其执行更严格的策略评估。`xattr -cr` 是安全的——Apple 的 notarize ticket 存储在 `Contents/CodeResources` 文件中，不是扩展属性，不会被误删。
+</Info>
+
+## 配置
+
+桌面应用启动后，会内嵌启动 PilotDeck Gateway 服务。配置文件路径与 Web 版相同：
+
+```
+~/.pilotdeck/pilotdeck.yaml
+```
+
+首次启动时，应用内会引导你完成 API Key 配置。详细配置说明请参考 [配置文件参考](/docs/reference/config-yaml)。
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="Web 安装" icon="globe" href="/docs/quickstart-web">
+    也可以通过 Web 方式使用
+  </Card>
+  <Card title="核心功能" icon="star" href="/docs/features/gateway">
+    了解 PilotDeck 的核心功能
+  </Card>
+</CardGroup>

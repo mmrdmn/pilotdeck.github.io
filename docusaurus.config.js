@@ -31,7 +31,12 @@ const config = {
       'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
-        docs: false,
+        docs: {
+          path: 'docs',
+          routeBasePath: 'docs',
+          sidebarPath: './sidebars.js',
+          editUrl: undefined,
+        },
         blog: false,
         theme: {
           customCss: './src/css/custom.css',
@@ -100,32 +105,62 @@ const config = {
           {
             type: 'custom-megaMenu',
             position: 'left',
-            label: 'Resources',
-            labelZh: '资源',
-            to: '/research',
+            label: 'Docs',
+            labelZh: '文档',
+            to: '/docs/introduction',
             items: [
               {
-                title: 'Docs',
-                titleZh: '文档',
+                title: 'Getting Started',
+                titleZh: '开始使用',
                 items: [
-                  { label: 'Tutorial', labelZh: '教程', href: 'https://github.com/Gucc111/PilotDeck#-installation--quick-start', target: '_blank' },
-                  { label: 'README', labelZh: '项目说明', href: 'https://github.com/Gucc111/PilotDeck', target: '_blank' },
+                  { label: 'Introduction', labelZh: '项目简介', to: '/docs/introduction' },
+                  { label: 'Quick Start (Web)', labelZh: '快速开始 (Web)', to: '/docs/quickstart-web' },
+                  { label: 'Quick Start (Desktop)', labelZh: '桌面版安装', to: '/docs/quickstart-desktop' },
                 ],
               },
               {
-                title: 'Updates',
-                titleZh: '动态',
+                title: 'Core Features',
+                titleZh: '核心功能',
                 items: [
-                  { label: 'Blog', labelZh: '博客', to: '/blog' },
-                  { label: 'Research', labelZh: '研究', to: '/research' },
+                  { label: 'WorkSpace', labelZh: 'WorkSpace 工作舱', to: '/docs/features/projects' },
+                  { label: 'Smart Router', labelZh: '智能路由', to: '/docs/features/router' },
+                  { label: 'Memory', labelZh: '长期记忆', to: '/docs/features/memory' },
+                  { label: 'Always-on', labelZh: '后台常驻', to: '/docs/features/always-on' },
                 ],
               },
               {
-                title: 'About',
-                titleZh: '关于',
+                title: 'Reference',
+                titleZh: '参考',
                 items: [
-                  { label: 'Team', labelZh: '团队', to: '/team' },
-                  { label: 'Demo', labelZh: '演示', to: '/demo' },
+                  { label: 'Architecture', labelZh: '架构说明', to: '/docs/architecture/overview' },
+                  { label: 'CLI', labelZh: 'CLI 命令', to: '/docs/reference/cli' },
+                  { label: 'English Docs', labelZh: '英文文档', to: '/docs/en/introduction' },
+                ],
+              },
+            ],
+          },
+          {
+            type: 'custom-megaMenu',
+            position: 'left',
+            label: 'Showcase',
+            labelZh: '案例广场',
+            to: '/use-cases',
+            items: [
+              {
+                title: 'Featured',
+                titleZh: '精选案例',
+                items: [
+                  { label: 'Open Case Showcase', labelZh: '案例广场首页', href: '/showcase/', target: '_self' },
+                  { label: 'Work Documents', labelZh: '工作文档生成', to: '/docs/showcase/ppt-whitepaper' },
+                  { label: 'Mini Games', labelZh: '小游戏开发', to: '/docs/showcase/mini-game' },
+                ],
+              },
+              {
+                title: 'Engineering',
+                titleZh: '工程化',
+                items: [
+                  { label: 'AI Platform', labelZh: 'AI 工程平台', to: '/docs/showcase/model-training' },
+                  { label: 'Podcast i18n', labelZh: '多语种播客', to: '/docs/showcase/podcast-multilingual' },
                 ],
               },
             ],

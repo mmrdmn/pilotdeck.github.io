@@ -1,0 +1,222 @@
+---
+title: "Always On 后台常驻"
+description: "Discovery 主动发现和 Cron 定时任务让 Agent 持续工作"
+icon: "clock"
+---
+
+# Always On 后台常驻
+
+Always On 让 PilotDeck 不仅仅是一个被动应答的工具，而是一个能主动工作的 Agent 平台。它包含两大能力：
+
+- **Discovery（主动发现）**：在 WorkSpace 空闲时主动扫描代码，发现问题并生成报告
+- **Cron（定时任务）**：按计划自动执行预设的工作
+
+## Discovery 主动发现
+
+Discovery 是 Always On 的核心能力。当 WorkSpace 空闲且满足触发条件时，Agent 会主动分析 WorkSpace，生成 Discovery Plan 和 Report。
+
+### 工作流程
+
+```
+   ┌─────────────────┐
+   │  Discovery Gate  │ ← 检查触发条件
+   │  (冷却/预算/忙碌) │
+   └───────┬─────────┘
+           │ 通过
+           ▼
+   ┌─────────────────┐
+   │ Discovery Plan   │ ← Agent 生成工作计划
+   │ (Markdown 格式)  │
+   └───────┬─────────┘
+           │
+           ▼
+   ┌─────────────────┐
+   │ Execution        │ ← 在独立工作区执行
+   │ (隔离环境)       │
+   └───────┬─────────┘
+           │
+           ▼
+   ┌─────────────────┐
+   │ Discovery Report │ ← 生成发现报告
+   │ (Markdown 格式)  │
+   └─────────────────┘
+```
+
+### 触发条件（Gate）
+
+Discovery 不会随意触发，需要通过以下 Gate 检查：
+
+| Gate | 说明 |
+|------|------|
+| **Cooldown** | 距离上次 Discovery 需经过冷却时间 |
+| **Budget** | 当天的 Discovery 次数未超过预算限制 |
+| **Busy** | 当前 WorkSpace 没有活跃的用户会话 |
+| **Enabled** | 配置中已启用 Always On |
+| **Schedule** | 在配置的允许时间窗口内 |
+
+### Discovery Plan
+
+Discovery Plan 是 Agent 生成的工作计划，以 Markdown 格式存储：
+
+```markdown
+<!-- discovery-plan-metadata: version=1, priority=medium -->
+# Discovery Plan: 代码质量检查
+
+## 目标
+分析项目中的代码质量问题
+
+## 任务
+1. 检查未使用的依赖
+2. 扫描潜在的安全漏洞
+3. 分析代码复杂度热点
+
+## 预估
+- 预计 Token 消耗: ~50k
+- 预计执行时间: 5 分钟
+```
+
+### Discovery Report
+
+执行完成后生成 Report：
+
+```markdown
+<!-- discovery-report-metadata: version=1, status=completed -->
+# Discovery Report: 代码质量检查
+
+## 发现
+1. 3 个未使用的 npm 依赖
+2. `src/utils/auth.ts` 存在硬编码密钥
+3. `src/services/` 目录平均复杂度偏高
+
+## 建议
+- 运行 `npm prune` 清理未使用依赖
+- 将硬编码密钥迁移到环境变量
+- 考虑拆分 UserService 中的复杂方法
+```
+
+### 工作区隔离
+
+Discovery 执行在独立的工作区中进行，支持两种策略：
+
+<Tabs>
+  <Tab title="Git Worktree（推荐）">
+    创建 Git worktree 作为隔离的工作目录，执行完毕后自动清理：
+
+    ```yaml
+    alwaysOn:
+      workspace:
+        strategy: git-worktree
+    ```
+  </Tab>
+  <Tab title="Snapshot Copy">
+    复制 WorkSpace 快照到临时目录：
+
+    ```yaml
+    alwaysOn:
+      workspace:
+        strategy: snapshot-copy
+    ```
+  </Tab>
+</Tabs>
+
+### 配置 Discovery
+
+```yaml pilotdeck.yaml
+alwaysOn:
+  enabled: true
+  trigger:
+    cooldownMinutes: 60          # 冷却时间（分钟）
+    dailyBudget: 5               # 每天最多 Discovery 次数
+    schedule:                     # 允许的时间窗口
+      startHour: 9
+      endHour: 22
+  execution:
+    maxTokens: 100000            # 单次 Discovery 的 Token 上限
+  workspace:
+    strategy: git-worktree
+  dormancy:
+    idleMinutes: 10              # WorkSpace 空闲多久后触发
+```
+
+## Cron 定时任务
+
+Cron 模块提供定时任务能力，支持一次性任务和周期性任务。
+
+### 任务类型
+
+<Tabs>
+  <Tab title="一次性任务">
+    在指定时间执行一次：
+
+    ```bash
+    pilotdeck cron create \
+      --session "cli:project=/Users/me/app:s_main" \
+      --message "运行测试套件并报告结果" \
+      --once "2025-01-15T09:00:00Z"
+    ```
+  </Tab>
+  <Tab title="周期性任务">
+    按 Cron 表达式周期执行：
+
+    ```bash
+    pilotdeck cron create \
+      --session "cli:project=/Users/me/app:s_main" \
+      --message "检查依赖更新并报告" \
+      --cron "0 9 * * 1"     # 每周一上午 9 点
+    ```
+  </Tab>
+</Tabs>
+
+### Cron CLI 命令
+
+```bash
+# 列出所有定时任务
+pilotdeck cron list
+
+# 列出包含历史执行记录的任务
+pilotdeck cron list --history
+
+# 创建定时任务
+pilotdeck cron create \
+  --session <sessionKey> \
+  --message <text> \
+  --cron <expression>
+
+# 删除定时任务
+pilotdeck cron delete <taskId>
+
+# 停止正在执行的任务
+pilotdeck cron stop <taskId>
+pilotdeck cron stop --run <runId>
+```
+
+### Cron 配置
+
+```yaml pilotdeck.yaml
+cron:
+  enabled: true
+  maxConcurrent: 3              # 最大并发任务数
+  historyRetentionDays: 30      # 历史记录保留天数
+```
+
+<Warning>
+Cron 和 Discovery 都需要运行 `pilotdeck server` 常驻进程。CLI 单次执行模式不支持这些功能。
+</Warning>
+
+## 数据存储
+
+Always On 相关数据存储在 WorkSpace 目录下：
+
+```
+~/.pilotdeck/projects/<project-id>/
+├── always-on/
+│   ├── discovery-state.json     # Discovery 状态
+│   ├── plans/                   # Discovery Plan 文件
+│   │   └── <plan-id>.md
+│   ├── reports/                 # Discovery Report 文件
+│   │   └── <report-id>.md
+│   └── run-events/              # 执行事件日志
+└── cron/
+    ├── tasks.json               # 任务列表
+    └── history/                 # 执行历史
+```

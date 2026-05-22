@@ -1,0 +1,171 @@
+---
+title: "Gateway 消息网关"
+description: "统一的多渠道消息网关，连接 CLI、TUI、Web UI、桌面和飞书"
+icon: "tower-broadcast"
+---
+
+# Gateway 消息网关
+
+Gateway 是 PilotDeck 的核心通信枢纽。它提供 WebSocket + HTTP 双协议接口，让所有 Channel（CLI、TUI、Web UI、桌面应用、飞书）通过统一的消息协议与 Agent 会话交互。
+
+## 架构概览
+
+```
+┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
+│  CLI    │  │  TUI    │  │ Web UI  │  │  飞书   │
+│ Channel │  │ Channel │  │ Channel │  │ Channel │
+└────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘
+     │            │            │             │
+     └────────────┴─────┬──────┴─────────────┘
+                        │
+                ┌───────▼───────┐
+                │   Gateway     │
+                │  (WS + HTTP)  │
+                └───────┬───────┘
+                        │
+                ┌───────▼───────┐
+                │ SessionRouter │
+                └───────┬───────┘
+                        │
+           ┌────────────┼────────────┐
+           │            │            │
+     ┌─────▼─────┐ ┌───▼───┐ ┌─────▼─────┐
+     │ Session A │ │ Sess B│ │ Session C │
+     │ (Agent)   │ │(Agent)│ │ (Agent)   │
+     └───────────┘ └───────┘ └───────────┘
+```
+
+## 运行模式
+
+Gateway 支持两种运行模式：
+
+<Tabs>
+  <Tab title="In-Process 模式">
+    Gateway 嵌入在当前进程中运行，适用于 CLI / TUI 单用户场景：
+
+    ```bash
+    # CLI 直接使用（自动创建 in-process gateway）
+    pilotdeck "分析这段代码的性能问题"
+
+    # TUI 模式
+    pilotdeck tui
+    ```
+
+    特点：
+    - 无需单独启动服务
+    - 进程退出后 Gateway 自动销毁
+    - 适合快速单次交互
+  </Tab>
+  <Tab title="Server 模式">
+    Gateway 作为常驻服务运行，多个 Channel 通过 WebSocket 连接：
+
+    ```bash
+    pilotdeck server --port 18789
+    ```
+
+    特点：
+    - 多 Channel 同时连接
+    - 会话持久化
+    - 支持 Always-On 和 Cron 能力
+    - Web UI 和飞书等远端 Channel 必须使用此模式
+  </Tab>
+</Tabs>
+
+## 核心概念
+
+### Session（会话）
+
+Session 是 Agent 的执行上下文，每个 Session 绑定：
+- 一个 `sessionKey`（唯一标识）
+- 一个 WorkSpace 目录 (`projectKey`)
+- 一个 Channel 类型（如 `cli`、`tui`、`web`）
+- 完整的对话历史 (Transcript)
+
+```
+sessionKey 格式: <channel>:project=<path>:s_<uuid>
+示例: web:project=/Users/me/myapp:s_abc123
+```
+
+### Turn（对话轮次）
+
+每次用户输入会触发一个 Turn。Gateway 接收输入后，通过 SessionRouter 分发到对应的 AgentSession，然后以流式事件返回 Agent 的响应。
+
+### 协议事件
+
+Gateway 的 WebSocket 协议定义了以下核心事件类型：
+
+| 事件类型 | 方向 | 说明 |
+|----------|------|------|
+| `submit_turn` | 客户端 → 网关 | 提交用户消息 |
+| `text_delta` | 网关 → 客户端 | Agent 文本流式输出 |
+| `thinking_delta` | 网关 → 客户端 | Agent 思考过程（如适用） |
+| `tool_call_start` | 网关 → 客户端 | 工具调用开始 |
+| `tool_call_end` | 网关 → 客户端 | 工具调用完成 |
+| `turn_complete` | 网关 → 客户端 | 当前轮次结束 |
+| `error` | 网关 → 客户端 | 错误事件 |
+
+### 鉴权
+
+Server 模式下，Gateway 使用 token 文件鉴权：
+
+```bash
+# Token 自动生成并保存在：
+~/.pilotdeck/server-token
+
+# WebSocket 连接时通过 hello 帧传递 token
+# HTTP 请求通过 Authorization header 传递
+```
+
+## 支持的 Channel
+
+<CardGroup cols={2}>
+  <Card title="CLI Channel" icon="terminal">
+    命令行单次交互模式，适合脚本化和自动化场景
+  </Card>
+  <Card title="TUI Channel" icon="rectangle-terminal">
+    基于 Ink 的交互式终端 UI，支持实时流式输出
+  </Card>
+  <Card title="Web Channel" icon="browser">
+    基于 React + Vite 的 Web UI，通过 WebSocket 连接 Gateway
+  </Card>
+  <Card title="Feishu Channel" icon="comments">
+    飞书机器人适配器，支持消息收发和会话管理
+  </Card>
+</CardGroup>
+
+## 启动 Gateway Server
+
+```bash
+# 默认端口 18789
+pilotdeck server
+
+# 自定义端口
+pilotdeck server --port 8080
+
+# 通过环境变量设置端口
+PILOTDECK_GATEWAY_PORT=8080 pilotdeck server
+```
+
+启动后输出：
+
+```
+PilotDeck server listening: http://127.0.0.1:18789
+WebSocket: ws://127.0.0.1:18789/ws
+Token: ~/.pilotdeck/server-token
+```
+
+## API 概览
+
+Gateway 对外暴露以下主要方法：
+
+| 方法 | 说明 |
+|------|------|
+| `submitTurn` | 提交一轮用户输入，返回流式事件 |
+| `abortTurn` | 中止当前正在进行的 Turn |
+| `newSession` | 创建新会话 |
+| `listSessions` | 列出 WorkSpace 下的所有会话 |
+| `resumeSession` | 恢复一个已有会话 |
+| `closeSession` | 关闭会话并释放资源 |
+| `describeServer` | 获取 Gateway 服务状态信息 |
+| `listProjects` | 列出所有已知 WorkSpace |
+| `describeProject` | 获取单个 WorkSpace 的详情 |

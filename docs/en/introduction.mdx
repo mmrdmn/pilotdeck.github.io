@@ -1,0 +1,67 @@
+---
+title: "Project Overview"
+description: "PilotDeck — a WorkSpace-first open-source agent platform for productivity"
+icon: "rocket"
+---
+
+# PilotDeck
+
+PilotDeck is a WorkSpace-first open-source AI agent platform built for productivity.
+
+It is not just another chat-style AI tool. PilotDeck starts from the **WorkSpace**: each project gets its own operating deck, with white-box memory inside the deck, intelligent routing across decks, and Always On automation outside the deck. It turns AI agents from conversation toys into tools that actually move work forward.
+
+## Core Capabilities
+
+<CardGroup cols={3}>
+  <Card title="WorkSpace" icon="cubes" href="/docs/en/features/projects">
+    One deck per project: dedicated files, memory, and skills, with clean isolation across parallel projects
+  </Card>
+  <Card title="Cost-Saving Router" icon="route" href="/docs/en/features/router">
+    TokenSaver tiering plus multi-provider fallback for lower cost and higher availability
+  </Card>
+  <Card title="Long-Term Memory" icon="brain" href="/docs/en/features/memory">
+    Project Memory and Feedback Memory with traceable, white-box behavior
+  </Card>
+  <Card title="Always On" icon="clock" href="/docs/en/features/always-on">
+    Deploy once and let PilotDeck keep moving: Discovery plus Cron-based scheduled work
+  </Card>
+  <Card title="Gateway" icon="tower-broadcast" href="/docs/en/features/gateway">
+    WebSocket and HTTP gateway for CLI, Web, Desktop, and Feishu channels
+  </Card>
+</CardGroup>
+
+## Why PilotDeck?
+
+<AccordionGroup>
+  <Accordion title="Your tasks keep growing, and agents lose track of what they are doing" icon="shuffle">
+    When every task shares the same context, knowledge from project A can pollute decisions in project B. Parallel work often means opening more windows and hoping the agent remembers the right things.
+
+    **PilotDeck's answer: one WorkSpace per project.** WorkSpace isolation lets projects run side by side without interference. If project A has a writing style, project B does not inherit it. If one project burns through tokens, you know where the cost went.
+  </Accordion>
+  <Accordion title="You teach the AI a preference once, and it forgets next time" icon="rotate">
+    Every new project becomes another round of repeated instructions: use shorter sentences, avoid this template, keep a formal tone. Execute, correct, forget, repeat.
+
+    **PilotDeck's answer: memory is scoped around project work.** Feedback Memory keeps your preferences, while Project Memory tracks goals and progress. Both stay visible and scoped to the right WorkSpace.
+  </Accordion>
+  <Accordion title="When you close the computer, the work stops" icon="power-off">
+    A terminal-based agent only works while you keep it open. Want to take a break and let the agent continue? Usually not possible.
+
+    **PilotDeck's answer: deploy it and let it keep pushing.** Always On keeps track of progress, watches costs, and surfaces issues while you are away.
+  </Accordion>
+  <Accordion title="Your token bill grows faster than expected" icon="piggy-bank">
+    Simple questions and complex architecture tasks should not always go through the most expensive model.
+
+    **PilotDeck's answer: intelligent routing saves cost automatically.** Router chooses model tiers by task complexity and uses fallback chains to maintain availability.
+  </Accordion>
+</AccordionGroup>
+
+## Quick Start
+
+<CardGroup cols={2}>
+  <Card title="Web Install" icon="globe" href="/docs/en/quickstart-web">
+    Install with one script and use PilotDeck from your browser
+  </Card>
+  <Card title="Desktop Install" icon="desktop" href="/docs/en/quickstart-desktop">
+    Download the DMG and use the native desktop app
+  </Card>
+</CardGroup>

@@ -1,0 +1,133 @@
+---
+title: "Architecture Overview"
+description: "PilotDeck system architecture and core components"
+icon: "sitemap"
+---
+
+# Architecture Overview
+
+PilotDeck uses a layered modular architecture. Each module has a clear responsibility and public interface.
+
+## System View
+
+```
+                           User Interaction Layer
+┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+│   CLI    │ │   TUI    │ │  Web UI  │ │ Desktop  │ │  Feishu  │
+│ Channel  │ │ Channel  │ │ Channel  │ │(Electron)│ │ Channel  │
+└─────┬────┘ └────┬─────┘ └─────┬────┘ └─────┬────┘ └────┬─────┘
+      │           │             │             │           │
+      └───────────┴──────┬──────┴─────────────┴───────────┘
+                         │
+                    ┌────▼─────┐
+                    │ Gateway  │  ← message gateway
+                    │ (WS/HTTP)│
+                    └────┬─────┘
+                         │
+              ┌──────────▼──────────┐
+              │   SessionRouter     │  ← session routing
+              └──────────┬──────────┘
+                         │
+              ┌──────────▼──────────┐
+              │   AgentSession      │  ← agent execution
+              │   ┌───────────────┐ │
+              │   │  TurnRunner   │ │
+              │   │  ┌──────────┐ │ │
+              │   │  │AgentLoop │ │ │
+              │   │  └──────────┘ │ │
+              │   └───────────────┘ │
+              └──────────┬──────────┘
+                         │
+    ┌────────┬───────────┼──────────┬─────────┐
+    │        │           │          │         │
+┌───▼──┐ ┌──▼───┐ ┌─────▼────┐ ┌──▼───┐ ┌──▼─────┐
+│Router│ │Model │ │ Context  │ │ Tool │ │Session │
+│      │ │      │ │ (Memory) │ │      │ │ Store  │
+└──────┘ └──────┘ └──────────┘ └──────┘ └────────┘
+```
+
+## Module List
+
+| Module | Directory | Responsibility |
+|--------|-----------|----------------|
+| **Adapters** | `src/adapters/` | Channel adapters and Web static mounting |
+| **Agent** | `src/agent/` | AgentSession, TurnRunner, and AgentLoop |
+| **Always-On** | `src/always-on/` | Discovery runtime |
+| **CLI** | `src/cli/` | CLI entry points such as server, tui, and cron |
+| **Context** | `src/context/` | Prompt assembly, projection, budget, compaction, and memory |
+| **Cron** | `src/cron/` | Scheduled task runtime |
+| **Extension** | `src/extension/` | Lifecycle hooks, plugins, and contributions |
+| **Gateway** | `src/gateway/` | In-process and WebSocket Gateway with SessionRouter |
+| **Lifecycle** | `src/lifecycle/` | Lifecycle runtime and hook effects |
+| **MCP** | `src/mcp/` | Model Context Protocol client integration |
+| **Model** | `src/model/` | Canonical model protocol and provider adapters |
+| **Permission** | `src/permission/` | Permission policy and decision runtime |
+| **Pilot** | `src/pilot/` | Path management and config loading |
+| **Router** | `src/router/` | Scenarios, fallback, TokenSaver, custom routers |
+| **Session** | `src/session/` | Transcript persistence, metadata, listing, and restore |
+| **Task** | `src/task/` | Background task management |
+| **Tool** | `src/tool/` | Tool registry, runtime, built-ins, scheduler |
+| **Web** | `src/web/` | Web static resource service |
+
+## Agent Execution Layer
+
+`AgentSession` is the runtime container for a conversation. It manages transcript, context state, tool registry, and model routing.
+
+`TurnRunner` manages one user turn:
+
+```
+User input
+    │
+    ▼
+┌─────────────────┐
+│ Prepare context  │ ← PromptAssembler + MessageProjector + MemoryResolver
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Route model      │ ← Router.decide()
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Execute request  │ ← Router.execute() → ModelRuntime.stream()
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Run tools        │ ← ToolRuntime.execute()
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Stream response  │ ← Gateway → Channel
+└─────────────────┘
+```
+
+`AgentLoop` handles multiple rounds of model tool calls until the model stops calling tools.
+
+## Context Management
+
+Context manages the full window for each request, including core instructions, project instructions, skills, memory, tool definitions, historical message projection, token budgets, and compaction.
+
+## Model Layer
+
+All providers are normalized into PilotDeck's **Canonical Protocol**:
+
+- `CanonicalModelRequest`
+- `CanonicalModelEvent`
+- `CanonicalMessage`
+- `CanonicalUsage`
+
+| Protocol | Provider examples |
+|----------|-------------------|
+| `anthropic` | Anthropic API and compatible proxies |
+| `openai` | OpenAI API, Azure OpenAI, DeepSeek, compatible proxies |
+
+## Tool System
+
+PilotDeck includes built-in tools such as `bash`, `read_file`, `write_file`, `edit_file`, `glob`, `grep`, `web_fetch`, `web_search`, `agent`, `ask_user_question`, `structured_output`, and background task tools.
+
+Tool scheduling supports:
+- **ConcurrentToolScheduler** for independent operations
+- **SequentialToolScheduler** for dependent or write-heavy operations
+
+## Extension System
+
+Extensions add plugins, skills, lifecycle hooks, commands, and MCP server instructions.

@@ -1,0 +1,75 @@
+---
+title: "Desktop Install"
+description: "Download and install the PilotDeck desktop app"
+icon: "desktop"
+---
+
+# Desktop Install
+
+PilotDeck provides a native macOS desktop app based on Electron. The current build supports Apple Silicon (arm64).
+
+## Standard Install
+
+<Steps>
+  <Step title="Download and open the DMG">
+    Download <a href="https://github.com/Gucc111/PilotDeck/releases/download/v0.0.4/PilotDeck-0.0.4-arm64.dmg" style={{color: '#2563EB'}}>PilotDeck-0.0.4-arm64.dmg</a>, then double-click the downloaded file.
+  </Step>
+  <Step title="Move it into Applications">
+    Drag `PilotDeck.app` into the `Applications` folder.
+  </Step>
+  <Step title="Launch">
+    Open PilotDeck from Launchpad or Finder.
+  </Step>
+</Steps>
+
+## Fix for DMG Files Received Through IM Apps
+
+<Warning>
+If you received the DMG file through sandboxed IM apps such as Feishu, WeChat, or QQ, macOS 14 (Sonoma) and later may reject the app because of the `com.apple.provenance` extended attribute, even when the code signature and notarization are valid.
+</Warning>
+
+### Option 1: Run the Fix Script
+
+```bash
+bash install-pilotdeck.sh
+```
+
+The script will:
+1. Find the installed `PilotDeck.app`
+2. Clear macOS quarantine/provenance extended attributes
+3. Verify code signing and Apple notarization
+
+### Option 2: Fix Manually
+
+```bash
+# Clear extended attributes
+xattr -cr /Applications/PilotDeck.app
+
+# Launch again
+open /Applications/PilotDeck.app
+```
+
+<Info>
+**Technical background:** macOS Sonoma introduced the `com.apple.provenance` extended attribute. Files downloaded by sandboxed apps such as Feishu or WeChat may be marked with this attribute, causing Gatekeeper to apply stricter policy checks. `xattr -cr` is safe here: Apple's notarization ticket is stored in `Contents/CodeResources`, not in extended attributes.
+</Info>
+
+## Configuration
+
+After the desktop app starts, it launches the embedded PilotDeck Gateway service. The config path is the same as the Web version:
+
+```
+~/.pilotdeck/pilotdeck.yaml
+```
+
+On first launch, the app guides you through API key setup. For details, see [Config File Reference](/docs/en/reference/config-yaml).
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Web Install" icon="globe" href="/docs/en/quickstart-web">
+    You can also use PilotDeck through the Web flow
+  </Card>
+  <Card title="Core Features" icon="star" href="/docs/en/features/gateway">
+    Learn about PilotDeck's core capabilities
+  </Card>
+</CardGroup>

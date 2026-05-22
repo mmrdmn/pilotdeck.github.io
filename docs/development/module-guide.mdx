@@ -1,0 +1,271 @@
+---
+title: "模块开发指南"
+description: "各核心模块的设计哲学、接口约定和开发要点"
+icon: "cubes"
+---
+
+# 模块开发指南
+
+本文介绍 PilotDeck 各核心模块的设计哲学和接口约定，帮助你快速上手某个模块的开发。
+
+## 整体原则
+
+<CardGroup cols={2}>
+  <Card title="模块化边界" icon="border-all">
+    每个模块通过 `index.ts` 定义公开 API，内部实现细节不对外暴露
+  </Card>
+  <Card title="依赖注入" icon="syringe">
+    模块间通过构造参数和接口注入依赖，便于测试和替换
+  </Card>
+  <Card title="协议优先" icon="handshake">
+    所有模块定义明确的 Protocol 类型，位于 `protocol/` 子目录
+  </Card>
+  <Card title="可测试性" icon="vial">
+    每个模块应可独立测试，使用 fake/stub 替代外部依赖
+  </Card>
+</CardGroup>
+
+---
+
+## Gateway 模块
+
+**目录：** `src/gateway/`
+
+### 核心对象
+
+| 对象 | 职责 |
+|------|------|
+| `Gateway` | 接口定义，所有 Gateway 实现的契约 |
+| `InProcessGateway` | In-Process 实现，直接在当前进程中运行 |
+| `SessionRouter` | 管理 Session 的创建、查找和生命周期 |
+| `GatewayWsClient` | WebSocket 客户端封装 |
+| `RemoteGateway` | 远端 Gateway 的客户端代理 |
+| `GatewayElicitationBus` | 处理工具向用户的提问（ask_user_question） |
+
+### 开发要点
+
+```typescript
+// 创建 Gateway 的标准方式
+import { createGateway } from "../gateway/index.js";
+
+const gateway = createGateway({
+  agent: { /* AgentSession 创建选项 */ },
+  projectStorage: { projectRoot, pilotHome },
+  idleSessionTimeoutMs: 30 * 60 * 1000,
+});
+
+// Gateway 接口
+interface Gateway {
+  submitTurn(input: GatewaySubmitTurnInput): AsyncIterable<GatewayEvent>;
+  abortTurn(input: { sessionKey: string }): Promise<void>;
+  newSession(input: NewSessionInput): Promise<{ sessionKey: string }>;
+  listSessions(input: ListSessionsInput): Promise<ListSessionsResult>;
+  // ...
+}
+```
+
+<Note>
+如果你需要新增 Gateway 方法，记得同时更新：
+1. `protocol/types.ts` 中的 `Gateway` 接口
+2. `InProcessGateway` 实现
+3. `RemoteGateway` 客户端代理
+4. `GatewayServer` 的 WebSocket handler
+</Note>
+
+---
+
+## Router 模块
+
+**目录：** `src/router/`
+
+### 内部结构
+
+```
+src/router/
+├── RouterRuntime.ts           # 主入口：createRouterRuntime()
+├── config/
+│   └── schema.ts              # 配置类型定义
+├── scenario/
+│   ├── decideScenario.ts      # 场景判定逻辑
+│   └── subagentDetector.ts    # 子 Agent 检测
+├── tokenSaver/
+│   └── classifyAndRoute.ts    # TokenSaver 分类与路由
+├── fallback/
+│   └── runFallbackChain.ts    # Fallback 链规划与执行
+├── retry/
+│   └── zeroUsageRetry.ts      # 空响应重试
+├── orchestrate/
+│   └── applyOrchestration.ts  # Auto-Orchestrate 编排
+├── customRouter/
+│   └── customRouter.ts        # 自定义路由器接口
+├── session/
+│   ├── SessionRouterStore.ts  # Session 级路由状态
+│   └── sessionUsageCache.ts   # Token 用量缓存
+├── stats/
+│   └── TokenStatsCollector.ts # 统计收集器
+├── protocol/
+│   ├── decision.ts            # 决策类型
+│   ├── events.ts              # 事件类型
+│   └── errors.ts              # 错误类型
+└── utils/
+    └── countTokens.ts         # Token 计数工具
+```
+
+### 扩展 TokenSaver Tier
+
+添加新的降档 Tier 时需要修改：
+
+1. **配置 Schema** (`config/schema.ts`)：添加 tier 定义
+2. **分类逻辑** (`tokenSaver/classifyAndRoute.ts`)：更新判定规则
+3. **测试**：添加对应的单测场景
+
+### 自定义路由器
+
+实现 `PilotDeckCustomRouter` 接口来创建自定义路由器：
+
+```typescript
+interface PilotDeckCustomRouter {
+  decide(input: CustomRouterDecideInput): Promise<Partial<RouterDecision> | undefined>;
+}
+```
+
+---
+
+## Context 模块
+
+**目录：** `src/context/`
+
+### 核心组件
+
+| 组件 | 文件 | 职责 |
+|------|------|------|
+| PromptAssembler | `prompt/PromptAssembler.ts` | 组装完整的 System Prompt |
+| MessageProjector | `projection/MessageProjector.ts` | 投影和裁剪历史消息 |
+| TokenBudgetManager | `budget/TokenBudgetManager.ts` | Token 预算管理和预警 |
+| CompactionEngine | `compaction/CompactionEngine.ts` | 历史消息压缩 |
+| MemoryResolver | `memory/MemoryResolver.ts` | 长期记忆检索接口 |
+| InstructionDiscovery | `instructions/InstructionDiscovery.ts` | 项目指令发现 |
+| AttachmentResolver | `attachments/AttachmentResolver.ts` | 附件（文件/图片）处理 |
+
+### Compaction（上下文压缩）
+
+当对话历史过长，Context 模块提供多层压缩策略：
+
+```
+AutoCompactionPolicy
+  │
+  ├── MicroCompaction         # 微压缩：截断大型工具输出
+  │
+  ├── SnipEngine              # 切片：标记压缩边界，丢弃旧消息
+  │
+  ├── CompactionEngine        # 主压缩：用模型总结旧消息
+  │
+  └── ContextOverflowRecovery # 紧急兜底：超过限制时强制截断
+```
+
+### 添加新的 Memory Provider
+
+实现 `MemoryResolver` 接口：
+
+```typescript
+interface MemoryResolver {
+  retrieve(input: MemoryRetrieveInput): Promise<MemoryRetrieveResult>;
+  captureTurn?(input: MemoryCaptureTurnInput): void;
+}
+```
+
+---
+
+## Model 模块
+
+**目录：** `src/model/`
+
+### Canonical Protocol
+
+所有 Provider 的请求和响应都转换为统一的 Canonical 格式：
+
+```typescript
+// 统一请求
+interface CanonicalModelRequest {
+  provider: string;
+  model: string;
+  messages: CanonicalMessage[];
+  tools?: CanonicalToolSchema[];
+  systemPrompt?: string;
+  // ...
+}
+
+// 统一流式事件
+type CanonicalModelEvent =
+  | { type: "message_start"; ... }
+  | { type: "text_delta"; text: string }
+  | { type: "thinking_delta"; text: string }
+  | { type: "tool_call_start"; ... }
+  | { type: "tool_call_delta"; ... }
+  | { type: "tool_call_end"; ... }
+  | { type: "message_end"; finishReason: CanonicalFinishReason }
+  | { type: "error"; error: CanonicalModelError };
+```
+
+### 添加新 Provider
+
+1. 在 `providers/` 下创建新的 Provider 适配器
+2. 实现请求转换（Canonical → Provider 格式）
+3. 实现响应转换（Provider 流式事件 → Canonical 事件）
+4. 在 `ModelProviderRegistry` 中注册
+
+---
+
+## Tool 模块
+
+**目录：** `src/tool/`
+
+### 添加内置工具
+
+1. 在 `builtin/` 下创建工具文件
+2. 定义工具的输入 Schema
+3. 实现 `PilotDeckToolDefinition` 接口
+4. 在 `createBuiltinRegistry` 中注册
+
+```typescript
+// 工具定义结构
+interface PilotDeckToolDefinition {
+  name: string;
+  description: string;
+  inputSchema: PilotDeckToolInputSchema;
+  execute(
+    call: PilotDeckToolCall,
+    context: PilotDeckToolRuntimeContext,
+  ): Promise<PilotDeckToolResult>;
+}
+```
+
+### 工具调度
+
+工具调度器决定多个工具调用的执行方式：
+
+- `ConcurrentToolScheduler`：并行执行，适合独立的读取操作
+- `SequentialToolScheduler`：顺序执行，适合有依赖关系的写操作
+
+---
+
+## Always-On 模块
+
+**目录：** `src/always-on/`
+
+### 核心组件
+
+| 组件 | 职责 |
+|------|------|
+| `AlwaysOnManager` | 顶层管理器，绑定 Gateway |
+| `AlwaysOnRuntime` | Discovery 运行时 |
+| `DiscoveryScheduler` | 调度器，检查 Gate 并触发 Discovery |
+| `DiscoveryFire` | 执行单次 Discovery |
+| `SignalWatcher` | 文件变化信号监听 |
+| `WorkspaceProviderRegistry` | 工作区提供器（git-worktree / snapshot-copy） |
+
+### 开发注意事项
+
+- Always-On 通过 `bindGateway()` 绑定到 Gateway 上
+- 它向 Gateway 注入额外工具（Discovery Plan Tool、Report Tool）
+- 它提供 SessionConfigOverrides 影响 Discovery 会话的配置

@@ -1,0 +1,237 @@
+---
+title: "Troubleshooting"
+description: "Common PilotDeck issues and fixes"
+icon: "circle-question"
+---
+
+# Troubleshooting
+
+## Installation Issues
+
+<AccordionGroup>
+  <Accordion title="Install script fails: Node.js version too old">
+    **Symptom:** the installer says Node.js is below version 18.
+
+    **Fix:** the installer tries to install Node.js 22 through fnm. If that fails, install manually:
+
+    ```bash
+    curl -fsSL https://fnm.vercel.app/install | bash
+    fnm install 22
+    fnm use 22
+
+    # or with nvm
+    nvm install 22
+    nvm use 22
+
+    node --version  # should be >= v18
+    ```
+  </Accordion>
+
+  <Accordion title="Install script fails: git is not installed">
+    **Fix:** install Xcode Command Line Tools:
+
+    ```bash
+    xcode-select --install
+    ```
+  </Accordion>
+
+  <Accordion title="pilotdeck command not found">
+    Check whether the command is on PATH:
+
+    ```bash
+    which pilotdeck
+    ls -la /usr/local/bin/pilotdeck
+    ls -la ~/.local/bin/pilotdeck
+    ```
+
+    If it was linked into `~/.local/bin`, add that directory to PATH:
+
+    ```bash
+    export PATH="$HOME/.local/bin:$PATH"
+    source ~/.zshrc
+    ```
+
+    Or create the link manually:
+
+    ```bash
+    ln -sf ~/.pilotdeck/app/ui/server/cli.js /usr/local/bin/pilotdeck
+    ```
+  </Accordion>
+
+  <Accordion title="npm install fails">
+    ```bash
+    npm cache clean --force
+    cd ~/.pilotdeck/app
+    rm -rf node_modules package-lock.json
+    npm install
+
+    # If it is a network issue, choose a mirror
+    npm config set registry https://registry.npmmirror.com
+    npm install
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Desktop App Issues
+
+<AccordionGroup>
+  <Accordion title="PilotDeck.app crashes or cannot start">
+    **Reason:** DMG files received through sandboxed IM apps may get the `com.apple.provenance` extended attribute on macOS 14+, causing Gatekeeper to reject execution.
+
+    **Fix:**
+
+    ```bash
+    bash install-pilotdeck.sh
+
+    # or manually
+    xattr -cr /Applications/PilotDeck.app
+    open /Applications/PilotDeck.app
+    ```
+
+    <Tip>
+    DMG files downloaded directly from the browser or transferred through AirDrop usually do not have this issue.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="codesign --verify says valid, but the app still will not start">
+    This is expected when `com.apple.provenance` is the problem. The signature is valid, but Gatekeeper rejects execution due to the source policy. Clear extended attributes with `xattr -cr`.
+  </Accordion>
+</AccordionGroup>
+
+## Configuration Issues
+
+<AccordionGroup>
+  <Accordion title="Startup error: missing_provider / missing_model">
+    Check that `agent.model` matches the provider and model definitions:
+
+    ```yaml
+    # Wrong: provider name does not match
+    agent:
+      model: anthropic/claude-sonnet-4-5
+
+    model:
+      providers:
+        anthropic-main:
+          ...
+
+    # Correct
+    agent:
+      model: anthropic-main/claude-sonnet-4-5
+    ```
+  </Accordion>
+
+  <Accordion title="Startup error: invalid_api_key_ref">
+    Check and set the environment variable:
+
+    ```bash
+    echo $ANTHROPIC_API_KEY
+    export ANTHROPIC_API_KEY="your-key-here"
+    echo 'export ANTHROPIC_API_KEY="your-key-here"' >> ~/.zshrc
+    source ~/.zshrc
+    ```
+
+    Inline plaintext keys are supported but not recommended for production.
+  </Accordion>
+
+  <Accordion title="Config changes do not take effect">
+    `pilotdeck.yaml` supports hot reload, but in-flight requests keep the old snapshot.
+
+    1. Wait for current requests to finish.
+    2. Restart `pilotdeck server` if needed.
+    3. Check server logs for validation errors.
+  </Accordion>
+
+  <Accordion title="PILOT_HOME has no effect">
+    `PILOT_HOME` must be set before startup and cannot be set in YAML:
+
+    ```bash
+    export PILOT_HOME=/custom/path
+    pilotdeck server
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Runtime Issues
+
+<AccordionGroup>
+  <Accordion title="Model requests time out">
+    1. Check connectivity:
+    ```bash
+    curl -I https://api.anthropic.com
+    ```
+
+    2. Increase timeout:
+    ```yaml
+    model:
+      providers:
+        anthropic-main:
+          timeoutMs: 300000
+    ```
+
+    3. If you use a proxy, verify proxy environment variables.
+  </Accordion>
+
+  <Accordion title="Router Fallback triggers frequently">
+    Check rate limits, network stability, and transient retry settings:
+
+    ```yaml
+    router:
+      transientRetry:
+        enabled: true
+        maxAttempts: 3
+        baseDelayMs: 2000
+    ```
+  </Accordion>
+
+  <Accordion title="pilotdeck tui requires an interactive terminal">
+    TUI mode requires a real interactive terminal. Use Terminal or iTerm2, use Web UI after `pilotdeck server`, or use one-shot CLI mode.
+  </Accordion>
+
+  <Accordion title="Cron command requires a running pilotdeck server">
+    Start the server first:
+
+    ```bash
+    pilotdeck server
+    pilotdeck cron list
+    ```
+  </Accordion>
+
+  <Accordion title="Memory cannot retrieve relevant context">
+    1. Confirm Memory is enabled.
+    2. Check `~/.pilotdeck/memory/`.
+    3. New projects may not have enough memory yet.
+    4. If `retrievalMode` is `explicit`, memory is only retrieved when requested.
+  </Accordion>
+
+  <Accordion title="WebSocket connection fails">
+    ```bash
+    curl http://127.0.0.1:18789
+    lsof -i :18789
+    cat ~/.pilotdeck/server-token
+    ```
+
+    If using a reverse proxy, ensure WebSocket upgrade requests are forwarded correctly.
+  </Accordion>
+</AccordionGroup>
+
+## Logs and Diagnostics
+
+Server logs are printed to stdout. Common prefixes:
+
+| Prefix | Source |
+|--------|--------|
+| `[always-on]` | Always-On Discovery |
+| `[cron]` | Cron runtime |
+| `[PilotDeck]` | Router retry and fallback |
+| `[runtime]` | Shutdown flow |
+
+Startup config diagnostics look like:
+
+```
+[config] warning: deprecated field "agent.fallbackModel", migrate to "router.fallback.default"
+[config] error: missing_provider "nonexistent" referenced by agent.model
+```
+
+<Tip>
+When filing an issue, include `node --version`, sanitized `~/.pilotdeck/pilotdeck.yaml`, server startup logs, and OS version.
+</Tip>

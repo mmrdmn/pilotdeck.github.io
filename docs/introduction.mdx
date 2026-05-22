@@ -1,0 +1,67 @@
+---
+title: "项目简介"
+description: "PilotDeck —— 以 WorkSpace 为核心的面向生产力的智能体开源平台"
+icon: "rocket"
+---
+
+# PilotDeck
+
+PilotDeck 是一个以 WorkSpace 为核心的面向生产力的智能体开源平台。
+
+它不是又一个"能聊天的 AI 工具"——PilotDeck 的架构从 **WorkSpace** 开始：每个项目一个舱，舱内白盒记忆、跨舱智能路由、舱外 Always-on 主动推进。让 AI Agent 从"对话玩具"变成真正干活的**生产力工具**。
+
+## 核心能力
+
+<CardGroup cols={3}>
+  <Card title="WorkSpace 工作舱" icon="cubes" href="/docs/features/projects">
+    每个项目一个舱——专属文件、专属记忆、专属技能，多项目并行互不干扰
+  </Card>
+  <Card title="省钱路由 (Router)" icon="route" href="/docs/features/router">
+    TokenSaver 智能降档 + 多 Provider Fallback 容错
+  </Card>
+  <Card title="长期记忆 (Memory)" icon="brain" href="/docs/features/memory">
+    Project Memory + Feedback Memory 双层记忆，全链路白盒可追溯
+  </Card>
+  <Card title="后台常驻 (Always On)" icon="clock" href="/docs/features/always-on">
+    你部署，我推进——Discovery 主动发现 + Cron 定时任务
+  </Card>
+  <Card title="消息网关 (Gateway)" icon="tower-broadcast" href="/docs/features/gateway">
+    WebSocket + HTTP 双协议网关，CLI / Web / 桌面 / 飞书统一接入
+  </Card>
+</CardGroup>
+
+## 为什么选择 PilotDeck？
+
+<AccordionGroup>
+  <Accordion title="你的任务越来越多，Agent 越来越不知道在忙什么" icon="shuffle">
+    所有任务挤在同一个上下文中，A 项目的知识会污染 B 项目的判断，多任务并行只能开多个窗口。
+
+    **PilotDeck 的回答：每个项目一个舱。** WorkSpace 隔离让多项目并行无扰——你给项目 A 设定了文案风格，项目 B 不会沾上 A 的腔调；一个项目的 Token 花超了，你知道钱花在了哪里。
+  </Accordion>
+  <Accordion title="你教了 AI 一次偏好，下次又忘了" icon="rotate">
+    每次新项目都要重新教 AI：用短句、别用这个模板、风格偏正式——执行、纠正、遗忘、再纠正，死循环。
+
+    **PilotDeck 的回答：记忆围绕项目任务读写。** Feedback Memory 教一次永远记住，不会串到别的舱；Project Memory 追踪项目进度，每一步可见。
+  </Accordion>
+  <Accordion title="你关了电脑，活就停了" icon="power-off">
+    打开终端 AI 才干活，关屏幕一切停止。想睡个午觉让 AI 继续跑？不行。
+
+    **PilotDeck 的回答：你部署，我推进。** Always-on 模式关不掉——有人替你记着进度、替你守着成本、替你排查异常。
+  </Accordion>
+  <Accordion title="Token 账单比工资还贵" icon="piggy-bank">
+    所有请求都走最贵的模型，简单问答和复杂架构设计花一样的钱。
+
+    **PilotDeck 的回答：智能路由自动省钱。** Router 根据任务复杂度自动选择模型档位，简单任务用便宜模型，同时提供 Fallback 容错保证可用性。
+  </Accordion>
+</AccordionGroup>
+
+## 快速开始
+
+<CardGroup cols={2}>
+  <Card title="Web 安装" icon="globe" href="/docs/quickstart-web">
+    一键脚本安装，浏览器访问 Web UI
+  </Card>
+  <Card title="桌面安装" icon="desktop" href="/docs/quickstart-desktop">
+    下载 DMG 安装包，原生桌面体验
+  </Card>
+</CardGroup>

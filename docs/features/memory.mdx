@@ -1,0 +1,150 @@
+---
+title: "Memory 长期记忆"
+description: "基于 PilotDeck 的跨会话长期记忆系统"
+icon: "brain"
+---
+
+# Memory 长期记忆
+
+PilotDeck 内置了基于 **PilotDeck Memory Core** 的长期记忆系统，能够自动捕获对话中的关键知识，并在新会话中自动检索和注入相关上下文。让你的 Agent 真正"记住"你的 WorkSpace。
+
+## 核心能力
+
+<CardGroup cols={2}>
+  <Card title="自动捕获" icon="camera">
+    每轮对话结束后，自动提取关键信息存入记忆
+  </Card>
+  <Card title="智能检索" icon="magnifying-glass">
+    新会话开始时，根据用户查询自动检索相关上下文
+  </Card>
+  <Card title="WorkSpace 感知" icon="folder">
+    检索时考虑当前 WorkSpace 上下文，返回最相关的记忆
+  </Card>
+  <Card title="跨会话" icon="arrows-turn-right">
+    记忆跨越会话边界，上一次对话的知识在新对话中自动可用
+  </Card>
+</CardGroup>
+
+## 工作原理
+
+Memory 系统的工作流分为 **写入（Capture）** 和 **读取（Retrieve）** 两个阶段：
+
+```
+                    ┌────────────────────────┐
+  每轮对话结束 ────▶│   Capture（捕获）       │
+                    │  提取关键信息           │
+                    │  标注 session / 时间戳  │
+                    └───────────┬────────────┘
+                                │
+                                ▼
+                    ┌────────────────────────┐
+                    │   PilotDeck Memory     │
+                    │   持久化存储            │
+                    │   ~/.pilotdeck/memory   │
+                    └───────────┬────────────┘
+                                │
+                                ▲
+  新会话/新 Turn ──────────────▶│
+                    ┌───────────┴────────────┐
+                    │   Retrieve（检索）      │
+                    │  根据 query 检索        │
+                    │  注入 System Context    │
+                    └────────────────────────┘
+```
+
+### 捕获阶段 (Capture)
+
+每轮对话结束后，Memory 系统自动：
+1. 将对话消息转换为标准化的 `ContextMemoryMessage` 格式
+2. 调用 PilotDeck Memory 的 `captureTurn` 提取关键知识片段
+3. 关联 `sessionKey` 和时间戳存入持久化存储
+
+### 检索阶段 (Retrieve)
+
+在新会话或新 Turn 开始时：
+1. 将用户的最新消息和最近对话上下文作为 query
+2. 调用 PilotDeck Memory 的 `retrieveContext` 检索相关记忆
+3. 将检索结果作为 `systemContext` 注入到 Prompt 中
+
+## 检索模式
+
+Memory 支持两种检索模式：
+
+<Tabs>
+  <Tab title="Auto 模式（默认）">
+    系统自动判断是否需要检索记忆，并选择最佳策略：
+
+    ```yaml
+    memory:
+      retrievalMode: auto
+    ```
+  </Tab>
+  <Tab title="Explicit 模式">
+    仅在用户明确请求时（如 "回忆一下之前的讨论"）才触发检索：
+
+    ```yaml
+    memory:
+      retrievalMode: explicit
+    ```
+  </Tab>
+</Tabs>
+
+## 配置
+
+```yaml pilotdeck.yaml
+memory:
+  enabled: true
+  rootDir: ~/.pilotdeck/memory  # 可选，默认为 PilotHome/memory
+  retrievalMode: auto           # auto | explicit
+```
+
+Memory 数据默认存储在 `~/.pilotdeck/memory` 目录下。
+
+## 与 Context 系统的集成
+
+Memory 是 PilotDeck Context 系统的一部分。Context 系统负责管理 Agent 每次请求的完整上下文，包括：
+
+| 组件 | 职责 |
+|------|------|
+| **PromptAssembler** | 组装 System Prompt，包括指令、技能、记忆等 |
+| **MessageProjector** | 投影历史消息，控制上下文窗口大小 |
+| **TokenBudgetManager** | 管理 Token 预算，避免超出模型上下文限制 |
+| **CompactionEngine** | 当上下文过长时，自动压缩历史消息 |
+| **MemoryResolver** | 从 PilotDeck Memory 检索长期记忆并注入上下文 |
+
+### Memory 在 Context 中的位置
+
+```
+System Prompt
+├── 核心指令
+├── 项目级指令 (Instructions)
+├── 技能上下文 (Skills)
+├── 记忆上下文 (Memory) ← MemoryResolver 注入
+└── 工具说明
+```
+
+## Attachment 机制
+
+Memory 检索结果通过 **MemoryAttachmentBuilder** 构建为标准化的附件格式，与其他 Context 附件（如文件内容、图片等）统一管理：
+
+```typescript
+// MemoryAttachmentBuilder 的输出
+{
+  systemContext: "基于之前的讨论，该项目使用 React 18 + TypeScript...",
+  diagnostics: [],
+  metadata: { trace: ..., debug: ... }
+}
+```
+
+## 诊断信息
+
+Memory 系统在运行过程中会产出诊断信息，帮助排查问题：
+
+| 诊断代码 | 说明 |
+|----------|------|
+| `memory_context_empty` | 检索未找到相关记忆（Info 级别） |
+| `memory_provider_error` | PilotDeck Memory 服务出错（Warning 级别） |
+
+<Tip>
+如果发现 Memory 效果不理想，可以检查 `~/.pilotdeck/memory` 目录下的数据，确认捕获是否正常工作。
+</Tip>

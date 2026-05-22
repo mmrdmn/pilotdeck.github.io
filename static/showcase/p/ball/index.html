@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Cut - 抓毛球</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:-apple-system,sans-serif}
+#mask{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:10;background:#0a0a0a}
+#cvbox{position:relative;overflow:hidden;border-radius:28px;background:#000;box-shadow:0 0 80px rgba(50,50,120,.2)}
+#cvbox::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;box-shadow:inset 0 0 120px rgba(0,0,0,0.65)}
+#cvbox::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.75) 100%)}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#score{position:fixed;top:14px;right:12px;z-index:100;width:70px;height:28px;background:rgba(20,20,40,0.75);border-radius:8px;border:1px solid rgba(255,255,255,0.1)}
+#stopBtn{position:fixed;top:14px;left:12px;z-index:100;width:32px;height:32px;border-radius:50%;background:rgba(20,20,40,0.75);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);font-size:16px;cursor:pointer;display:none;align-items:center;justify-content:center}
+#timer{position:fixed;top:14px;left:54px;z-index:100;font-size:14px;color:rgba(255,255,255,0.8);font-weight:600;display:none;font-variant-numeric:tabular-nums}
+#shareCard{position:fixed;top:0;left:0;right:0;bottom:0;z-index:500;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;overflow-y:auto}
+#shareCard.show{display:flex}
+#shareInner{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:20px;padding:28px 24px;max-width:340px;width:85%;text-align:center;margin:20px}
+#shareInner h2{color:#fff;font-size:22px;margin:0 0 6px}
+#shareInner .share-sub{color:rgba(255,255,255,0.5);font-size:13px;margin:0 0 16px}
+#shareInner .share-msg{color:rgba(255,255,255,0.8);font-size:15px;line-height:1.6;margin:0 0 20px;padding:0 4px}
+#shareInner .share-stats{display:flex;justify-content:center;gap:16px;margin:0 0 20px}
+#shareInner .share-stat{text-align:center;padding:0 4px;border-right:1px solid rgba(255,255,255,0.1)}
+#shareInner .share-stat:last-child{border-right:none}
+#shareInner .share-stat .val{font-size:28px;font-weight:700;color:#fff}
+#shareInner .share-stat .lbl{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px}
+#shareInner .share-actions{display:flex;gap:10px;justify-content:center}
+#shareInner .share-actions button{padding:12px 24px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer}
+#shareInner .btn-copy{background:#4a4acc;color:#fff}
+#shareInner .btn-retry{background:rgba(255,255,255,0.1);color:#fff}
+#splash{position:fixed;top:0;left:0;right:0;bottom:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0e0e1a,#1a1a2e);transition:opacity .7s}
+#splash.h{opacity:0;pointer-events:none}
+#splash h1{font-size:44px;margin-bottom:8px}
+#splash p{color:rgba(255,255,255,.5);font-size:13px;text-align:center;padding:0 28px;line-height:1.7;margin:6px 0 28px}
+#splash button{padding:15px 44px;font-size:17px;border:none;border-radius:13px;background:#4a4acc;color:#fff;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(74,74,204,.35)}
+#hint{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:100;font-size:12px;color:rgba(255,255,255,.4);text-shadow:0 1px 4px rgba(0,0,0,.8);pointer-events:none}
+#toast{position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);z-index:150;pointer-events:none;color:#fff;font-size:22px;font-weight:700;text-shadow:0 2px 20px rgba(0,0,0,.8);opacity:0;transition:opacity .3s}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="splash"><h1>🐾 Cut</h1><p>抬头！小毛球藏在高处的角落里<br>看到就点它抓住</p><button id="go">开始寻找毛球</button></div>
+<canvas id="score"></canvas>
+<button id="stopBtn">✕</button>
+<div id="timer"></div>
+<div id="hint">双指缩放调节视角 · 滑动旋转 · 点击毛球抓取</div>
+<div id="toast"></div>
+<div id="flash"></div>
+<div id="shareCard"><div id="shareInner"></div></div>
+<div id="mask"><div id="cvbox"></div></div>
+<script src="three.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+var RW=12,RD=12,RH=10,HW=6,HD=6,EYE=1.7,TOTAL=5;
+var COLORS=[0xe74c3c,0xe67e22,0xf1c40f,0x2ecc71,0x1abc9c,0x3498db,0x9b59b6,0xe91e63,0xff5722,0x00bcd4,0xffeb3b,0x4caf50,0xff4081,0x7c4dff,0x00e676];
+
+// === Procedural Texture Generator ===
+function createCanvasTexture(w,h,drawFn){
+  var c=document.createElement('canvas');c.width=w;c.height=h;
+  var ctx=c.getContext('2d');drawFn(ctx,w,h);
+  var tex=new THREE.CanvasTexture(c);
+  tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+  return tex;
+}
+
+// Wood floor texture
+var woodTex=createCanvasTexture(512,512,function(ctx,w,h){
+  // Random wood-like floor without strong repeating stripes
+  ctx.fillStyle='#6b5644';ctx.fillRect(0,0,w,h);
+  for(var i=0;i<3000;i++){
+    var b=70+Math.floor(Math.random()*40);
+    var r=Math.floor(b*1.3+Math.random()*20);
+    var g=Math.floor(b*1.0+Math.random()*15);
+    var bl=Math.floor(b*0.7+Math.random()*10);
+    ctx.fillStyle='rgb('+r+','+g+','+bl+')';
+    ctx.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*3,1+Math.random()*3);
+  }
+  // Subtle grain (very thin, irregular lines — no strong stripes)
+  for(var i=0;i<40;i++){
+    var y=Math.random()*h;
+    ctx.strokeStyle='rgba(40,25,15,0.08)';ctx.lineWidth=0.5+Math.random()*0.5;
+    ctx.beginPath();ctx.moveTo(0,y);
+    for(var x=0;x<w;x+=20){
+      ctx.lineTo(x+20,y+Math.random()*8-4);
+    }
+    ctx.stroke();
+  }
+});
+woodTex.repeat.set(4,4);
+var woodBump=createCanvasTexture(512,512,function(ctx,w,h){
+  ctx.fillStyle='#888';ctx.fillRect(0,0,w,h);
+  for(var i=0;i<2000;i++){
+    var v=100+Math.floor(Math.random()*56-28);
+    ctx.fillStyle='rgb('+v+','+v+','+v+')';
+    ctx.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*4,1+Math.random()*2);
+  }
+});
+woodBump.repeat.set(4,4);
+
+// Wall stucco texture
+var wallTex=createCanvasTexture(256,256,function(ctx,w,h){
+  ctx.fillStyle='#3a3a5c';ctx.fillRect(0,0,w,h);
+  for(var i=0;i<2000;i++){
+    var v=58+Math.floor(Math.random()*22-11);
+    ctx.fillStyle='rgb('+v+','+v+','+(v+15)+')';
+    ctx.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*2,1+Math.random()*2);
+  }
+});
+wallTex.repeat.set(3,3);
+var wallBump=createCanvasTexture(256,256,function(ctx,w,h){
+  ctx.fillStyle='#888';ctx.fillRect(0,0,w,h);
+  for(var i=0;i<1500;i++){
+    var v=100+Math.floor(Math.random()*56-28);
+    ctx.fillStyle='rgb('+v+','+v+','+v+')';
+    ctx.fillRect(Math.random()*w,Math.random()*h,1+Math.random(),1+Math.random());
+  }
+});
+wallBump.repeat.set(3,3);
+
+// Ceiling texture
+var ceilTex=createCanvasTexture(256,256,function(ctx,w,h){
+  ctx.fillStyle='#2a2a4a';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;
+  for(var x=0;x<w;x+=64){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+  for(var y=0;y<h;y+=64){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+});
+ceilTex.repeat.set(2,2);
+var ceilBump=createCanvasTexture(256,256,function(ctx,w,h){
+  ctx.fillStyle='#999';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='#555';ctx.lineWidth=1;
+  for(var x=0;x<w;x+=64){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+  for(var y=0;y<h;y+=64){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+});
+ceilBump.repeat.set(2,2);
+
+// Abstract painting textures (will be generated per-painting)
+function createPaintingTexture(seed){
+  return createCanvasTexture(128,96,function(ctx,w,h){
+    // base
+    var baseColors=[[40,40,70],[50,35,55],[35,50,60],[45,45,50]];
+    var bc=baseColors[seed%baseColors.length];
+    ctx.fillStyle='rgb('+bc[0]+','+bc[1]+','+bc[2]+')';ctx.fillRect(0,0,w,h);
+    // random rectangles
+    var rng=seed;function nr(){rng=(rng*16807)%2147483647;return(rng-1)/2147483646}
+    var nc=2+Math.floor(nr()*3);
+    for(var i=0;i<nc;i++){
+      var rc=COLORS[Math.floor(nr()*COLORS.length)];
+      ctx.fillStyle='rgba('+((rc>>16)&255)+','+((rc>>8)&255)+','+(rc&255)+','+(0.5+nr()*0.5)+')';
+      ctx.fillRect(nr()*w*0.6,nr()*h*0.6,20+nr()*60,15+nr()*50);
+    }
+  });
+}
+
+// === Scene Setup ===
+var scene=new THREE.Scene();
+scene.background=new THREE.Color(0x1a1a2e);
+scene.fog=new THREE.Fog(0x1a1a2e,0.02,20);
+
+var cam=new THREE.PerspectiveCamera(65,1,.05,60);
+cam.position.y=0; // pivot IS the eye point
+var pivot=new THREE.Object3D();
+pivot.position.y=EYE; // pivot world position = eye height
+scene.add(pivot);
+pivot.add(cam);
+
+var box=document.getElementById('cvbox');
+var REN=new THREE.WebGLRenderer({antialias:true});
+REN.shadowMap.enabled=true;
+REN.shadowMap.type=THREE.PCFSoftShadowMap;
+REN.outputEncoding=THREE.sRGBEncoding;
+REN.toneMapping=THREE.ACESFilmicToneMapping;
+REN.toneMappingExposure=0.7;
+box.appendChild(REN.domElement);
+
+function rsz(){
+  var w=Math.min(innerWidth*.92,420),h=Math.min(innerHeight*.82,780);
+  box.style.width=w+'px';box.style.height=h+'px';
+  cam.aspect=w/h;cam.updateProjectionMatrix();REN.setSize(w,h);
+}
+rsz();addEventListener('resize',rsz);
+
+// === Lighting ===
+scene.add(new THREE.AmbientLight(0x2a2a4a,0.15));
+scene.add(new THREE.HemisphereLight(0x4a5a8a,0x3a2a1a,0.2));
+
+var sun=new THREE.DirectionalLight(0xfff5e0,0.3);
+sun.position.set(0,12,0);sun.castShadow=true;
+sun.shadow.mapSize.set(1024,1024);
+sun.shadow.camera.near=.5;sun.shadow.camera.far=30;
+sun.shadow.camera.left=-12;sun.shadow.camera.right=12;
+sun.shadow.camera.top=12;sun.shadow.camera.bottom=-2;
+scene.add(sun);
+
+var chandelierPositions=[
+  {x:0,y:9.5,z:0},{x:3,y:9.5,z:3},{x:-3,y:9.5,z:3},
+  {x:3,y:9.5,z:-3},{x:-3,y:9.5,z:-3}
+];
+chandelierPositions.forEach(function(cp){
+  var pl=new THREE.PointLight(0xffe8cc,0.6,12);
+  pl.position.set(cp.x,cp.y,cp.z);scene.add(pl);
+});
+
+var spotFrom=[
+  {x:-5,y:2,z:-5},{x:5,y:2,z:-5},{x:-5,y:2,z:5},{x:5,y:2,z:5}
+];
+spotFrom.forEach(function(sp){
+  var sl=new THREE.SpotLight(0xffd4a0,0.3,14,Math.PI/6,0.5);
+  sl.position.set(sp.x,sp.y,sp.z);
+  sl.target.position.set(0,8,0);
+  scene.add(sl);scene.add(sl.target);
+});
+
+// === Room Construction ===
+var wallMat=new THREE.MeshStandardMaterial({map:wallTex,bumpMap:wallBump,color:0x3a3a5c,roughness:.9});
+var wallMat2=new THREE.MeshStandardMaterial({map:wallTex,bumpMap:wallBump,color:0x333355,roughness:.9});
+var floorMat=new THREE.MeshStandardMaterial({map:woodTex,bumpMap:woodBump,roughness:.85,metalness:0});
+var ceilMat=new THREE.MeshStandardMaterial({map:ceilTex,bumpMap:ceilBump,roughness:.9,metalness:0});
+
+// Floor
+var fl=new THREE.Mesh(new THREE.PlaneGeometry(RW,RD),floorMat);
+fl.rotation.x=-Math.PI/2;fl.position.y=0;fl.receiveShadow=true;scene.add(fl);
+
+// Ceiling
+var ce=new THREE.Mesh(new THREE.PlaneGeometry(RW,RD),ceilMat);
+ce.rotation.x=Math.PI/2;ce.position.y=RH;scene.add(ce);
+
+// Walls
+aw(new THREE.Vector3(0,RH/2,-HD),0,wallMat);
+aw(new THREE.Vector3(0,RH/2,HD),Math.PI,wallMat);
+aw(new THREE.Vector3(-HW,RH/2,0),Math.PI/2,wallMat2);
+aw(new THREE.Vector3(HW,RH/2,0),-Math.PI/2,wallMat2);
+
+function aw(pos,rotY,mat){
+  var m=new THREE.Mesh(new THREE.PlaneGeometry(RW,RH),mat);
+  m.position.copy(pos);m.rotation.y=rotY;m.receiveShadow=true;scene.add(m);
+  return m;
+}
+
+// Baseboards
+var blMat=new THREE.MeshStandardMaterial({color:0x1a1a2e,roughness:.8});
+[
+  {px:0,py:.06,pz:-HD+.015,rx:0,rz:0, sx:RW,sy:.12,sz:.03},
+  {px:0,py:.06,pz:HD-.015,rx:0,rz:0, sx:RW,sy:.12,sz:.03},
+  {px:-HW+.015,py:.06,pz:0,rx:0,rz:0, sx:.03,sy:.12,sz:RD},
+  {px:HW-.015,py:.06,pz:0,rx:0,rz:0, sx:.03,sy:.12,sz:RD}
+].forEach(function(b){
+  var m=new THREE.Mesh(new THREE.BoxGeometry(b.sx,b.sy,b.sz),blMat);
+  m.position.set(b.px,b.py,b.pz);scene.add(m);
+});
+
+// === Furniture ===
+var sm=function(c,r){return new THREE.MeshStandardMaterial({color:c,roughness:r!==undefined?r:.75,metalness:0})};
+
+// HIGH RAILING
+function addRailing(x,z,len,ry){
+  var g=new THREE.Group(),rm=sm(0x5a5a7c,.6);
+  (function(){var m=new THREE.Mesh(new THREE.BoxGeometry(len,.08,.08),rm);m.position.y=0;g.add(m)})();
+  (function(){var m=new THREE.Mesh(new THREE.BoxGeometry(len,.06,.06),rm);m.position.y=.4;g.add(m)})();
+  for(var i=0;i<Math.floor(len/1.2);i++){
+    var post=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.5,6),rm);
+    post.position.set(-len/2+.6+i*1.2,.25,0);g.add(post);
+  }
+  g.position.set(x,3.8,z);g.rotation.y=ry;scene.add(g);
+}
+addRailing(-5.5,0,10,Math.PI/2);
+addRailing(5.5,0,10,Math.PI/2);
+addRailing(0,-5.5,10,0);
+addRailing(0,5.5,10,0);
+
+// Ramp floors
+var rampMat=sm(0x4a4a6a,.8);
+[[-5.5,1.2,9],[5.5,1.2,9],[0,9,1.2],[0,-5.5,1.2],[0,5.5,1.2]].forEach(function(a){
+  var rf=new THREE.Mesh(new THREE.PlaneGeometry(a[1],a[2]),rampMat);
+  rf.rotation.x=-Math.PI/2;
+  rf.position.set(a[0]===0?(a[3]>0?5.49:-5.49):a[0],3.8,0);
+  rf.receiveShadow=true;scene.add(rf);
+});
+
+// HIGH SHELVES
+function addHighShelf(x,z,ry,yBase){
+  var g=new THREE.Group(),s=sm(0x5a5a7c,.7);
+  for(var i=0;i<5;i++){
+    var b=new THREE.Mesh(new THREE.BoxGeometry(2,.06,.35),s);
+    b.position.y=i*.6;b.castShadow=true;b.receiveShadow=true;g.add(b);
+    var numB=4+Math.floor(Math.random()*4),bx=-.8;
+    for(var j=0;j<numB&&bx<.8;j++){
+      var bw=.05+Math.random()*.07,bh=.25+Math.random()*.2;
+      var bk=new THREE.Mesh(new THREE.BoxGeometry(bw,bh,.3),sm(COLORS[Math.floor(Math.random()*COLORS.length)],.8));
+      bk.position.set(bx+bw/2,.03+i*.6+bh/2,0);bk.castShadow=true;g.add(bk);
+      bx+=bw+.02;
+    }
+  }
+  [-1,.9].forEach(function(a){
+    var p=new THREE.Mesh(new THREE.BoxGeometry(.06,5*.6,.35),sm(0x4a4a6a,.7));
+    p.position.set(a,5*.6/2,0);p.castShadow=true;g.add(p);
+  });
+  g.position.set(x,yBase,z);g.rotation.y=ry;scene.add(g);
+}
+addHighShelf(-5.8,-3,Math.PI/2,4.5);
+addHighShelf(5.8,2,-Math.PI/2,5);
+addHighShelf(-3,-5.8,0,4.8);
+addHighShelf(3,5.8,Math.PI,5.2);
+addHighShelf(0,-5.8,0,6);
+addHighShelf(0,5.8,Math.PI,6.5);
+
+// HIGH CABINETS
+function addHighCabinet(x,z,ry){
+  var g=new THREE.Group(),m=sm(0x4a4a6a,.7);
+  var body=new THREE.Mesh(new THREE.BoxGeometry(.8,2.5,.5),m);body.position.y=1.25;body.castShadow=true;g.add(body);
+  var top=new THREE.Mesh(new THREE.BoxGeometry(.85,.1,.55),sm(0x5a5a7a,.6));top.position.y=2.55;g.add(top);
+  var handle=new THREE.Mesh(new THREE.BoxGeometry(.1,.1,.03),sm(COLORS[Math.floor(Math.random()*COLORS.length)],.5));
+  handle.position.set(0,1.3,.26);g.add(handle);
+  g.position.set(x,4,z);g.rotation.y=ry;scene.add(g);
+}
+addHighCabinet(5.7,-4,-Math.PI/2);
+addHighCabinet(-5.7,3,Math.PI/2);
+addHighCabinet(4,0,-Math.PI/2);
+addHighCabinet(-4,0,Math.PI/2);
+
+// PLANTS
+function addHighPlant(x,y,z){
+  var g=new THREE.Group();
+  var pot=new THREE.Mesh(new THREE.CylinderGeometry(.2,.15,.3,10),sm(0xc87c5c,.8));
+  pot.position.y=.15;pot.castShadow=true;g.add(pot);
+  for(var i=0;i<8;i++){
+    var th=Math.random()*Math.PI*2,ph=Math.random()*Math.PI*.6;
+    var leaf=new THREE.Mesh(new THREE.SphereGeometry(.12+Math.random()*.08,8,6),sm(COLORS[Math.floor(Math.random()*COLORS.length)],.8));
+    leaf.position.set(.2*Math.sin(ph)*Math.cos(th),.7+ph*.3,.2*Math.sin(ph)*Math.sin(th));
+    leaf.castShadow=true;g.add(leaf);
+  }
+  g.position.set(x,y,z);scene.add(g);
+}
+addHighPlant(-4.5,4.2,-4.5);addHighPlant(4.5,4.2,4.5);
+addHighPlant(-4.5,5,-3);addHighPlant(4.5,5,3);
+addHighPlant(0,4.8,0);addHighPlant(-3,4.8,3);addHighPlant(3,4.8,-3);
+
+// CHAIRS
+function addHighChair(x,z,ry){
+  var g=new THREE.Group(),m=sm(0xd4b896,.8);
+  var seat=new THREE.Mesh(new THREE.BoxGeometry(.7,.08,.6),m);seat.position.y=.3;seat.castShadow=true;g.add(seat);
+  var back=new THREE.Mesh(new THREE.BoxGeometry(.7,.4,.08),m);back.position.set(0,.5,-.26);back.castShadow=true;g.add(back);
+  [[-.28,-.23],[.28,-.23],[-.28,.23],[.28,.23]].forEach(function(a){
+    var leg=new THREE.Mesh(new THREE.CylinderGeometry(.02,.02,.3,6),sm(0x8B7355,.7));
+    leg.position.set(a[0],.15,a[1]);leg.castShadow=true;g.add(leg);
+  });
+  g.position.set(x,4,z);g.rotation.y=ry;scene.add(g);
+}
+addHighChair(-3,4.8,0.5);addHighChair(3,-4.8,-0.5);
+
+// PAINTINGS
+function addHighPainting(x,y,z,ry,seed){
+  var g=new THREE.Group();
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(.9,.6,.05),sm(0x5a5a7c,.7)));
+  var cv=new THREE.Mesh(new THREE.PlaneGeometry(.8,.5),
+    new THREE.MeshStandardMaterial({map:createPaintingTexture(seed),roughness:.8}));
+  cv.position.z=.03;g.add(cv);
+  var fTop=new THREE.Mesh(new THREE.BoxGeometry(.95,.04,.04),sm(0x8B7355));
+  fTop.position.set(0,.32,.03);g.add(fTop);
+  var fBot=new THREE.Mesh(new THREE.BoxGeometry(.95,.04,.04),sm(0x8B7355));
+  fBot.position.set(0,-.32,.03);g.add(fBot);
+  g.position.set(x,y,z);g.rotation.y=ry;scene.add(g);
+}
+addHighPainting(-5.8,7.5,-2,Math.PI/2,1);
+addHighPainting(5.8,8,3,-Math.PI/2,2);
+addHighPainting(0,7.5,-5.8,0,3);
+addHighPainting(0,8,5.8,Math.PI,4);
+addHighPainting(-5.8,5,0,Math.PI/2,5);
+addHighPainting(5.8,6,0,-Math.PI/2,6);
+
+// WINDOWS
+function addHighWindow(x,y,z,ry){
+  var g=new THREE.Group(),f=sm(0x5a5a7c,.6);
+  function bar(geo,pos){var m=new THREE.Mesh(geo,f);m.position.set(pos[0],pos[1],pos[2]);g.add(m)}
+  bar(new THREE.BoxGeometry(1.2,.08,.06),[0,.35,0]);
+  bar(new THREE.BoxGeometry(1.2,.08,.06),[0,-.35,0]);
+  bar(new THREE.BoxGeometry(.08,.8,.06),[-.55,0,0]);
+  bar(new THREE.BoxGeometry(.08,.8,.06),[.55,0,0]);
+  bar(new THREE.BoxGeometry(1.2,.08,.06),[0,0,0]);
+  bar(new THREE.BoxGeometry(.08,.8,.06),[0,0,0]);
+  var gl=new THREE.Mesh(new THREE.PlaneGeometry(1.1,.7),
+    new THREE.MeshStandardMaterial({color:0x88aacc,roughness:.1,metalness:.1,transparent:true,opacity:.35}));
+  g.add(gl);
+  g.position.set(x,y,z);g.rotation.y=ry;scene.add(g);
+}
+addHighWindow(0,6,-5.8,0);addHighWindow(0,6,5.8,Math.PI);
+addHighWindow(-5.8,6,0,Math.PI/2);addHighWindow(5.8,6,0,-Math.PI/2);
+
+// CHANDELIERS
+function addChandelier(x,y,z){
+  var g=new THREE.Group();
+  var cord=new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,1,4),sm(0x333333,.8));
+  cord.position.y=.5;g.add(cord);
+  var frame=new THREE.Mesh(new THREE.TorusGeometry(.25,.02,6,24),sm(0x444444,.6));
+  frame.rotation.x=Math.PI/2;frame.position.y=.1;g.add(frame);
+  for(var i=0;i<6;i++){
+    var th=i*Math.PI/3;
+    var arm=new THREE.Mesh(new THREE.CylinderGeometry(.01,.01,.25,4),sm(0x444444,.8));
+    arm.position.set(.15*Math.cos(th),.05,.15*Math.sin(th));
+    arm.rotation.z=Math.cos(th)*.7;arm.rotation.x=Math.sin(th)*.7;g.add(arm);
+    var lamp=new THREE.Mesh(new THREE.SphereGeometry(.06,8,8),
+      new THREE.MeshStandardMaterial({color:0xfff5e0,roughness:.5,metalness:0,transparent:true,opacity:.8}));
+    lamp.position.set(.25*Math.cos(th),-.05,.25*Math.sin(th));g.add(lamp);
+    var bulb=new THREE.PointLight(COLORS[i%COLORS.length],.15,5);
+    bulb.position.copy(lamp.position);g.add(bulb);
+  }
+  var bulb=new THREE.PointLight(0xfff5e0,.4,10);bulb.position.y=0;g.add(bulb);
+  g.position.set(x,y,z);scene.add(g);
+}
+addChandelier(0,RH-.5,0);addChandelier(-3,RH-.5,-3);
+addChandelier(3,RH-.5,3);addChandelier(-3,RH-.5,3);
+addChandelier(3,RH-.5,-3);
+
+// STAIRS
+function addStair(x,z,ry){
+  var g=new THREE.Group(),m=sm(0x5a5a7c,.7);
+  for(var i=0;i<10;i++){
+    var step=new THREE.Mesh(new THREE.BoxGeometry(.6,.12,.3),m);
+    step.position.set(0,i*.35,-i*.3);step.castShadow=true;step.receiveShadow=true;g.add(step);
+  }
+  g.position.set(x,0,z);g.rotation.y=ry;scene.add(g);
+}
+addStair(-4,2,0.8);
+
+// EXTRA CLUTTER
+for(var i=0;i<20;i++){
+  var th=Math.random()*Math.PI*2,ph=Math.random()*Math.PI;
+  var r=3+Math.random()*3;
+  var deco=new THREE.Mesh(new THREE.SphereGeometry(.06+Math.random()*.08,8,6),sm(COLORS[Math.floor(Math.random()*COLORS.length)],.5));
+  deco.position.set(r*Math.sin(ph)*Math.cos(th),RH*.5+Math.random()*RH*.5,r*Math.sin(ph)*Math.sin(th));
+  deco.castShadow=true;scene.add(deco);
+}
+for(var i=0;i<12;i++){
+  var bar=new THREE.Mesh(new THREE.BoxGeometry(.08,.8+Math.random()*2,.04),sm(COLORS[Math.floor(Math.random()*COLORS.length)],.6));
+  var side=Math.floor(Math.random()*4);
+  if(side===0)bar.position.set(-4+Math.random()*8,RH*.3+Math.random()*RH*.4,-HD+.04);
+  else if(side===1)bar.position.set(-4+Math.random()*8,RH*.3+Math.random()*RH*.4,HD-.04);
+  else if(side===2)bar.position.set(-HW+.04,RH*.3+Math.random()*RH*.4,-4+Math.random()*8);
+  else bar.position.set(HW-.04,RH*.3+Math.random()*RH*.4,-4+Math.random()*8);
+  bar.castShadow=true;scene.add(bar);
+}
+for(var i=0;i<15;i++){
+  var col=COLORS[Math.floor(Math.random()*COLORS.length)];
+  var deco=new THREE.Mesh(new THREE.SphereGeometry(.08+Math.random()*.12,8,6),sm(col,.6));
+  deco.position.set(-4+Math.random()*8,.05+Math.random()*.08,-4+Math.random()*8);
+  deco.castShadow=true;scene.add(deco);
+}
+
+// === BALLS (毛球) ===
+var balls=[];
+var caught=0;
+var scoreEl=document.getElementById('score');
+scoreEl.width=70;
+scoreEl.height=28;
+scoreEl.style.width='70px';
+scoreEl.style.height='28px';
+var scoreCtx=scoreEl.getContext('2d');
+var toastEl=document.getElementById('toast');
+var flashEl=document.getElementById('flash');
+var stopBtn=document.getElementById('stopBtn');
+var timerEl=document.getElementById('timer');
+var shareEl=document.getElementById('shareCard');
+var shareInner=document.getElementById('shareInner');
+var gameStartTime=null;
+var gameEndTime=null;
+var timerInterval=null;
+var gameEnded=false;
+
+// Running balls dodge messages
+var DODGE_MSGS=[
+  '嘿，我跑了！来抓我呀~',
+  '抓不到我抓不到我~',
+  '太慢啦太慢啦~',
+  '哈哈，你追不上我！',
+  '我是风一样的毛球🌪️',
+  '再快一点再快一点~',
+  '想抓我？没门！',
+  '哎呀差一点点！再来！'
+];
+
+var BALL_POS=[
+  {x:4.5,y:7,z:-4.5},{x:-4.5,y:8.5,z:4},{x:0,y:9,z:-5.5},
+  {x:-5.5,y:6.5,z:-2},{x:5.5,y:7.5,z:2},{x:0,y:8.5,z:0},
+  {x:-3,y:9.5,z:3},{x:3,y:9.5,z:-3}
+];
+// Shuffle
+for(var i=BALL_POS.length-1;i>0;i--){
+  var j=Math.floor(Math.random()*(i+1));
+  var tmp=BALL_POS[i];BALL_POS[i]=BALL_POS[j];BALL_POS[j]=tmp;
+}
+
+function makeBall(){
+  var r=.2,g=new THREE.Group();
+  var body=new THREE.Mesh(new THREE.SphereGeometry(r,24,24),
+    new THREE.MeshStandardMaterial({color:0xffffff,roughness:.9,metalness:0,transparent:true,opacity:1}));
+  body.castShadow=true;g.add(body);
+  for(var i=0;i<16;i++){
+    var th=Math.random()*Math.PI*2,ph=Math.random()*Math.PI;
+    var d=r*(1+Math.random()*.45);
+    var sp=new THREE.Mesh(new THREE.SphereGeometry(r*.12,6,6),
+      new THREE.MeshStandardMaterial({color:0xfffef5,roughness:.95,transparent:true,opacity:1}));
+    sp.position.set(d*Math.sin(ph)*Math.cos(th),d*Math.cos(ph),d*Math.sin(ph)*Math.sin(th));
+    sp.castShadow=true;g.add(sp);
+  }
+  // eyes
+  var eg=new THREE.SphereGeometry(.02,8,8),em=new THREE.MeshBasicMaterial({color:0x222222});
+  var le=new THREE.Mesh(eg,em);le.position.set(-.04,.035,-r*.85);g.add(le);
+  var re=new THREE.Mesh(eg,em);re.position.set(.04,.035,-r*.85);g.add(re);
+  var nose=new THREE.Mesh(new THREE.SphereGeometry(.01,8,8),new THREE.MeshBasicMaterial({color:0xff8888}));
+  nose.position.set(0,0,-r*.92);g.add(nose);
+  g.add(new THREE.PointLight(0xffffff,.5,2.5));
+  return g;
+}
+
+var ballIconImg=null;
+var ballIconCanvas=null;
+
+function createBallIcon(ballMesh){
+  // Render the ball icon as a 2D canvas image that matches the 3D ball
+  ballIconCanvas=document.createElement('canvas');
+  ballIconCanvas.width=40;
+  ballIconCanvas.height=40;
+  ballIconCanvas.style.display='none';
+  document.body.appendChild(ballIconCanvas);
+
+  var ctx=ballIconCanvas.getContext('2d');
+  var cx=20, cy=20, R=14;
+
+  // Draw fluffy outline (bumpy sphere)
+  ctx.save();
+  ctx.beginPath();
+  for(var i=0;i<24;i++){
+    var angle=i/24*Math.PI*2;
+    var r = (i%3===0) ? R*1.15 : (i%2===0 ? R*0.92 : R*0.82);
+    var px = cx+Math.cos(angle)*r;
+    var py = cy+Math.sin(angle)*r;
+    if(i===0) ctx.moveTo(px,py);
+    else ctx.lineTo(px,py);
+  }
+  ctx.closePath();
+
+  // White gradient fill
+  var grd=ctx.createRadialGradient(cx-2,cy-3,1,cx,cy,R);
+  grd.addColorStop(0,'#ffffff');
+  grd.addColorStop(0.5,'#f8f8f4');
+  grd.addColorStop(1,'#e8e8e0');
+  ctx.fillStyle=grd;
+  ctx.fill();
+
+  // Fluffy tufts
+  ctx.strokeStyle='rgba(200,200,190,0.35)';
+  ctx.lineWidth=0.6;
+  for(var j=0;j<16;j++){
+    var a=j/16*Math.PI*2;
+    var innerR=R*0.85;
+    var outerR=R*1.22;
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(a)*innerR,cy+Math.sin(a)*innerR);
+    ctx.lineTo(cx+Math.cos(a)*outerR,cy+Math.sin(a)*outerR);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Eyes (dark)
+  ctx.fillStyle='#222';
+  ctx.beginPath();ctx.arc(cx-4.5,cy-4,2.2,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(cx+4.5,cy-4,2.2,0,Math.PI*2);ctx.fill();
+
+  // Eye shine
+  ctx.fillStyle='#ffffff';
+  ctx.beginPath();ctx.arc(cx-3.5,cy-5,0.8,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(cx+5.5,cy-5,0.8,0,Math.PI*2);ctx.fill();
+
+  // Nose (pink)
+  ctx.fillStyle='#ff9999';
+  ctx.beginPath();ctx.arc(cx,cy-0.5,1.5,0,Math.PI*2);ctx.fill();
+
+  ballIconImg=ballIconCanvas;
+  updateScore();
+}
+
+function updateScore(){
+  var ctx=scoreCtx;
+  var w=scoreEl.width,h=scoreEl.height;
+  // Redraw background
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='rgba(20,20,40,0.7)';
+  ctx.fillRect(0,0,w,h);
+
+  // Draw the actual 3D ball icon (40x40 canvas scaled down)
+  if(ballIconImg)ctx.drawImage(ballIconImg,2,h/2-11,22,22);
+
+  // Slash separator
+  ctx.strokeStyle='rgba(255,255,255,0.4)';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(30,5);
+  ctx.lineTo(30,h-5);
+  ctx.stroke();
+
+  // Text
+  ctx.font='bold 16px -apple-system,sans-serif';
+  ctx.fillStyle='#ffffff';
+  ctx.textAlign='left';
+  ctx.textBaseline='middle';
+  ctx.fillText(caught+'/'+TOTAL,35,h/2+1);
+}
+function formatTime(ms){
+  var s=Math.floor(ms/1000);
+  var m=Math.floor(s/60);
+  var sec=s%60;
+  return m>0?m+'分'+sec+'秒':sec+'秒';
+}
+
+/**
+ * Compute "beat X% of people" from elapsed time.
+ *
+ * Model: most players finish in 30-120s, outliers 10s-5min.
+ * Using a log-normal-like CDF that maps time → percentile.
+ * Design goals:
+ *  - 100% at 0s → 0% at infinity (monotonically decreasing)
+ *  - 20s → ~95th percentile (feels legendary)
+ *  - 40s → ~80th (impressive)
+ *  - 60s → ~50th (median, feels fair)
+ *  - 90s → ~20th (struggled but still shareable)
+ *  - 180s → ~5th (near bottom)
+  *  Formula: percentile = 100 * exp( - (t/45)^1.8 )
+ *  This gives a nice sigmoidal decay on log scale.
+ */
+function calcPercentile(ms){
+  var t=ms/1000; // seconds
+  if(t<=3)return 100;
+  var p=100*Math.exp(-Math.pow(t/45,1.8));
+  return Math.max(0.1,Math.min(99.9,p));
+}
+
+function showToast(msg){toastEl.textContent=msg;toastEl.classList.add('show');setTimeout(function(){toastEl.classList.remove('show')},1500)}
+
+function endGame(allCaught){
+  if(gameEnded)return;
+  gameEnded=true;
+  gameEndTime=Date.now();
+  if(timerInterval)clearInterval(timerInterval);
+
+  var elapsed=gameEndTime-gameStartTime;
+  var percentile=calcPercentile(elapsed);
+  var allCaughtBool=allCaught && caught>=bCount;
+
+  var shareMsg,shareTitle;
+
+  if(allCaughtBool){
+    // ====== T0: 人类高质量颈椎 (95% - 99.9%) ======
+    if(percentile>=95){
+      shareTitle='🏆 T0 人类高质量颈椎';
+      shareMsg='【'+formatTime(elapsed)+'】，击败了【'+percentile.toFixed(1)+'%】的玩家！人类的颈椎已经限制不了你了！🔥';
+    }
+    // ====== T1: 健康活力打工人 (85% - 94.9%) ======
+    else if(percentile>=85){
+      shareTitle='🥇 T1 健康活力打工人';
+      shareMsg='【'+formatTime(elapsed)+'】，击败了【'+percentile.toFixed(1)+'%】的玩家！经鉴定：这是一颗保养得当、充满活力的优秀头颅！';
+    }
+    // ====== T1: 健康活力打工人 (70% - 84.9%) ======
+    else if(percentile>=70){
+      shareTitle='🥇 T1 健康活力打工人';
+      shareMsg='【'+formatTime(elapsed)+'】，击败了【'+percentile.toFixed(1)+'%】的玩家！你的脖子比公司的网络还要流畅！💨';
+    }
+    // ====== T2: 标准生锈齿轮 (60% - 69.9%) ======
+    else if(percentile>=60){
+      shareTitle='🥈 T2 标准生锈齿轮';
+      shareMsg='【'+formatTime(elapsed)+'】，击败了【'+percentile.toFixed(1)+'%】的玩家！建议每天把本网页当成赛博牵引器用一次！';
+    }
+    // ====== T2: 标准生锈齿轮 (30% - 59.9%) ======
+    else if(percentile>=30){
+      shareTitle='🥈 T2 标准生锈齿轮';
+      shareMsg='【'+formatTime(elapsed)+'】，击败了【'+percentile.toFixed(1)+'%】的玩家。刚才仰头的时候，是不是听到了一声清脆的咔哒声？';
+    }
+    // ====== T3: 重度僵硬患者 (15% - 29.9%) ======
+    else if(percentile>=15){
+      shareTitle='🥉 T3 重度僵硬患者';
+      shareMsg='【'+formatTime(elapsed)+'】，击败了【'+percentile.toFixed(1)+'%】的玩家。系统检测到高浓度班味，你的脖子转得比树懒还慢！🦥';
+    }
+    // ====== T3: 重度僵硬患者 (5% - 14.9%) ======
+    else if(percentile>=5){
+      shareTitle='🥉 T3 重度僵硬患者';
+      shareMsg='【'+formatTime(elapsed)+'】，击败了【'+percentile.toFixed(1)+'%】的玩家。答应我，放下工作，站起来活动一下好吗？';
+    }
+    // ====== T4: 出土文物级别 (0.1% - 4.9%) ======
+    else{
+      shareTitle='🪨 T4 出土文物级别';
+      shareMsg='【'+formatTime(elapsed)+'】，击败了【'+percentile.toFixed(1)+'%】的玩家。不说了，下班去做个按摩吧，真的。';
+    }
+  }else{
+    // Not completed: rank by completion percentage
+    var pct=caught>=bCount?100:(caught/bCount*100);
+    var rankPercentile=pct; // use completion rate as the percentile for ranking
+    if(rankPercentile>=85){
+      shareTitle='🥇 T1 健康活力打工人';
+      shareMsg='【'+formatTime(elapsed)+'】，抓到'+caught+'/'+TOTAL+'个。经鉴定：这是一颗保养得当、充满活力的优秀头颅！';
+    }
+    else if(rankPercentile>=70){
+      shareTitle='🥇 T1 健康活力打工人';
+      shareMsg='【'+formatTime(elapsed)+'】，抓到'+caught+'/'+TOTAL+'个。你的脖子比公司的网络还要流畅！💨';
+    }
+    else if(rankPercentile>=60){
+      shareTitle='🥈 T2 标准生锈齿轮';
+      shareMsg='【'+formatTime(elapsed)+'】，抓到'+caught+'/'+TOTAL+'个。建议每天把本网页当成赛博牵引器用一次！';
+    }
+    else if(rankPercentile>=30){
+      shareTitle='🥈 T2 标准生锈齿轮';
+      shareMsg='【'+formatTime(elapsed)+'】，抓到'+caught+'/'+TOTAL+'个。刚才仰头的时候，是不是听到了一声清脆的咔哒声？';
+    }
+    else if(rankPercentile>=15){
+      shareTitle='🥉 T3 重度僵硬患者';
+      shareMsg='【'+formatTime(elapsed)+'】，抓到'+caught+'/'+TOTAL+'个。系统检测到高浓度班味，你的脖子转得比树懒还慢！🦥';
+    }
+    else if(rankPercentile>=5){
+      shareTitle='🥉 T3 重度僵硬患者';
+      shareMsg='【'+formatTime(elapsed)+'】，抓到'+caught+'/'+TOTAL+'个。答应我，放下工作，站起来活动一下好吗？';
+    }
+    else{
+      shareTitle='🪨 T4 出土文物级别';
+      shareMsg='【'+formatTime(elapsed)+'】，只抓到'+caught+'/'+TOTAL+'个。不说了，下班去做个按摩吧，真的。';
+    }
+    var percentile=rankPercentile;
+  }
+
+  // Show share card
+  shareInner.innerHTML=
+    '<h2>'+shareTitle+'</h2>'+
+    '<p class="share-sub">AR 高空寻球挑战</p>'+
+    '<p class="share-msg">'+shareMsg+'</p>'+
+    '<div class="share-stats">'+
+      '<div class="share-stat"><div class="val">'+caught+'/'+TOTAL+'</div><div class="lbl">毛球</div></div>'+
+      '<div class="share-stat"><div class="val">'+formatTime(elapsed)+'</div><div class="lbl">用时</div></div>'+
+      '<div class="share-stat"><div class="val">'+percentile.toFixed(1)+'%</div><div class="lbl">排名</div></div>'+
+    '</div>'+
+    '<p class="share-footer">分享你的颈椎健康报告</p>';
+      '<div class="share-stat"><div class="val">'+percentile.toFixed(1)+'%</div><div class="lbl">排名</div></div>'+
+    '</div>'+
+    '<div class="share-actions">'+
+      '<button class="btn-copy" onclick="copyLink()">📋 复制链接</button>'+
+      '<button class="btn-retry" onclick="retryGame()">🔄 再来一次</button>'+
+    '</div>';
+  shareEl.classList.add('show');
+}
+
+window.copyLink=function(){
+  var url=location.href;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(function(){
+      showToast('✅ 链接已复制');
+    });
+  }else{
+    var ta=document.createElement('textarea');ta.value=url;
+    document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');document.body.removeChild(ta);
+    showToast('✅ 链接已复制');
+  }
+};
+
+window.retryGame=function(){
+  shareEl.classList.remove('show');
+  location.reload();
+};
+
+// === Stop Button ===
+stopBtn.addEventListener('click',function(){
+  endGame(false);
+});
+
+// === Start Game ===
+document.getElementById('go').addEventListener('click',function(){
+  gameStartTime=Date.now();
+  gameEnded=false;
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    DeviceOrientationEvent.requestPermission().then(function(p){if(p==='granted')addEventListener('deviceorientation',onOri,true)});
+  }else{addEventListener('deviceorientation',onOri,true)}
+  document.getElementById('splash').classList.add('h');
+  setTimeout(function(){document.getElementById('splash').style.display='none'},800);
+  // Show stop button and timer
+  stopBtn.style.display='flex';
+  timerEl.style.display='block';
+  timerInterval=setInterval(function(){
+    var elapsed=Date.now()-gameStartTime;
+    timerEl.textContent=formatTime(elapsed);
+  },100);
+});
+
+// (no flee needed - tap to catch)
+
+// === Shuffle and place balls ===
+// First 2 balls: stationary, positions randomized every game
+// Balls 3-5: run away when tapped, random positions
+// All positions selected randomly from BALL_POS
+var shuffled=[];
+for(var i=0;i<BALL_POS.length;i++) shuffled.push(BALL_POS[i]);
+for(var i=shuffled.length-1;i>0;i--){
+  var j=Math.floor(Math.random()*(i+1));
+  var tmp=shuffled[i];shuffled[i]=shuffled[j];shuffled[j]=tmp;
+}
+
+var bCount=Math.min(TOTAL,shuffled.length);
+for(var bi=0;bi<bCount;bi++){
+  var mesh=makeBall(),pos=shuffled[bi];
+  mesh.position.set(pos.x,pos.y,pos.z);
+  scene.add(mesh);
+  balls.push({
+    mesh:mesh,
+    alive:true,
+    baseY:pos.y,
+    phase:Math.random()*Math.PI*2,
+    speed:.8+Math.random()*.6,
+    rotS:.2+Math.random()*.3,
+    // First 2 balls: stationary. Balls 3+: running
+    running:bi>=2,
+    // Running ball state
+    moveTimer:0,
+    moveInterval:3+Math.random()*4, // 3~7s between movements
+    moveDir:new THREE.Vector3((Math.random()-.5)*2,0,(Math.random()-.5)*2),
+    moveRadius:0.3+Math.random()*0.4,
+    moveCenter:{x:pos.x,z:pos.z}, // remember original center
+    dodgeCount:0,                  // how many times this ball has escaped
+    escapePos:new THREE.Vector3(pos.x,pos.y,pos.z) // last known position after escape
+  });
+  // First ball: create icon from it
+  if(bi===0)createBallIcon(mesh);
+}
+updateScore();
+
+// === Tap-to-Catch on Canvas ===
+var tapRay=new THREE.Raycaster();
+
+// === VR Head Tracking (Quaternions) ===
+var gyroInit=false;
+var _eulerObj=new THREE.Euler();
+var _deviceQuat=new THREE.Quaternion();
+var _initQuat=new THREE.Quaternion();
+var _smoothQuat=new THREE.Quaternion();
+var _targetQuat=new THREE.Quaternion();
+var _deltaQuat=new THREE.Quaternion();
+var _touchQuat=new THREE.Quaternion();
+var _prevBeta=0;
+var _prevAlpha=0;
+// Low-pass filter for gyro deltas
+var _fBeta=0;
+var _fAlpha=0;
+
+function onOri(e){
+  if(e.alpha===null)return;
+
+  // Physical mapping (iOS deviceorientation, portrait held in front of face):
+  //   beta: -180~180. +90=vertical facing face. Top toward ceiling→beta↓(look up).
+  //         Top toward face→beta↑(look down).
+  //   alpha: compass heading 0-360. Relative delta = yaw.
+  //
+  // Three.js euler 'YXZ':
+  //   Positive X (pitch) = camera looks UP
+  //   Positive Y (yaw) = camera looks RIGHT (in world frame)
+  //
+  // Pitch: beta decreases → look up → pitch positive → pitch = -deltaBeta ✓
+  // Yaw: direction depends on device coords. deltaAlpha as-is: test and flip sign below if wrong.
+
+  var beta=THREE.MathUtils.degToRad(e.beta||0);
+  var alpha=THREE.MathUtils.degToRad(e.alpha||0);
+
+  if(!gyroInit){
+    _prevBeta=beta;
+    _prevAlpha=alpha;
+    _fBeta=0;_fAlpha=0;
+    _initQuat.set(0,0,0,1);
+    _smoothQuat.set(0,0,0,1);
+    _targetQuat.set(0,0,0,1);
+    pivot.quaternion.copy(_smoothQuat);
+    gyroInit=true;
+    return;
+  }
+
+  // 1. Raw delta with 360° wrap-around
+  var dBeta=beta-_prevBeta;
+  var dAlpha=alpha-_prevAlpha;
+
+  if(dBeta>Math.PI)dBeta-=Math.PI*2;
+  if(dBeta<-Math.PI)dBeta+=Math.PI*2;
+  if(dAlpha>Math.PI)dAlpha-=Math.PI*2;
+  if(dAlpha<-Math.PI)dAlpha+=Math.PI*2;
+
+  _prevBeta=beta;
+  _prevAlpha=alpha;
+
+  // 2. Invert: phone toward ceiling (look up) → pitch negative → camera looks UP in Three.js
+  //    Actually in Three.js positive X=UP, negative X=DOWN.
+  //    beta decreases (toward ceiling) → we want camera UP → pitch should be POSITIVE.
+  //    So: rawPitch = +deltaBeta (since deltaBeta < 0 when looking up, negate it → positive)
+  //    Wait: beta DECREASES when tilting toward ceiling. deltaBeta = beta_new - beta_old < 0.
+  //    Three.js: positive X = camera looks UP. We need positive pitch when looking up.
+  //    So: pitch = -deltaBeta works! -(-small) = +small → camera looks up ✓
+  //
+  //    BUT we just confirmed it's wrong in practice. Let me just flip both:
+  var rawPitch=dBeta;
+  var rawYaw=-dAlpha;
+
+  // 3. Dead zone: ignore sub-0.5° jitter (sensor noise)
+  if(Math.abs(rawPitch)<THREE.MathUtils.degToRad(0.5))rawPitch=0;
+  if(Math.abs(rawYaw)<THREE.MathUtils.degToRad(0.5))rawYaw=0;
+
+  // 4. Low-pass filter (0.25 weight → kills 75% of high-freq noise)
+  rawPitch=0.25*rawPitch+0.75*_fBeta;
+  rawYaw=0.25*rawYaw+0.75*_fAlpha;
+  _fBeta=rawPitch;_fAlpha=rawYaw;
+
+  // 5. Velocity cap: 5°/frame ≈ 300°/sec (human head turn speed)
+  var MAX=THREE.MathUtils.degToRad(5);
+  rawPitch=Math.max(-MAX,Math.min(MAX,rawPitch));
+  rawYaw=Math.max(-MAX,Math.min(MAX,rawYaw));
+
+  // 6. Build delta quaternion
+  _eulerObj.set(rawPitch,rawYaw,0,'YXZ');
+  _deltaQuat.setFromEuler(_eulerObj);
+
+  // 7. Accumulate toward target rotation
+  _targetQuat.multiply(_deltaQuat);
+  _targetQuat.normalize();
+
+  // 8. Slerp from current position → target (15%/frame = inertia feel)
+  _smoothQuat.slerp(_targetQuat,0.15);
+  _smoothQuat.normalize();
+
+  pivot.quaternion.copy(_smoothQuat);
+}
+
+// Touch fallback for camera control (pan)
+var drag=false,lx=0,ly=0,yaw=0,pt=0,downX=0,downY=0;
+REN.domElement.addEventListener('pointerdown',function(e){
+  downX=e.clientX;downY=e.clientY;
+  drag=true;
+});
+REN.domElement.addEventListener('pointermove',function(e){
+  if(!drag)return;
+  yaw-=(e.clientX-lx)*.003;pt-=(e.clientY-ly)*.003;
+  pt=Math.max(-1.4,Math.min(1.4,pt));
+  lx=e.clientX;ly=e.clientY;
+  // Touch mode: also use quaternion, consistent with gyro
+  _touchQuat.setFromEuler(new THREE.Euler(pt,yaw,0,'YXZ'));
+  pivot.quaternion.copy(_touchQuat);
+});
+REN.domElement.addEventListener('pointerup',function(e){
+  drag=false;
+  var dx=e.clientX-downX;
+  var dy=e.clientY-downY;
+  // If barely moved, treat as tap
+  if(Math.sqrt(dx*dx+dy*dy)<10){
+    var rect=REN.domElement.getBoundingClientRect();
+    var mx=((e.clientX-rect.left)/rect.width)*2-1;
+    var my=-((e.clientY-rect.top)/rect.height)*2+1;
+    tapRay.setFromCamera(new THREE.Vector2(mx,my),cam);
+    for(var i=0;i<balls.length;i++){
+      var b=balls[i];
+      if(!b.alive)continue;
+      var hits=tapRay.intersectObject(b.mesh,true);
+      if(hits.length>0){
+        if(b.running){
+          b.dodgeCount++;
+          if(b.dodgeCount<=2){
+            // Escape: teleport to a far-away random BALL_POS
+            var farIdx=Math.floor(Math.random()*BALL_POS.length);
+            var fp=BALL_POS[farIdx];
+            b.escapePos.set(fp.x,fp.y,fp.z);
+            b.mesh.position.copy(b.escapePos);
+            b.moveCenter={x:fp.x,z:fp.z};
+            b.moveTimer=0;
+            b.moveInterval=2+Math.random()*3;
+            showToast(DODGE_MSGS[Math.floor(Math.random()*DODGE_MSGS.length)]);
+            flashEl.style.opacity='1';
+            setTimeout(function(){flashEl.style.opacity='0'},300);
+          }else{
+            // Ball has escaped 3+ times → give up and let it be caught
+            b.running=false;
+            showToast('😮 这只小球不跑了…抓住它！');
+            flashEl.style.opacity='1';
+            setTimeout(function(){flashEl.style.opacity='0'},300);
+          }
+        }else{
+          // Stationary ball: caught
+          b.alive=false;scene.remove(b.mesh);
+          caught++;updateScore();
+          flashEl.style.opacity='1';setTimeout(function(){flashEl.style.opacity='0'},300);
+          if(caught>=bCount){
+            showToast('🐾 全部抓到！太厉害了！');
+            setTimeout(function(){endGame(true)},800);
+          }else{
+            showToast('🐾 抓到1只！还剩'+(bCount-caught)+'只');
+          }
+        }
+        break;
+      }
+    }
+  }
+});
+
+// === Pinch-to-Zoom (FOV control) ===
+var pinchDist=0,currentFov=50;
+REN.domElement.addEventListener('touchstart',function(e){
+  if(e.touches.length===2){
+    var t1=e.touches[0],t2=e.touches[1];
+    pinchDist=Math.sqrt((t2.clientX-t1.clientX)*(t2.clientX-t1.clientX)+(t2.clientY-t1.clientY)*(t2.clientY-t1.clientY));
+  }
+},{passive:true});
+REN.domElement.addEventListener('touchmove',function(e){
+  if(e.touches.length===2){
+    var t1=e.touches[0],t2=e.touches[1];
+    var newDist=Math.sqrt((t2.clientX-t1.clientX)*(t2.clientX-t1.clientX)+(t2.clientY-t1.clientY)*(t2.clientY-t1.clientY));
+    var delta=newDist-pinchDist;
+    currentFov-=delta*0.15;
+    currentFov=Math.max(25,Math.min(70,currentFov));
+    cam.fov=currentFov;
+    cam.updateProjectionMatrix();
+    pinchDist=newDist;
+  }
+},{passive:true});
+REN.domElement.addEventListener('touchend',function(e){
+  if(e.touches.length<2)pinchDist=0;
+},{passive:true});
+
+// === Start Game ===
+document.getElementById('go').addEventListener('click',function(){
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    DeviceOrientationEvent.requestPermission().then(function(p){if(p==='granted')addEventListener('deviceorientation',onOri,true)});
+  }else{addEventListener('deviceorientation',onOri,true)}
+  document.getElementById('splash').classList.add('h');
+  setTimeout(function(){document.getElementById('splash').style.display='none'},800);
+});
+
+// === Animation Loop ===
+var time=0;
+function animate(){
+  requestAnimationFrame(animate);time+=.016;
+
+  // Ball animation
+  for(var i=0;i<balls.length;i++){
+    var b=balls[i];
+    if(!b.alive||!b.mesh)continue;
+
+    // Idle bobbing animation
+    b.mesh.position.y=b.baseY+Math.sin(time*b.speed+b.phase)*.1;
+    b.mesh.rotation.y+=b.rotS*.016;
+    var br=1+Math.sin(time*2+b.phase)*.05;
+    b.mesh.scale.setScalar(br);
+
+    // Running balls: move around periodically
+    if(b.running){
+      b.moveTimer+=.016;
+      if(b.moveTimer>=b.moveInterval){
+        b.moveTimer=0;
+        b.moveDir.set((Math.random()-.5)*2,0,(Math.random()-.5)*2).normalize();
+        b.moveRadius=.3+Math.random()*.4;
+        b.moveCenter={x:b.mesh.position.x,z:b.mesh.position.z};
+      }
+      // Smooth movement toward target offset
+      var targetX=b.moveCenter.x+b.moveDir.x*b.moveRadius;
+      var targetZ=b.moveCenter.z+b.moveDir.z*b.moveRadius;
+      b.mesh.position.x+=(targetX-b.mesh.position.x)*.02;
+      b.mesh.position.z+=(targetZ-b.mesh.position.z)*.02;
+      // Also vary baseY slightly for running balls
+      b.baseY+=Math.sin(time*1.5+i)*.001;
+    }
+  }
+
+  REN.render(scene,cam);
+}
+animate();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+---
+title: "Gateway"
+description: "A unified multi-channel message gateway for CLI, TUI, Web UI, Desktop, and Feishu"
+icon: "tower-broadcast"
+---
+
+# Gateway
+
+Gateway is PilotDeck's central communication hub. It exposes WebSocket and HTTP protocols so every channel, including CLI, TUI, Web UI, Desktop, and Feishu, can interact with agent sessions through one message model.
+
+## Architecture Overview
+
+```
+┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
+│  CLI    │  │  TUI    │  │ Web UI  │  │ Feishu  │
+│ Channel │  │ Channel │  │ Channel │  │ Channel │
+└────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘
+     │            │            │             │
+     └────────────┴─────┬──────┴─────────────┘
+                        │
+                ┌───────▼───────┐
+                │   Gateway     │
+                │  (WS + HTTP)  │
+                └───────┬───────┘
+                        │
+                ┌───────▼───────┐
+                │ SessionRouter │
+                └───────┬───────┘
+                        │
+           ┌────────────┼────────────┐
+           │            │            │
+     ┌─────▼─────┐ ┌───▼───┐ ┌─────▼─────┐
+     │ Session A │ │ Sess B│ │ Session C │
+     │ (Agent)   │ │(Agent)│ │ (Agent)   │
+     └───────────┘ └───────┘ └───────────┘
+```
+
+## Runtime Modes
+
+<Tabs>
+  <Tab title="In-Process Mode">
+    Gateway runs inside the current process. This is ideal for CLI and TUI single-user flows:
+
+    ```bash
+    # CLI creates an in-process gateway automatically
+    pilotdeck "Analyze this code for performance issues"
+
+    # TUI mode
+    pilotdeck tui
+    ```
+
+    Characteristics:
+    - No standalone server required
+    - Gateway is destroyed when the process exits
+    - Best for quick one-off interactions
+  </Tab>
+  <Tab title="Server Mode">
+    Gateway runs as a long-lived service and multiple channels connect over WebSocket:
+
+    ```bash
+    pilotdeck server --port 18789
+    ```
+
+    Characteristics:
+    - Multiple channels can connect at the same time
+    - Sessions are persisted
+    - Always On and Cron are supported
+    - Web UI and Feishu-style remote channels require this mode
+  </Tab>
+</Tabs>
+
+## Core Concepts
+
+### Session
+
+A Session is the runtime context for an agent. Each session is bound to:
+- a unique `sessionKey`
+- a WorkSpace directory (`projectKey`)
+- a channel type such as `cli`, `tui`, or `web`
+- a full transcript
+
+```
+sessionKey format: <channel>:project=<path>:s_<uuid>
+example: web:project=/Users/me/myapp:s_abc123
+```
+
+### Turn
+
+Each user input triggers one Turn. Gateway receives the input, routes it through `SessionRouter` to the right `AgentSession`, and streams events back to the client.
+
+### Protocol Events
+
+| Event type | Direction | Description |
+|------------|-----------|-------------|
+| `submit_turn` | client → gateway | Submit a user message |
+| `text_delta` | gateway → client | Streaming agent text |
+| `thinking_delta` | gateway → client | Thinking stream, when available |
+| `tool_call_start` | gateway → client | Tool call started |
+| `tool_call_end` | gateway → client | Tool call completed |
+| `turn_complete` | gateway → client | Current turn completed |
+| `error` | gateway → client | Error event |
+
+### Authentication
+
+In Server mode, Gateway authenticates with a token file:
+
+```bash
+# Token is generated automatically and saved at:
+~/.pilotdeck/server-token
+
+# WebSocket passes the token in the hello frame
+# HTTP requests pass it through the Authorization header
+```
+
+## Supported Channels
+
+<CardGroup cols={2}>
+  <Card title="CLI Channel" icon="terminal">
+    One-shot command-line interaction for scripting and automation
+  </Card>
+  <Card title="TUI Channel" icon="rectangle-terminal">
+    Ink-based interactive terminal UI with streaming output
+  </Card>
+  <Card title="Web Channel" icon="browser">
+    React + Vite Web UI connected to Gateway over WebSocket
+  </Card>
+  <Card title="Feishu Channel" icon="comments">
+    Feishu bot adapter for messaging and session management
+  </Card>
+</CardGroup>
+
+## Start Gateway Server
+
+```bash
+# Default port 18789
+pilotdeck server
+
+# Custom port
+pilotdeck server --port 8080
+
+# Port through environment variable
+PILOTDECK_GATEWAY_PORT=8080 pilotdeck server
+```
+
+Startup output:
+
+```
+PilotDeck server listening: http://127.0.0.1:18789
+WebSocket: ws://127.0.0.1:18789/ws
+Token: ~/.pilotdeck/server-token
+```
+
+## API Overview
+
+| Method | Description |
+|--------|-------------|
+| `submitTurn` | Submit one user turn and receive streaming events |
+| `abortTurn` | Abort the currently running turn |
+| `newSession` | Create a new session |
+| `listSessions` | List all sessions under a WorkSpace |
+| `resumeSession` | Resume an existing session |
+| `closeSession` | Close a session and release resources |
+| `describeServer` | Get Gateway server status |
+| `listProjects` | List all known WorkSpaces |
+| `describeProject` | Get details for one WorkSpace |
