@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" width="600" height="480">
+  <rect width="600" height="480" fill="#f8fafc"/>
+  <!-- Memory inspector window -->
+  <g>
+    <rect x="60" y="60" width="480" height="360" rx="14" fill="#fff" stroke="#000" stroke-width="2"/>
+    <!-- title bar -->
+    <rect x="60" y="60" width="480" height="38" rx="14" fill="#0f172a"/>
+    <rect x="60" y="78" width="480" height="20" fill="#0f172a"/>
+    <circle cx="80" cy="79" r="5" fill="#ff5f56"/>
+    <circle cx="98" cy="79" r="5" fill="#ffbd2e"/>
+    <circle cx="116" cy="79" r="5" fill="#27c93f"/>
+    <text x="260" y="84" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#cbd5e1">Memory Inspector  Project A</text>
+
+    <!-- entries -->
+    <g font-family="-apple-system, sans-serif" font-size="12">
+      <!-- entry 1 pinned -->
+      <g>
+        <rect x="80" y="120" width="440" height="56" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+        <text x="92" y="138" font-size="10" font-weight="700" fill="#2563eb" letter-spacing="0.05em"> PINNED · 2026-05-22</text>
+        <text x="92" y="158" font-weight="600" fill="#0f172a">Always use short, declarative sentences in marketing copy</text>
+      </g>
+      <!-- entry 2 -->
+      <g>
+        <rect x="80" y="186" width="440" height="56" rx="8" fill="#fff" stroke="#e5e7eb"/>
+        <text x="92" y="204" font-size="10" font-weight="700" fill="#64748b" letter-spacing="0.05em">2026-05-21 · retrieved 3×</text>
+        <text x="92" y="224" fill="#0f172a">Tone preference: avoid the word "leverage"</text>
+        <!-- edit/delete icons -->
+        <g fill="#94a3b8">
+          <rect x="476" y="200" width="14" height="14" rx="3"/>
+          <rect x="494" y="200" width="14" height="14" rx="3"/>
+        </g>
+      </g>
+      <!-- entry 3 -->
+      <g>
+        <rect x="80" y="252" width="440" height="56" rx="8" fill="#fff" stroke="#e5e7eb"/>
+        <text x="92" y="270" font-size="10" font-weight="700" fill="#64748b" letter-spacing="0.05em">2026-05-20 · auto-extracted</text>
+        <text x="92" y="290" fill="#0f172a">Reviewer: Wang Yi · Deadline: May 28</text>
+      </g>
+      <!-- entry 4 dimmed (rolled back) -->
+      <g opacity="0.5">
+        <rect x="80" y="318" width="440" height="56" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+        <text x="92" y="336" font-size="10" font-weight="700" fill="#dc2626" letter-spacing="0.05em">¶ ROLLED BACK · 2026-05-19</text>
+        <text x="92" y="356" fill="#7f1d1d" text-decoration="line-through">Use formal academic tone</text>
+      </g>
+    </g>
+
+    <!-- side trace -->
+    <g font-family="-apple-system, sans-serif" font-size="10" fill="#94a3b8">
+      <text x="80" y="402" font-weight="600">TRACE</text>
+      <text x="80" y="416">generation ’ extraction ’ storage ’ retrieval</text>
+    </g>
+  </g>
+</svg>

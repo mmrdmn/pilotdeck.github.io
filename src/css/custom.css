@@ -1,0 +1,216 @@
+/* src/css/custom.css - PilotDeck Seed-style theme (ported from UltraRAG reference) */
+:root {
+  --ifm-color-primary: #000000;
+  --ifm-color-primary-dark: #333333;
+  --ifm-color-primary-light: #666666;
+
+  --site-bg-color: #ffffff;
+  --site-text-color: #111827;
+
+  --pd-accent: #2563eb;
+  --pd-accent-soft: rgba(37, 99, 235, 0.08);
+
+  --ifm-navbar-height: 60px;
+}
+
+[data-theme='light'] {
+  --ifm-background-color: #ffffff;
+  --ifm-font-color-base: #1f2937;
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.8);
+}
+
+.main-wrapper {
+  padding-top: var(--ifm-navbar-height);
+}
+
+/* ===== Navbar - frosted white (Seed style) ===== */
+.navbar {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0;
+  height: 60px;
+  min-height: 60px;
+}
+
+.navbar__inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+.navbar__brand {
+  position: absolute !important;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  margin-right: 0 !important;
+}
+
+.navbar__logo {
+  height: 28px;
+}
+
+.navbar__items--right {
+  position: absolute !important;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  margin-left: 0 !important;
+}
+
+.navbar__inner > .navbar__items:not(.navbar__items--right) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  gap: 4px;
+}
+
+.navbar__item {
+  color: #333333;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.2s;
+  padding: 8px 16px;
+  line-height: 1;
+}
+
+.navbar__item:hover,
+.navbar__item--active {
+  color: #000000;
+  background: transparent !important;
+}
+
+/* Mobile */
+@media (max-width: 996px) {
+  .navbar {
+    height: 52px;
+    min-height: 52px;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: #fff !important;
+  }
+  .navbar__inner {
+    justify-content: space-between;
+    padding: 0 12px;
+  }
+  .navbar__brand {
+    position: static !important;
+    transform: none;
+    margin-right: 0 !important;
+  }
+  .navbar__items--right {
+    position: static !important;
+    transform: none;
+    gap: 4px;
+  }
+  .navbar__logo {
+    height: 24px;
+  }
+  .navbar__inner > .navbar__items:not(.navbar__items--right) > .navbar__item {
+    display: none !important;
+  }
+  .navbar__items--right {
+    display: none !important;
+  }
+  .main-wrapper {
+    padding-top: 52px;
+  }
+  .navbar-sidebar {
+    background: #fff;
+  }
+  .navbar-sidebar__brand {
+    display: none !important;
+  }
+}
+
+/* ===== Footer ===== */
+.footer {
+  background-color: #fafafa;
+  color: #666;
+  border-top: 1px solid #eee;
+}
+
+.footer__copyright {
+  color: #999;
+  font-size: 12px;
+}
+
+/* ===== Markdown / Blog typography (kept for future use) ===== */
+.markdown {
+  font-size: 17px !important;
+  line-height: 1.8 !important;
+  color: #333 !important;
+  letter-spacing: 0.01em;
+}
+
+.markdown p {
+  margin-bottom: 1.5em !important;
+}
+
+.markdown h1 {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #111 !important;
+  margin-top: 2.5em !important;
+  margin-bottom: 0.8em !important;
+}
+
+.markdown h2 {
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  color: #111 !important;
+  margin-top: 2em !important;
+  margin-bottom: 0.7em !important;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.markdown h3 {
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+  color: #222 !important;
+  margin-top: 1.8em !important;
+  margin-bottom: 0.6em !important;
+}
+
+.markdown blockquote {
+  border-left: 3px solid var(--pd-accent) !important;
+  background: #f8fafc !important;
+  padding: 1em 1.5em !important;
+  margin: 1.5em 0 !important;
+  border-radius: 0 8px 8px 0;
+  color: #444 !important;
+}
+
+.markdown code {
+  font-size: 0.9em !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  background: #f3f4f6 !important;
+  color: #e11d48 !important;
+  font-weight: 500;
+}
+
+.markdown img {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  margin: 1.5em 0;
+}

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 320" width="500" height="320">
+  <rect width="500" height="320" fill="#f8fafc"/>
+  <!-- Web app frame -->
+  <g>
+    <rect x="50" y="40" width="400" height="240" rx="12" fill="#fff" stroke="#000" stroke-width="2"/>
+    <!-- sidebar -->
+    <rect x="50" y="40" width="90" height="240" fill="#0f172a"/>
+    <g fill="#cbd5e1" font-family="-apple-system, sans-serif" font-size="10">
+      <rect x="62" y="60" width="66" height="20" rx="4" fill="#2563eb"/>
+      <text x="74" y="74" fill="#fff" font-weight="600">Models</text>
+      <text x="74" y="100">Datasets</text>
+      <text x="74" y="122">Training</text>
+      <text x="74" y="144">Eval</text>
+      <text x="74" y="166">Deploy</text>
+    </g>
+    <!-- main canvas: training curve -->
+    <g>
+      <rect x="158" y="58" width="280" height="30" rx="4" fill="#f1f5f9"/>
+      <text x="172" y="78" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#0f172a">Embedding Fine-tuning · run_042</text>
+      <!-- loss chart -->
+      <rect x="158" y="100" width="280" height="120" rx="6" fill="#fafafa" stroke="#e5e7eb"/>
+      <polyline points="170,200 200,170 230,150 260,140 290,128 320,124 350,120 380,118 410,116 430,115"
+                fill="none" stroke="#2563eb" stroke-width="2"/>
+      <polyline points="170,210 200,190 230,180 260,170 290,166 320,160 350,158 380,156 410,154 430,152"
+                fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <text x="172" y="116" font-family="-apple-system, sans-serif" font-size="10" fill="#2563eb" font-weight="600"> train loss</text>
+      <text x="172" y="130" font-family="-apple-system, sans-serif" font-size="10" fill="#94a3b8">--- eval loss</text>
+      <!-- metrics -->
+      <g font-family="-apple-system, sans-serif" font-size="10">
+        <rect x="158" y="234" width="86" height="34" rx="6" fill="#eff6ff"/>
+        <text x="168" y="248" fill="#1d4ed8" font-weight="700">Recall@10</text>
+        <text x="168" y="262" fill="#1d4ed8" font-size="13" font-weight="800">0.847</text>
+        <rect x="254" y="234" width="86" height="34" rx="6" fill="#f0fdf4"/>
+        <text x="264" y="248" fill="#15803d" font-weight="700">MRR</text>
+        <text x="264" y="262" fill="#15803d" font-size="13" font-weight="800">0.692</text>
+        <rect x="350" y="234" width="88" height="34" rx="6" fill="#fef3c7"/>
+        <text x="360" y="248" fill="#b45309" font-weight="700">Steps</text>
+        <text x="360" y="262" fill="#b45309" font-size="13" font-weight="800">12,400</text>
+      </g>
+    </g>
+  </g>
+  <!-- "no code" badge -->
+  <g>
+    <rect x="350" y="295" width="100" height="22" rx="11" fill="#000"/>
+    <text x="400" y="310" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#fff">low-code</text>
+  </g>
+</svg>

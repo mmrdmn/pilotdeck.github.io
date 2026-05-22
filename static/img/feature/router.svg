@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" width="600" height="480">
+  <rect width="600" height="480" fill="#f8fafc"/>
+
+  <!-- incoming tasks -->
+  <g>
+    <text x="40" y="60" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#64748b" letter-spacing="0.05em">INCOMING TASKS</text>
+    <g font-family="-apple-system, sans-serif" font-size="12">
+      <rect x="40" y="80"  width="160" height="40" rx="8" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      <text x="56" y="105" fill="#0f172a">Polish copy</text>
+      <rect x="40" y="140" width="160" height="40" rx="8" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      <text x="56" y="165" fill="#0f172a">Design system</text>
+      <rect x="40" y="200" width="160" height="40" rx="8" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      <text x="56" y="225" fill="#0f172a">Reorder list</text>
+      <rect x="40" y="260" width="160" height="40" rx="8" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      <text x="56" y="285" fill="#0f172a">Architect</text>
+      <rect x="40" y="320" width="160" height="40" rx="8" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      <text x="56" y="345" fill="#0f172a">Translate</text>
+    </g>
+  </g>
+
+  <!-- router -->
+  <g>
+    <rect x="240" y="160" width="120" height="160" rx="14" fill="#0f172a"/>
+    <text x="300" y="200" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#fff" letter-spacing="0.05em">ROUTER</text>
+    <text x="300" y="222" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#94a3b8">difficulty</text>
+    <text x="300" y="236" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#94a3b8">detector</text>
+    <!-- node lights -->
+    <circle cx="270" cy="270" r="5" fill="#22d3ee"/>
+    <circle cx="300" cy="270" r="5" fill="#2563eb"/>
+    <circle cx="330" cy="270" r="5" fill="#a855f7"/>
+    <text x="300" y="298" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="10" fill="#94a3b8">routes 5 tasks</text>
+  </g>
+
+  <!-- arrows in -->
+  <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+    <path d="M 200 100 L 240 200" stroke-dasharray="4 3"/>
+    <path d="M 200 160 L 240 220"/>
+    <path d="M 200 220 L 240 240" stroke-dasharray="4 3"/>
+    <path d="M 200 280 L 240 260"/>
+    <path d="M 200 340 L 240 280" stroke-dasharray="4 3"/>
+  </g>
+
+  <!-- model targets -->
+  <g font-family="-apple-system, sans-serif" font-size="12">
+    <!-- Light model -->
+    <g>
+      <rect x="420" y="90" width="140" height="80" rx="12" fill="#fff" stroke="#22d3ee" stroke-width="2"/>
+      <text x="440" y="116" font-weight="700" fill="#0e7490">MiniMax-M2.7</text>
+      <text x="440" y="134" font-size="10" fill="#64748b">light · cheap · 70% load</text>
+      <text x="440" y="155" font-size="11" font-weight="600" fill="#0e7490">$0.30 / 1M tok</text>
+    </g>
+    <!-- Main model -->
+    <g>
+      <rect x="420" y="190" width="140" height="80" rx="12" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+      <text x="440" y="216" font-weight="700" fill="#1d4ed8">Sonnet 4.6</text>
+      <text x="440" y="234" font-size="10" fill="#64748b">main · balanced · 25%</text>
+      <text x="440" y="255" font-size="11" font-weight="600" fill="#1d4ed8">$3 / 1M tok</text>
+    </g>
+    <!-- Frontier model -->
+    <g>
+      <rect x="420" y="290" width="140" height="80" rx="12" fill="#fff" stroke="#a855f7" stroke-width="2"/>
+      <text x="440" y="316" font-weight="700" fill="#7e22ce">Opus 4.5</text>
+      <text x="440" y="334" font-size="10" fill="#64748b">frontier · only key calls</text>
+      <text x="440" y="355" font-size="11" font-weight="600" fill="#7e22ce">$15 / 1M tok</text>
+    </g>
+  </g>
+
+  <!-- arrows out -->
+  <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+    <path d="M 360 220 L 420 130" stroke="#22d3ee" stroke-width="2"/>
+    <path d="M 360 240 L 420 230" stroke="#2563eb" stroke-width="2"/>
+    <path d="M 360 260 L 420 330" stroke="#a855f7" stroke-width="2"/>
+  </g>
+
+  <!-- bottom caption -->
+  <text x="300" y="430" text-anchor="middle" font-family="-apple-system, sans-serif"
+        font-size="13" fill="#64748b">~70% spend savings · matches frontier quality</text>
+</svg>
