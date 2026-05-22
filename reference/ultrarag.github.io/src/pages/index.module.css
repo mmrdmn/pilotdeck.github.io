@@ -1,0 +1,892 @@
+/* Hero 区域 - Seed 风格 (极简、高对比) */
+.heroSection {
+  background-color: #ffffff;
+  padding: 60px 0 80px; /* 顶部留白（已由 main-wrapper 提供 60px navbar 高度） */
+  text-align: left; /* 改为左对齐，更有设计感 */
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.heroContent {
+  max-width: 1200px; /* 加宽容器 */
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px; /* 缩小文字和图片之间的间距 */
+}
+
+.heroTextWrapper {
+  flex: 1;
+  max-width: 600px;
+}
+
+.heroTitle {
+  font-size: 78px;
+  line-height: 1;
+  font-weight: 800; 
+  letter-spacing: -0.04em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #000000;
+  margin-bottom: 24px;
+}
+
+/* 渐变色文字效果 */
+.gradientText {
+  background: linear-gradient(120deg, #000000 0%, #434343 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroSubtitle {
+  font-size: 24px; /* 恢复原口号大小 */
+  line-height: 1.5;
+  font-weight: 400;
+  color: #666666;
+  margin-bottom: 48px;
+  max-width: 540px;
+}
+
+/* 按钮区域 */
+.heroButtons {
+  display: flex;
+  gap: 12px; /* 按钮间距 */
+  align-items: center;
+  flex-wrap: nowrap; /* 禁止换行，强制在一行 */
+}
+
+/* Seed 风格按钮：直角微圆角，实心黑 */
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px; /* 稍微调小一点，更精致 */
+  height: 48px; /* 统一高度 */
+  background-color: #000000;
+  color: #ffffff !important;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px; /* 微圆角 */
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #000000;
+  white-space: nowrap;
+}
+
+.btnPrimary:hover {
+  background-color: #333333;
+  transform: translateY(-1px);
+  text-decoration: none;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  height: 48px; /* 统一高度 */
+  background-color: #ffffff;
+  color: #111111 !important;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #e5e5e5; /* 极细灰边框 */
+  white-space: nowrap;
+}
+
+.btnSecondary:hover {
+  border-color: #000000;
+  background-color: #ffffff;
+  text-decoration: none;
+  color: #000000 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.heroImage {
+  flex: 0.7;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-left: -40px; /* 向左靠近文字 */
+}
+
+.heroImgElement {
+  width: 100%; /* 占满容器 */
+  height: auto;
+  max-width: 600px; /* 适度限制最大宽度 */
+  border-radius: 0; /* 去掉圆角 */
+  box-shadow: none; /* 去掉阴影 */
+  object-fit: contain;
+}
+
+/* 网格布局区域 (替代 Carousel) */
+.gridSection {
+  padding: 100px 0;
+  background: #ffffff;
+}
+
+.sectionHeader {
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  padding: 0 40px;
+}
+
+.sectionTitle {
+  font-size: 40px;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.sectionDesc {
+  font-size: 18px;
+  color: #666;
+  max-width: 600px;
+}
+
+/* 轮播容器 */
+.carouselContainer {
+  max-width: 1200px; /* 定宽 */
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative;
+}
+
+/* 轮播大卡片 - 左右布局 */
+.carouselCard {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 20px; /* 大圆角 */
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  display: flex; /* 左右布局 */
+  align-items: stretch;
+  height: 480px; /* 固定高度，展现大气感 */
+  transition: all 0.5s ease;
+}
+
+.carouselImageWrapper {
+  flex: 1.2; /* 图片占比较大 */
+  position: relative;
+  background-color: #f9f9f9;
+  overflow: hidden;
+}
+
+.carouselImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+  will-change: transform, opacity;
+}
+
+/* 轮播切换动画 - 向右滑入 */
+.slideInRight {
+  animation: slideInFromRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* 轮播切换动画 - 向左滑入 */
+.slideInLeft {
+  animation: slideInFromLeft 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* 内容淡入上滑 */
+.fadeSlideIn {
+  animation: fadeSlideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes slideInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.carouselCard:hover .carouselImage {
+  transform: scale(1.05);
+}
+
+.carouselContent {
+  flex: 0.8;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.carouselTag {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.carouselTitle {
+  font-size: 36px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.carouselDesc {
+  font-size: 18px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+/* Feature card action buttons */
+.carouselActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btnFeature {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  background-color: #000;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #000;
+  white-space: nowrap;
+}
+
+.btnFeature:hover {
+  background-color: #333;
+  text-decoration: none;
+  color: #fff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btnFeature svg {
+  transition: transform 0.2s ease;
+}
+
+.btnFeature:hover svg {
+  transform: translateX(3px);
+}
+
+.btnFeatureOutline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background-color: #fff;
+  color: #111 !important;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #e5e5e5;
+  white-space: nowrap;
+}
+
+.btnFeatureOutline:hover {
+  border-color: #000;
+  text-decoration: none;
+  color: #000 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 指示点 */
+.carouselDots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background-color: #2563eb;
+  transform: scale(1.2);
+}
+
+/* 轮播左右箭头 */
+.carouselArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-70%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  color: #333;
+  font-size: 0; /* 隐藏文字，用 SVG 代替 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+/* 使用伪元素画箭头 chevron */
+.carouselArrow::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #333;
+  border-bottom: 2px solid #333;
+  display: block;
+  transition: border-color 0.3s ease;
+}
+
+.arrowLeft::after {
+  transform: rotate(135deg);
+  margin-left: 3px;
+}
+
+.arrowRight::after {
+  transform: rotate(-45deg);
+  margin-right: 3px;
+}
+
+.carouselArrow:hover {
+  background: #000;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  transform: translateY(-70%) scale(1.08);
+}
+
+.carouselArrow:hover::after {
+  border-color: #fff;
+}
+
+.arrowLeft {
+  left: -64px;
+}
+
+.arrowRight {
+  right: -64px;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 996px) {
+  /* ... previous media queries ... */
+
+  .carouselCard {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .carouselImageWrapper {
+    height: 240px;
+    flex: none;
+  }
+  
+  .carouselContent {
+    padding: 30px;
+    flex: none;
+  }
+
+  .carouselTitle {
+    font-size: 28px;
+  }
+}
+
+/* Quick Start Section */
+.quickStartSection {
+  padding: 100px 0;
+  background: #ffffff;
+  border-top: 1px solid #f0f0f0;
+}
+
+.quickStartContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 80px;
+}
+
+.quickStartCode {
+  flex: 1;
+  background: #1e1e1e;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #fff;
+  position: relative;
+  padding-top: 48px; /* 留出标题栏空间 */
+}
+
+/* Mac 窗口红黄绿点 */
+.quickStartCode::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f56;
+  box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+  z-index: 10;
+}
+
+/* 强制覆盖 CodeBlock 样式以适应容器 */
+.quickStartCode :global(.theme-code-block) {
+  margin: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.quickStartCode pre {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 24px 24px !important; /* 调整内边距 */
+  color: #ffffff !important;
+}
+
+/* VSCode Dark+ 风格 Bash 语法高亮 */
+.quickStartCode :global(.token) {
+  color: #d4d4d4 !important;
+}
+
+.quickStartCode :global(.token.comment) {
+  color: #6A9955 !important;
+  font-style: italic;
+}
+
+.quickStartCode :global(.token.function) {
+  color: #DCDCAA !important;
+}
+
+.quickStartCode :global(.token.keyword) {
+  color: #569CD6 !important;
+}
+
+.quickStartCode :global(.token.string) {
+  color: #CE9178 !important;
+}
+
+.quickStartCode :global(.token.builtin),
+.quickStartCode :global(.token.class-name) {
+  color: #4EC9B0 !important;
+}
+
+.quickStartCode :global(.token.number) {
+  color: #B5CEA8 !important;
+}
+
+.quickStartCode :global(.token.operator) {
+  color: #d4d4d4 !important;
+}
+
+.quickStartCode :global(.token.variable) {
+  color: #9CDCFE !important;
+}
+
+.quickStartCode :global(.token.punctuation) {
+  color: #d4d4d4 !important;
+}
+
+.quickStartCode :global(.token.assign-left),
+.quickStartCode :global(.token.environment) {
+  color: #9CDCFE !important;
+}
+
+.quickStartCode :global(.token.command),
+.quickStartCode :global(.token.function-name) {
+  color: #DCDCAA !important;
+}
+
+.quickStartCode :global(.token.parameter) {
+  color: #9CDCFE !important;
+}
+
+/* 隐藏复制按钮 */
+.quickStartCode :global([class*="buttonGroup"]) {
+  display: none !important;
+}
+
+.quickStartContent {
+  flex: 1;
+}
+
+.quickStartTitle {
+  font-size: 40px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 24px;
+  letter-spacing: -0.01em;
+}
+
+.quickStartDesc {
+  font-size: 18px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+/* 图片容器 */
+.quickStartImageWrapper {
+  flex: 1.2; /* 稍微大一点，默认是 1 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 移除背景色和边框阴影，使图片更纯粹 */
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.quickStartImage {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.quickStartImageWrapper:hover .quickStartImage {
+  transform: scale(1.02);
+}
+
+/* 调整间距 */
+.quickStartSection {
+  padding: 100px 0;
+  background: #ffffff;
+  border-top: 1px solid #f0f0f0;
+}
+
+.gapLine {
+  height: 100px;
+  width: 1px;
+}
+.logoSection {
+  padding: 80px 0;
+  background-color: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.logoGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px 60px;
+  max-width: 1000px;
+  margin: 40px auto 0;
+  padding: 0 20px;
+  opacity: 0.6;
+}
+
+.logoItem {
+  height: 32px;
+  filter: grayscale(100%);
+  transition: all 0.3s;
+}
+
+.logoItem:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* 移动端适配 - 平板 */
+@media screen and (max-width: 996px) {
+  .heroSection {
+    padding: 40px 0 60px;
+  }
+
+  .heroContent {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding: 20px 24px 0;
+    gap: 24px;
+  }
+
+  .heroTextWrapper {
+    max-width: 100%;
+  }
+
+  .heroTitle {
+    font-size: 48px;
+  }
+
+  .heroSubtitle {
+    font-size: 18px;
+    margin-bottom: 32px;
+    max-width: 100%;
+  }
+
+  .heroButtons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .heroImage {
+    flex: none;
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .heroImgElement {
+    max-width: 400px;
+  }
+
+  .gridSection {
+    padding: 60px 0;
+  }
+
+  .sectionHeader {
+    padding: 0 24px;
+    margin-bottom: 40px;
+  }
+
+  .sectionTitle {
+    font-size: 32px;
+  }
+
+  .sectionDesc {
+    font-size: 16px;
+  }
+
+  .carouselContainer {
+    padding: 0 24px;
+  }
+
+  .arrowLeft {
+    left: -8px;
+  }
+
+  .arrowRight {
+    right: -8px;
+  }
+
+  .carouselArrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .carouselArrow::after {
+    width: 8px;
+    height: 8px;
+  }
+
+  .quickStartSection {
+    padding: 60px 0;
+  }
+
+  .quickStartContainer {
+    flex-direction: column-reverse;
+    gap: 40px;
+    padding: 0 24px;
+    text-align: center;
+  }
+
+  .quickStartCode {
+    width: 100%;
+    text-align: left;
+  }
+
+  .quickStartTitle {
+    font-size: 32px;
+  }
+
+  .quickStartDesc {
+    font-size: 16px;
+  }
+
+  .logoGrid {
+    gap: 24px 40px;
+  }
+}
+
+/* 移动端适配 - 手机 */
+@media screen and (max-width: 480px) {
+  .heroSection {
+    padding: 24px 0 40px;
+  }
+
+  .heroContent {
+    padding: 16px 16px 0;
+  }
+
+  .heroTitle {
+    font-size: 36px;
+    margin-bottom: 16px;
+  }
+
+  .heroSubtitle {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    width: 100%;
+    justify-content: center;
+    height: 44px;
+    font-size: 15px;
+    padding: 10px 20px;
+  }
+
+  .heroImgElement {
+    max-width: 100%;
+  }
+
+  .gridSection {
+    padding: 40px 0;
+  }
+
+  .sectionHeader {
+    padding: 0 16px;
+    margin-bottom: 28px;
+  }
+
+  .sectionTitle {
+    font-size: 26px;
+  }
+
+  .carouselContainer {
+    padding: 0 16px;
+  }
+
+  .carouselCard {
+    border-radius: 14px;
+  }
+
+  .carouselImageWrapper {
+    height: 200px;
+  }
+
+  .carouselContent {
+    padding: 20px;
+  }
+
+  .carouselTitle {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .carouselDesc {
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .carouselArrow {
+    width: 32px;
+    height: 32px;
+  }
+
+  .arrowLeft {
+    left: 4px;
+  }
+
+  .arrowRight {
+    right: 4px;
+  }
+
+  .carouselDots {
+    margin-top: 24px;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .quickStartSection {
+    padding: 40px 0;
+  }
+
+  .quickStartContainer {
+    padding: 0 16px;
+    gap: 28px;
+  }
+
+  .quickStartContainer[style] {
+    margin-top: 60px !important;
+  }
+
+  .quickStartTitle {
+    font-size: 26px;
+    margin-bottom: 16px;
+  }
+
+  .quickStartDesc {
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+
+  .logoSection {
+    padding: 40px 0;
+  }
+
+  .logoGrid {
+    gap: 16px 28px;
+  }
+}

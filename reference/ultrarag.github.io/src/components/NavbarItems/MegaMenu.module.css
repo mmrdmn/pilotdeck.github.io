@@ -1,0 +1,108 @@
+/* 导航栏项容器 - 清除 navbar__item 的 padding，避免双重 padding */
+.megaMenuContainer {
+  position: static !important;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 !important;
+}
+
+.megaMenuTrigger {
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333333; /* 深色文字适配亮色导航栏，与 HomeLink 一致 */
+  transition: color 0.2s;
+  padding: 8px 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.megaMenuTrigger:hover,
+.megaMenuTrigger.active {
+  color: #000000;
+}
+
+/* 全宽下拉菜单 - 亮色毛玻璃效果 (Seed 风格) */
+.megaMenuDropdown {
+  position: fixed;
+  top: var(--ifm-navbar-height, 60px); /* 匹配导航栏高度 */
+  left: 0;
+  width: 100vw;
+  background-color: rgba(255, 255, 255, 0.95); /* 亮色背景 */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(-10px);
+  z-index: 100;
+  
+  padding: 40px 0 50px 0;
+}
+
+.megaMenuDropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* 下拉内容区 */
+.dropdownContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 48px;
+  padding: 0 40px;
+}
+
+/* 列样式 */
+.menuColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.columnTitle {
+  font-size: 12px;
+  color: #999999; /* 灰色小标题 */
+  margin-bottom: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.menuList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menuItem {
+  margin-bottom: 12px;
+}
+
+.menuLink {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333333; /* 深色链接 */
+  text-decoration: none;
+  transition: color 0.2s;
+  display: block;
+}
+
+.menuLink:hover {
+  color: #000000;
+  text-decoration: none;
+}
+
+/* 移动端隐藏 */
+@media (max-width: 996px) {
+  .megaMenuContainer {
+    display: none;
+  }
+}

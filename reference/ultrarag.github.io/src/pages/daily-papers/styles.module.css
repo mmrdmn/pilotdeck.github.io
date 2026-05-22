@@ -1,0 +1,295 @@
+/* src/pages/daily-papers/styles.module.css */
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  gap: 2rem;
+  min-height: 80vh;
+}
+
+/* 左侧侧边栏 - 日期导航 */
+.sidebar {
+  width: 240px;
+  position: sticky;
+  top: 100px;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 1rem;
+  border-right: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.sidebarTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #111827;
+  padding-left: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.headerIcon {
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.dateList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dateItem {
+  margin-bottom: 0.25rem;
+}
+
+.dateButton {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.dateButton:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.dateButton.active {
+  background-color: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* 右侧内容区 */
+.mainContent {
+  flex: 1;
+  min-width: 0; /* 防止 flex 子项溢出 */
+}
+
+.pageHeader {
+  margin-bottom: 2.5rem;
+}
+
+.pageTitle {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pageSubtitle {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.dateSection {
+  margin-bottom: 4rem;
+  scroll-margin-top: 100px; /* 锚点定位偏移 */
+}
+
+.dateHeader {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 论文卡片 Grid */
+.paperGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(800px, 1fr));
+  gap: 1.5rem;
+}
+
+@media screen and (max-width: 1200px) {
+  .paperGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.paperCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.paperCard:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.cardHeader {
+  margin-bottom: 1rem;
+}
+
+.paperTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+  display: block;
+}
+
+.paperTitle:hover {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.paperMeta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+/* 摘要和总结区域 */
+.contentSection {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.summaryBox {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  border-left: 4px solid #3b82f6;
+}
+
+.summaryLabel {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.summaryText {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 可折叠的 Abstract */
+.abstractDetails {
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+}
+
+.abstractSummary {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: #4b5563;
+  font-size: 0.9rem;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.abstractSummary:hover {
+  background-color: #f9fafb;
+}
+
+.abstractSummary::after {
+  content: '+';
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: #9ca3af;
+}
+
+.abstractDetails[open] .abstractSummary::after {
+  content: '-';
+}
+
+.abstractContent {
+  padding: 1rem;
+  padding-top: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  border-top: 1px solid #f3f4f6;
+  background-color: #ffffff;
+}
+
+/* Loading 状态 */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  width: 100%;
+  color: #6b7280;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 996px) {
+  .container {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 200px;
+    position: relative;
+    top: 0;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+  }
+
+  .paperGrid {
+    grid-template-columns: 1fr;
+  }
+}

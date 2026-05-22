@@ -1,0 +1,172 @@
+/* src/pages/team.module.css */
+
+.teamPageContainer {
+    padding: 4rem 0;
+    background-color: #ffffff;
+    min-height: 80vh; /* 保证内容少的时候footer也在下面 */
+  }
+  
+  .headerSection {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+  
+  .headerSection h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 1rem;
+  }
+  
+  .headerSection p {
+    font-size: 1.2rem;
+    color: #6b7280;
+  }
+  
+  /* 复用之前的样式 */
+  .teamGroup { margin-bottom: 5rem; text-align: center; }
+  
+  .groupTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #3b82f6; /* 独立页面可以用蓝色标题区分 */
+    margin-bottom: 3rem;
+    position: relative;
+    display: inline-block;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 10px;
+  }
+  
+  .teamGrid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3rem;
+  }
+  
+  .memberCard {
+    width: 180px; /* 独立页面卡片可以稍微大一点 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease;
+  }
+  
+  .memberCard:hover { transform: translateY(-5px); }
+  
+  .avatarWrapper {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 1.2rem;
+  }
+  
+  .avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #ffffff;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.15);
+  }
+
+  .avatarLink {
+    display: inline-block;
+    line-height: 0;
+  }
+  
+  .memberInfo {
+    text-align: center;
+  }
+
+  .memberName { font-size: 1.2rem; font-weight: 700; color: #111827; margin-bottom: 0.3rem; }
+
+  .memberNameLink {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .memberNameLink:hover,
+  .memberNameLink:focus {
+    text-decoration: underline;
+  }
+  
+  .memberTitle {
+    display: block;
+    font-size: 0.85rem;
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+  }
+
+  .memberRole { font-size: 0.85rem; color: #9ca3af; }
+
+  /* 顶部两组并排布局 */
+  .topGroupsRow {
+    display: flex;
+    justify-content: center;
+    gap: 6rem;
+    margin-bottom: 5rem;
+  }
+
+  .topGroupsRow .teamGroup {
+    margin-bottom: 0;
+    flex: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    .topGroupsRow {
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .teamPageContainer {
+      padding: 2rem 0;
+    }
+
+    .headerSection h1 {
+      font-size: 2rem;
+    }
+
+    .headerSection p {
+      font-size: 1rem;
+    }
+
+    .groupTitle {
+      font-size: 1.2rem;
+    }
+
+    .teamGrid {
+      gap: 1.5rem;
+      justify-content: center;
+    }
+
+    .memberCard {
+      width: 140px;
+    }
+
+    .avatarWrapper {
+      width: 90px;
+      height: 90px;
+    }
+
+    .avatar {
+      width: 90px;
+      height: 90px;
+    }
+
+    .memberName {
+      font-size: 1rem;
+    }
+
+    .memberTitle {
+      font-size: 0.8rem;
+    }
+
+    .memberRole {
+      font-size: 0.75rem;
+    }
+
+    .teamGroup {
+      margin-bottom: 1.5rem;
+    }
+  }
