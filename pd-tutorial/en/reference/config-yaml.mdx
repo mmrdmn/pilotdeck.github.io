@@ -1,0 +1,209 @@
+---
+title: "Config File Reference"
+description: "Complete pilotdeck.yaml field reference"
+icon: "file-code"
+---
+
+# Config File Reference
+
+PilotDeck config lives at `~/.pilotdeck/pilotdeck.yaml` and uses YAML.
+
+## Full Schema
+
+```yaml
+schemaVersion: 1                    # required, currently only 1
+
+agent:
+  model: <provider-id>/<model-id>   # required, provider/model
+
+model:
+  providers:
+    <provider-id>:
+      protocol: anthropic | openai
+      url: <string>
+      apiKey: <string>              # supports ${ENV} references
+      timeoutMs: <number>
+      headers:
+        <key>: <value>
+      models:
+        <model-id>:
+          displayName: <string>
+          capabilities:
+            supportsToolUse: <bool>
+            supportsStreaming: <bool>
+            supportsParallelToolCalls: <bool>
+            supportsThinking: <bool>
+            supportsJsonSchema: <bool>
+            supportsPromptCache: <bool>
+            maxContextTokens: <number>
+            maxOutputTokens: <number>
+          multimodal:
+            input: [text, image, pdf]
+            maxImagesPerRequest: <number>
+            supportedImageMimeTypes:
+              - <mime-type>
+
+router:
+  scenarios:
+    default:
+      provider: <provider-id>
+      model: <model-id>
+  tokenSaver:
+    enabled: <bool>
+    subagent:
+      policy: skip | judge | always-low
+    tiers:
+      <tier-name>:
+        provider: <provider-id>
+        model: <model-id>
+  fallback:
+    default:
+      - provider: <provider-id>
+        model: <model-id>
+  zeroUsageRetry:
+    enabled: <bool>
+    maxAttempts: <number>
+  transientRetry:
+    enabled: <bool>
+    maxAttempts: <number>
+    baseDelayMs: <number>
+    maxDelayMs: <number>
+  autoOrchestrate:
+    enabled: <bool>
+    skillExtensionId: <string>
+    subagentMaxTokens: <number>
+  customRouter:
+    extensionId: <string>
+
+gateway:
+  port: <number>
+
+memory:
+  enabled: <bool>
+  rootDir: <string>
+  retrievalMode: auto | explicit
+
+alwaysOn:
+  enabled: <bool>
+  trigger:
+    cooldownMinutes: <number>
+    dailyBudget: <number>
+    schedule:
+      startHour: <number>
+      endHour: <number>
+  execution:
+    maxTokens: <number>
+  workspace:
+    strategy: git-worktree | snapshot-copy
+  dormancy:
+    idleMinutes: <number>
+
+cron:
+  enabled: <bool>
+  maxConcurrent: <number>
+  historyRetentionDays: <number>
+
+extension:
+  # plugins and skills
+
+adapters:
+  # channel adapter config
+```
+
+## Minimal Config
+
+```yaml
+schemaVersion: 1
+
+agent:
+  model: anthropic-main/claude-sonnet-4-5
+
+model:
+  providers:
+    anthropic-main:
+      protocol: anthropic
+      url: https://api.anthropic.com
+      apiKey: ${ANTHROPIC_API_KEY}
+      models:
+        claude-sonnet-4-5:
+          displayName: Claude Sonnet 4.5
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+```
+
+## Multi-Provider Example
+
+```yaml
+schemaVersion: 1
+
+agent:
+  model: anthropic-main/claude-sonnet-4-5
+
+model:
+  providers:
+    anthropic-main:
+      protocol: anthropic
+      url: https://api.anthropic.com
+      apiKey: ${ANTHROPIC_API_KEY}
+      timeoutMs: 120000
+      models:
+        claude-sonnet-4-5:
+          displayName: Claude Sonnet 4.5
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            supportsThinking: true
+            maxContextTokens: 200000
+            maxOutputTokens: 8192
+        claude-haiku:
+          displayName: Claude Haiku
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            maxContextTokens: 200000
+            maxOutputTokens: 4096
+
+    openai-backup:
+      protocol: openai
+      url: https://api.openai.com/v1
+      apiKey: ${OPENAI_API_KEY}
+      models:
+        gpt-4o:
+          displayName: GPT-4o
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            maxContextTokens: 128000
+            maxOutputTokens: 4096
+
+router:
+  tokenSaver:
+    enabled: true
+    tiers:
+      high:
+        provider: anthropic-main
+        model: claude-sonnet-4-5
+      low:
+        provider: anthropic-main
+        model: claude-haiku
+  fallback:
+    default:
+      - provider: openai-backup
+        model: gpt-4o
+```
+
+## Merge Rules
+
+| Type | Rule |
+|------|------|
+| Map | Deep merge by key |
+| Scalar | Higher priority overrides lower priority |
+| Array | Replaced as a whole, not concatenated |
+| `null` | Treated as a normal override value |
+
+## Deprecated Fields
+
+| Field | Replacement | Behavior |
+|-------|-------------|----------|
+| `agent.fallbackModel` | `router.fallback.default` | Warning and ignored |

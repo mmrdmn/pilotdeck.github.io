@@ -1,0 +1,334 @@
+---
+title: "常见问题排查"
+description: "PilotDeck 常见问题与解决方案"
+icon: "circle-question"
+---
+
+# 常见问题排查
+
+## 安装问题
+
+<AccordionGroup>
+  <Accordion title="安装脚本报错: Node.js 版本过低">
+    **现象：** 安装脚本提示 Node.js 版本低于 18。
+
+    **解决：** 安装脚本会自动尝试通过 fnm 安装 Node.js 22。如果自动安装失败，手动安装：
+
+    ```bash
+    # 使用 fnm
+    curl -fsSL https://fnm.vercel.app/install | bash
+    fnm install 22
+    fnm use 22
+
+    # 或使用 nvm
+    nvm install 22
+    nvm use 22
+
+    # 验证版本
+    node --version  # 应 >= v18
+    ```
+  </Accordion>
+
+  <Accordion title="安装脚本报错: git is not installed">
+    **现象：** 提示 git 未安装。
+
+    **解决：** 安装 Xcode 命令行工具：
+
+    ```bash
+    xcode-select --install
+    ```
+  </Accordion>
+
+  <Accordion title="pilotdeck 命令不可用">
+    **现象：** 安装完成后，终端中输入 `pilotdeck` 提示命令未找到。
+
+    **解决方案：**
+
+    1. 检查是否在 PATH 中：
+    ```bash
+    which pilotdeck
+    ls -la /usr/local/bin/pilotdeck
+    ls -la ~/.local/bin/pilotdeck
+    ```
+
+    2. 如果链接到了 `~/.local/bin`，确保该目录在 PATH 中：
+    ```bash
+    # 添加到 ~/.zshrc 或 ~/.bashrc
+    export PATH="$HOME/.local/bin:$PATH"
+    source ~/.zshrc
+    ```
+
+    3. 手动创建链接：
+    ```bash
+    ln -sf ~/.pilotdeck/app/ui/server/cli.js /usr/local/bin/pilotdeck
+    ```
+  </Accordion>
+
+  <Accordion title="npm install 失败">
+    **现象：** 安装依赖时报网络错误或权限错误。
+
+    **解决方案：**
+
+    ```bash
+    # 清理缓存后重试
+    npm cache clean --force
+    cd ~/.pilotdeck/app
+    rm -rf node_modules package-lock.json
+    npm install
+
+    # 如果是网络问题，可以设置 npm 镜像
+    npm config set registry https://registry.npmmirror.com
+    npm install
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 桌面应用问题
+
+<AccordionGroup>
+  <Accordion title="双击 PilotDeck.app 闪退 / 无法启动">
+    **现象：** macOS 提示"无法启动 PilotDeck 应用程序"，窗口一闪消失。
+
+    **原因：** 通过飞书、微信等沙盒 IM 接收的 DMG，macOS 14+ 会添加 `com.apple.provenance` 扩展属性导致 Gatekeeper 拒绝执行。
+
+    **解决：**
+
+    ```bash
+    # 方法一：运行修复脚本
+    bash install-pilotdeck.sh
+
+    # 方法二：手动清除扩展属性
+    xattr -cr /Applications/PilotDeck.app
+    open /Applications/PilotDeck.app
+    ```
+
+    <Tip>
+    从浏览器直接下载或通过 AirDrop 传输的 DMG 不会有此问题。
+    </Tip>
+  </Accordion>
+
+  <Accordion title="codesign --verify 报告 valid 但仍无法启动">
+    **说明：** 这是正常的。`com.apple.provenance` 的限制发生在 Gatekeeper 执行策略层，而不是签名验证层。签名本身是有效的，但执行策略拒绝了来自低信任来源的可执行文件。
+
+    使用 `xattr -cr` 清除扩展属性即可解决。此操作是安全的——Apple 的 notarize ticket 存储在 `Contents/CodeResources` 文件中，不是扩展属性。
+  </Accordion>
+</AccordionGroup>
+
+## 配置问题
+
+<AccordionGroup>
+  <Accordion title="启动报错: missing_provider / missing_model">
+    **现象：** 启动时提示 provider 或 model 未找到。
+
+    **解决：** 检查 `agent.model` 的格式和对应定义：
+
+    ```yaml
+    # ❌ 错误：provider 名称不匹配
+    agent:
+      model: anthropic/claude-sonnet-4-5  # provider id 是 "anthropic"
+
+    model:
+      providers:
+        anthropic-main:  # 这里的 id 是 "anthropic-main"
+          ...
+
+    # ✅ 正确：保持一致
+    agent:
+      model: anthropic-main/claude-sonnet-4-5
+
+    model:
+      providers:
+        anthropic-main:
+          models:
+            claude-sonnet-4-5:
+              ...
+    ```
+  </Accordion>
+
+  <Accordion title="启动报错: invalid_api_key_ref">
+    **现象：** 提示 API Key 环境变量未设置。
+
+    **解决：**
+
+    ```bash
+    # 检查环境变量是否设置
+    echo $ANTHROPIC_API_KEY
+
+    # 设置环境变量
+    export ANTHROPIC_API_KEY="your-key-here"
+
+    # 建议写入 shell profile 永久生效
+    echo 'export ANTHROPIC_API_KEY="your-key-here"' >> ~/.zshrc
+    source ~/.zshrc
+    ```
+
+    或者在配置中直接写入（不推荐用于生产环境）：
+
+    ```yaml
+    model:
+      providers:
+        anthropic-main:
+          apiKey: sk-ant-api03-xxxxx   # 明文写入
+    ```
+  </Accordion>
+
+  <Accordion title="配置修改后不生效">
+    **原因：** 如果修改的是 `pilotdeck.yaml`，热重载机制会自动加载新配置。但正在进行的请求仍使用旧配置。
+
+    **解决：**
+    1. 等待当前请求完成后，新请求会使用新配置
+    2. 如果仍不生效，重启 `pilotdeck server`
+    3. 检查 Server 日志是否有配置校验错误
+  </Accordion>
+
+  <Accordion title="PILOT_HOME 环境变量无效">
+    **注意：** `PILOT_HOME` 必须在启动前设置，不能写在 YAML 配置文件中。
+
+    ```bash
+    # ✅ 正确：通过环境变量设置
+    export PILOT_HOME=/custom/path
+    pilotdeck server
+
+    # ❌ 错误：不能在 YAML 中设置
+    # pilotdeck.yaml 中没有 pilotHome 字段
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## 运行时问题
+
+<AccordionGroup>
+  <Accordion title="模型请求超时">
+    **现象：** Agent 响应非常慢或超时。
+
+    **排查：**
+
+    1. 检查网络连接到模型 Provider 的可达性：
+    ```bash
+    curl -I https://api.anthropic.com
+    ```
+
+    2. 增大超时时间：
+    ```yaml
+    model:
+      providers:
+        anthropic-main:
+          timeoutMs: 300000  # 5 分钟
+    ```
+
+    3. 如果使用代理，确保代理配置正确：
+    ```bash
+    export HTTP_PROXY=http://your-proxy:port
+    export HTTPS_PROXY=http://your-proxy:port
+    ```
+  </Accordion>
+
+  <Accordion title="Router Fallback 频繁触发">
+    **现象：** 日志中频繁出现 `pilotdeck_router_fallback` 事件。
+
+    **排查：**
+    1. 主 Provider 可能遇到限流，检查 API 用量
+    2. 检查网络连接稳定性
+    3. 调整 Transient Retry 配置减少不必要的 Fallback：
+    ```yaml
+    router:
+      transientRetry:
+        enabled: true
+        maxAttempts: 3
+        baseDelayMs: 2000
+    ```
+  </Accordion>
+
+  <Accordion title="pilotdeck tui 报错: requires an interactive terminal">
+    **现象：** 在非 TTY 环境（如 CI、管道、IDE 内置终端等）运行 `pilotdeck tui` 时报错。
+
+    **解决：** TUI 模式需要交互式终端。使用以下替代方案：
+    - 在真正的终端中运行（如 macOS Terminal、iTerm2）
+    - 使用 Web UI：`pilotdeck server` 后浏览器访问
+    - 使用 CLI 模式：`pilotdeck "your message"`
+  </Accordion>
+
+  <Accordion title="Cron 命令报错: requires a running pilotdeck server">
+    **现象：** 运行 `pilotdeck cron list` 报错。
+
+    **解决：** Cron 子命令需要连接到运行中的 Gateway Server：
+
+    ```bash
+    # 先在另一个终端启动 server
+    pilotdeck server
+
+    # 然后运行 cron 命令
+    pilotdeck cron list
+    ```
+  </Accordion>
+
+  <Accordion title="Memory 检索不到相关内容">
+    **排查：**
+
+    1. 确认 Memory 已启用：
+    ```yaml
+    memory:
+      enabled: true
+    ```
+
+    2. 检查 memory 数据目录是否有内容：
+    ```bash
+    ls ~/.pilotdeck/memory/
+    ```
+
+    3. Memory 需要积累足够的对话才能有效检索。新项目的前几次对话可能没有匹配结果（诊断信息 `memory_context_empty`），这是正常的。
+
+    4. 检查 `retrievalMode`：如果设置为 `explicit`，只有用户明确要求时才会检索记忆。
+  </Accordion>
+
+  <Accordion title="WebSocket 连接失败">
+    **排查：**
+
+    1. 确认 Server 正在运行：
+    ```bash
+    curl http://127.0.0.1:18789
+    ```
+
+    2. 检查端口是否被占用：
+    ```bash
+    lsof -i :18789
+    ```
+
+    3. 检查鉴权 Token：
+    ```bash
+    cat ~/.pilotdeck/server-token
+    ```
+
+    4. 如果使用反向代理，确保 WebSocket 升级请求被正确转发。
+  </Accordion>
+</AccordionGroup>
+
+## 日志与诊断
+
+### 查看 Server 日志
+
+Server 日志直接输出到标准输出。常见的日志前缀：
+
+| 前缀 | 来源 |
+|------|------|
+| `[always-on]` | Always-On Discovery 模块 |
+| `[cron]` | Cron 定时任务模块 |
+| `[PilotDeck]` | Router 重试 / 回退信息 |
+| `[runtime]` | 关闭流程信息 |
+
+### 配置诊断
+
+启动时的配置问题会以诊断信息输出：
+
+```
+[config] warning: deprecated field "agent.fallbackModel", migrate to "router.fallback.default"
+[config] error: missing_provider "nonexistent" referenced by agent.model
+```
+
+<Tip>
+如果遇到无法解决的问题，建议收集以下信息后提交 Issue：
+1. `node --version` 输出
+2. `~/.pilotdeck/pilotdeck.yaml` 内容（脱敏 API Key）
+3. Server 启动日志
+4. 操作系统版本
+</Tip>

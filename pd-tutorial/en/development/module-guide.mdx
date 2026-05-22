@@ -1,0 +1,209 @@
+---
+title: "Module Development Guide"
+description: "Design philosophy, interfaces, and development notes for core modules"
+icon: "cubes"
+---
+
+# Module Development Guide
+
+This guide explains the design philosophy and interface contracts of PilotDeck core modules.
+
+## Principles
+
+<CardGroup cols={2}>
+  <Card title="Module Boundaries" icon="border-all">
+    Each module exposes public API through `index.ts` and keeps implementation details internal
+  </Card>
+  <Card title="Dependency Injection" icon="syringe">
+    Modules receive dependencies through constructors and interfaces for testability and replacement
+  </Card>
+  <Card title="Protocol First" icon="handshake">
+    Modules define explicit protocol types under `protocol/`
+  </Card>
+  <Card title="Testability" icon="vial">
+    Modules should be independently testable with fake or stub dependencies
+  </Card>
+</CardGroup>
+
+---
+
+## Gateway Module
+
+**Directory:** `src/gateway/`
+
+| Object | Responsibility |
+|--------|----------------|
+| `Gateway` | Interface contract for all Gateway implementations |
+| `InProcessGateway` | In-process implementation |
+| `SessionRouter` | Creates, finds, and manages sessions |
+| `GatewayWsClient` | WebSocket client wrapper |
+| `RemoteGateway` | Client-side proxy for a remote Gateway |
+| `GatewayElicitationBus` | Handles `ask_user_question` prompts |
+
+```typescript
+import { createGateway } from "../gateway/index.js";
+
+const gateway = createGateway({
+  agent: { /* AgentSession options */ },
+  projectStorage: { projectRoot, pilotHome },
+  idleSessionTimeoutMs: 30 * 60 * 1000,
+});
+
+interface Gateway {
+  submitTurn(input: GatewaySubmitTurnInput): AsyncIterable<GatewayEvent>;
+  abortTurn(input: { sessionKey: string }): Promise<void>;
+  newSession(input: NewSessionInput): Promise<{ sessionKey: string }>;
+  listSessions(input: ListSessionsInput): Promise<ListSessionsResult>;
+}
+```
+
+<Note>
+When adding a Gateway method, update the protocol interface, `InProcessGateway`, `RemoteGateway`, and the WebSocket handler.
+</Note>
+
+---
+
+## Router Module
+
+**Directory:** `src/router/`
+
+```
+src/router/
+├── RouterRuntime.ts
+├── config/schema.ts
+├── scenario/decideScenario.ts
+├── tokenSaver/classifyAndRoute.ts
+├── fallback/runFallbackChain.ts
+├── retry/zeroUsageRetry.ts
+├── orchestrate/applyOrchestration.ts
+├── customRouter/customRouter.ts
+├── session/SessionRouterStore.ts
+├── stats/TokenStatsCollector.ts
+├── protocol/
+└── utils/countTokens.ts
+```
+
+To add a TokenSaver tier, update the config schema, classification logic, and tests.
+
+Custom routers implement:
+
+```typescript
+interface PilotDeckCustomRouter {
+  decide(input: CustomRouterDecideInput): Promise<Partial<RouterDecision> | undefined>;
+}
+```
+
+---
+
+## Context Module
+
+**Directory:** `src/context/`
+
+| Component | File | Responsibility |
+|-----------|------|----------------|
+| PromptAssembler | `prompt/PromptAssembler.ts` | Build the full System Prompt |
+| MessageProjector | `projection/MessageProjector.ts` | Project and trim history |
+| TokenBudgetManager | `budget/TokenBudgetManager.ts` | Track token budget |
+| CompactionEngine | `compaction/CompactionEngine.ts` | Compress history |
+| MemoryResolver | `memory/MemoryResolver.ts` | Long-term memory retrieval |
+| InstructionDiscovery | `instructions/InstructionDiscovery.ts` | Discover project instructions |
+| AttachmentResolver | `attachments/AttachmentResolver.ts` | Handle file and image attachments |
+
+Compaction has multiple layers:
+
+```
+AutoCompactionPolicy
+  │
+  ├── MicroCompaction
+  ├── SnipEngine
+  ├── CompactionEngine
+  └── ContextOverflowRecovery
+```
+
+A memory provider implements:
+
+```typescript
+interface MemoryResolver {
+  retrieve(input: MemoryRetrieveInput): Promise<MemoryRetrieveResult>;
+  captureTurn?(input: MemoryCaptureTurnInput): void;
+}
+```
+
+---
+
+## Model Module
+
+**Directory:** `src/model/`
+
+All providers are converted into Canonical format:
+
+```typescript
+interface CanonicalModelRequest {
+  provider: string;
+  model: string;
+  messages: CanonicalMessage[];
+  tools?: CanonicalToolSchema[];
+  systemPrompt?: string;
+}
+
+type CanonicalModelEvent =
+  | { type: "message_start" }
+  | { type: "text_delta"; text: string }
+  | { type: "thinking_delta"; text: string }
+  | { type: "tool_call_start" }
+  | { type: "tool_call_delta" }
+  | { type: "tool_call_end" }
+  | { type: "message_end"; finishReason: CanonicalFinishReason }
+  | { type: "error"; error: CanonicalModelError };
+```
+
+To add a provider, create an adapter under `providers/`, implement request and stream conversion, and register it in `ModelProviderRegistry`.
+
+---
+
+## Tool Module
+
+**Directory:** `src/tool/`
+
+To add a built-in tool:
+
+1. Create the tool file under `builtin/`
+2. Define its input schema
+3. Implement `PilotDeckToolDefinition`
+4. Register it in `createBuiltinRegistry`
+
+```typescript
+interface PilotDeckToolDefinition {
+  name: string;
+  description: string;
+  inputSchema: PilotDeckToolInputSchema;
+  execute(
+    call: PilotDeckToolCall,
+    context: PilotDeckToolRuntimeContext,
+  ): Promise<PilotDeckToolResult>;
+}
+```
+
+Tool scheduling:
+- `ConcurrentToolScheduler` runs independent operations in parallel
+- `SequentialToolScheduler` runs dependent or write-sensitive operations in order
+
+---
+
+## Always-On Module
+
+**Directory:** `src/always-on/`
+
+| Component | Responsibility |
+|-----------|----------------|
+| `AlwaysOnManager` | Top-level manager bound to Gateway |
+| `AlwaysOnRuntime` | Discovery runtime |
+| `DiscoveryScheduler` | Checks gates and triggers Discovery |
+| `DiscoveryFire` | Runs one Discovery execution |
+| `SignalWatcher` | Watches file change signals |
+| `WorkspaceProviderRegistry` | Provides git-worktree or snapshot-copy isolation |
+
+Notes:
+- Always-On binds to Gateway through `bindGateway()`.
+- It injects Discovery Plan and Report tools.
+- It provides session config overrides for Discovery sessions.

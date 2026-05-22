@@ -1,0 +1,208 @@
+---
+title: "贡献指南"
+description: "如何参与 PilotDeck 开发"
+icon: "code-pull-request"
+---
+
+# 贡献指南
+
+欢迎参与 PilotDeck 的开发！本文介绍如何搭建开发环境、提交代码和遵循项目规范。
+
+## 开发环境搭建
+
+### 系统要求
+
+| 依赖 | 版本 |
+|------|------|
+| macOS | Sonoma (14) 或更高 |
+| Node.js | v18+ （推荐 v22） |
+| npm | v9+ |
+| Git | 最新版 |
+| TypeScript | v5.9+（项目内安装） |
+
+### 克隆与初始化
+
+```bash
+# 克隆仓库
+git clone https://github.com/Gucc111/PilotDeck.git
+cd PilotDeck
+
+# 安装依赖（根目录 + ui workspace）
+npm install
+
+# 编译 Gateway
+npm run build
+
+# 安装并编译 Web UI
+cd ui
+npm install
+npm run build
+cd ..
+```
+
+### 开发模式启动
+
+PilotDeck 提供了一键开发启动脚本：
+
+```bash
+# 一键启动（推荐）
+npm run dev
+```
+
+`npm run dev` 会执行 `scripts/dev-launcher.mjs`，自动完成：
+1. 运行 `predev` 钩子 —— 初始化配置文件
+2. 启动 Gateway Server（热重载）
+3. 启动 Web UI 开发服务器 (Vite HMR)
+
+也可以分别启动各组件：
+
+```bash
+# 分别启动（在不同终端窗口）
+
+# 终端 1: Gateway Server（使用 tsx 热重载）
+npm run server
+
+# 终端 2: Web UI 开发服务器
+cd ui
+npm run client
+
+# 或使用 concurrently 同时启动
+cd ui
+npm run dev:concurrent
+```
+
+## 项目结构
+
+```
+PilotDeck/
+├── src/                    # Gateway 后端源码（TypeScript）
+│   ├── adapters/           # Channel 适配器
+│   ├── agent/              # Agent 执行引擎
+│   ├── always-on/          # Discovery 主动发现
+│   ├── cli/                # CLI 入口
+│   ├── context/            # 上下文管理（含 Memory）
+│   ├── cron/               # 定时任务
+│   ├── extension/          # 插件/技能扩展
+│   ├── gateway/            # Gateway 消息网关
+│   ├── lifecycle/          # 生命周期管理
+│   ├── mcp/                # MCP 协议集成
+│   ├── model/              # 模型协议抽象
+│   ├── permission/         # 权限系统
+│   ├── pilot/              # 路径和配置加载
+│   ├── router/             # 智能路由
+│   ├── session/            # 会话管理
+│   ├── task/               # 后台任务
+│   ├── tool/               # 工具系统
+│   └── web/                # Web 静态资源
+├── ui/                     # Web UI 前端（React + Vite）
+│   ├── src/                # 前端源码
+│   ├── server/             # UI Bridge 服务器
+│   └── shared/             # 前后端共享类型
+├── apps/
+│   └── desktop/            # Electron 桌面应用
+├── tests/                  # 测试套件
+├── docs/                   # 内部设计文档
+├── scripts/                # 构建和开发脚本
+├── config/                 # 额外配置（MCP 等）
+└── packages/               # 其他内部包
+```
+
+## 编码规范
+
+### TypeScript
+
+- 使用 **严格模式** TypeScript（`strict: true`）
+- 优先使用 `type` 而非 `interface`（项目既有惯例）
+- 导出时使用 `export type {}` 对纯类型导出
+- 使用 `.js` 扩展名的导入路径（ESM 规范）
+
+```typescript
+// ✅ 推荐
+import { createGateway, type Gateway } from "../gateway/index.js";
+
+// ❌ 避免
+import { createGateway, Gateway } from "../gateway/index";
+```
+
+### 模块边界
+
+每个 `src/<module>/` 目录通过 `index.ts` 定义公开 API。
+
+<Warning>
+- **不要** 直接导入其他模块的内部文件，只通过 `index.ts` 导出的接口
+- **不要** 在模块间产生循环依赖
+- 依赖方向从上层到下层，下层模块不依赖上层
+</Warning>
+
+### 命名约定
+
+| 类别 | 约定 | 示例 |
+|------|------|------|
+| 文件名 | PascalCase（类/组件）或 camelCase（工具函数） | `RouterRuntime.ts`, `decideScenario.ts` |
+| 类/类型 | PascalCase | `SessionRouter`, `RouterDecision` |
+| 函数 | camelCase | `createGateway`, `loadPilotConfig` |
+| 常量 | UPPER_SNAKE_CASE | `DEFAULT_PILOT_HOME` |
+| 目录 | kebab-case | `always-on`, `pilot-config` |
+
+## Git 工作流
+
+### 分支策略
+
+| 分支 | 用途 |
+|------|------|
+| `main` | 稳定主线 |
+| `feature/<name>` | 新功能开发 |
+| `fix/<name>` | Bug 修复 |
+| `refactor/<name>` | 重构 |
+
+### Commit 信息
+
+遵循语义化格式：
+
+```
+<type>(<scope>): <description>
+
+feat(router): add custom router plugin support
+fix(gateway): handle WebSocket reconnection timeout
+refactor(context): extract CompactionEngine from ContextRuntime
+docs(config): update YAML schema documentation
+test(router): add TokenSaver decision unit tests
+```
+
+## 编译与构建
+
+```bash
+# 编译 Gateway 后端
+npm run build
+# 输出到 dist/
+
+# 编译 Web UI
+cd ui && npm run build
+# 输出到 ui/dist/
+
+# 类型检查（不编译）
+cd ui && npm run typecheck
+```
+
+## 提交 PR 的检查清单
+
+<Steps>
+  <Step title="本地编译通过">
+    ```bash
+    npm run build
+    ```
+  </Step>
+  <Step title="测试通过">
+    ```bash
+    npm test
+    ```
+  </Step>
+  <Step title="UI 类型检查通过（如涉及）">
+    ```bash
+    cd ui && npm run typecheck
+    ```
+  </Step>
+  <Step title="更新相关文档">
+    如果修改了配置 Schema、CLI 命令或公开 API，同步更新 `docs/` 中的文档。
+  </Step>
+</Steps>

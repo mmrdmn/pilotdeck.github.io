@@ -1,0 +1,200 @@
+---
+title: "Router 省钱路由"
+description: "智能模型路由，通过 TokenSaver 和 Fallback 降低成本、提高可用性"
+icon: "route"
+---
+
+# Router 省钱路由
+
+Router 是 PilotDeck 的智能模型路由引擎。它根据任务复杂度自动选择最合适（最经济）的模型，同时提供多 Provider Fallback 容错机制，确保服务持续可用。
+
+## 核心能力
+
+<CardGroup cols={2}>
+  <Card title="TokenSaver 智能降档" icon="piggy-bank">
+    分析用户输入的复杂度，自动选择匹配的模型档位，简单任务用便宜模型
+  </Card>
+  <Card title="Fallback 容错链" icon="shield-halved">
+    主 Provider 不可用时，自动切换到备用 Provider，用户无感知
+  </Card>
+  <Card title="Scenario 场景路由" icon="code-branch">
+    根据 Agent 类型（主 Agent / 子 Agent）应用不同的路由策略
+  </Card>
+  <Card title="Custom Router 扩展" icon="puzzle-piece">
+    支持自定义路由插件，实现你自己的路由逻辑
+  </Card>
+</CardGroup>
+
+## 路由决策流程
+
+Router 的每次路由决策经过以下阶段：
+
+```
+用户请求
+    │
+    ▼
+┌─────────────────────────┐
+│  1. Custom Router 检查  │ ← 如果有自定义路由插件
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│  2. Scenario 场景判定   │ ← 根据 explicit/default/subagent 决定
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│  3. TokenSaver 降档判定 │ ← 分析复杂度，选择合适的模型档位
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│  4. Session Sticky      │ ← 同一会话保持模型一致性
+└───────────┬─────────────┘
+            │
+            ▼
+     RouterDecision
+  { provider, model, tier }
+```
+
+## TokenSaver 智能降档
+
+TokenSaver 是 Router 最核心的省钱能力。它通过分析用户消息的复杂度，将请求分配到不同的模型档位 (Tier)。
+
+### 工作原理
+
+1. **Judge 判定**：使用一个轻量级模型（Judge）分析用户请求的复杂度
+2. **档位匹配**：根据判定结果选择对应的模型档位
+3. **Sticky 绑定**：同一会话的后续请求保持相同档位（除非用户明确切换）
+
+### 档位示例
+
+| 档位 | 适用场景 | 模型示例 |
+|------|----------|----------|
+| high | 复杂架构设计、多文件重构 | Claude Sonnet 4.5 |
+| medium | 常规编码、Bug 修复 | Claude Sonnet |
+| low | 简单问答、文件查看 | Claude Haiku |
+
+### 配置 TokenSaver
+
+```yaml pilotdeck.yaml
+router:
+  tokenSaver:
+    enabled: true
+    subagent:
+      policy: judge    # skip | judge | always-low
+    tiers:
+      high:
+        provider: anthropic-main
+        model: claude-sonnet-4-5
+      medium:
+        provider: anthropic-main
+        model: claude-sonnet-4-20250514
+      low:
+        provider: anthropic-main
+        model: claude-haiku
+```
+
+## Fallback 容错链
+
+当主 Provider 返回错误（超时、限流、服务不可用等）时，Router 自动切换到 Fallback 链中的下一个 Provider。
+
+### 可触发 Fallback 的错误类型
+
+- `timeout` - 请求超时
+- `rate_limit` - 达到速率限制
+- `server_error` - 服务端 5xx 错误
+- `network_error` - 网络连接问题
+
+### 配置 Fallback
+
+```yaml pilotdeck.yaml
+router:
+  fallback:
+    default:
+      - provider: openai-backup
+        model: gpt-4o
+      - provider: deepseek-backup
+        model: deepseek-chat
+```
+
+### 重试策略
+
+Router 还内置了两种重试机制：
+
+<Tabs>
+  <Tab title="Transient Retry（瞬时重试）">
+    对同一 Provider 的瞬时错误进行指数退避重试：
+
+    ```yaml
+    router:
+      transientRetry:
+        enabled: true
+        maxAttempts: 5
+        baseDelayMs: 1000
+        maxDelayMs: 30000
+    ```
+  </Tab>
+  <Tab title="Zero Usage Retry（空响应重试）">
+    Provider 返回空内容时自动重试：
+
+    ```yaml
+    router:
+      zeroUsageRetry:
+        enabled: true
+        maxAttempts: 5
+    ```
+  </Tab>
+</Tabs>
+
+## Scenario 场景路由
+
+Router 根据 Agent 角色应用不同的路由策略：
+
+| 场景类型 | 说明 |
+|----------|------|
+| `default` | 默认场景，使用 `agent.model` 配置的模型 |
+| `explicit` | 用户或系统明确指定的模型 |
+| `subagent` | 子 Agent 调用，可应用独立的路由策略 |
+
+子 Agent 的路由策略通过 `tokenSaver.subagent.policy` 控制：
+
+- `skip`：子 Agent 不经过 TokenSaver，使用默认模型
+- `judge`：子 Agent 也经过 Judge 判定（默认）
+- `always-low`：子 Agent 始终使用最低档位
+
+## Auto-Orchestrate（自动编排）
+
+当 TokenSaver 生效时，Router 可以自动调整 System Prompt 和工具列表，针对低档位模型优化任务执行：
+
+```yaml pilotdeck.yaml
+router:
+  autoOrchestrate:
+    enabled: true
+    skillExtensionId: "my-skill-extension"
+    subagentMaxTokens: 50000
+```
+
+## 统计面板
+
+Router 内置 Token 使用统计收集器，记录每次请求的模型选择和 Token 消耗：
+
+```typescript
+// 获取统计数据
+const stats = router.stats;
+// 包含: sessionId, provider, model, tier, role, usage, timestamps
+```
+
+## 事件总线
+
+Router 在关键节点发出事件，便于监控和调试：
+
+| 事件 | 说明 |
+|------|------|
+| `pilotdeck_router_decision` | 路由决策完成 |
+| `pilotdeck_router_fallback` | 触发 Fallback 切换 |
+| `pilotdeck_router_token_saver_failed` | TokenSaver 判定失败 |
+| `pilotdeck_router_zero_usage_retry` | 空响应重试 |
+| `pilotdeck_router_transient_retry` | 瞬时错误重试 |
+| `pilotdeck_router_execute_failed` | 执行最终失败 |
+| `pilotdeck_router_custom_failed` | 自定义路由器失败 |

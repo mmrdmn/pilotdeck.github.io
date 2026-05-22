@@ -1,0 +1,180 @@
+---
+title: "Web 安装 & 快速开始"
+description: "通过一键脚本安装 PilotDeck，在浏览器中使用"
+icon: "globe"
+---
+
+# Web 安装 & 快速开始
+
+PilotDeck 提供一键安装脚本，自动完成依赖检查、代码拉取、编译和启动。
+
+## 系统要求
+
+<CardGroup cols={3}>
+  <Card title="操作系统" icon="apple">
+    macOS（当前仅支持）
+  </Card>
+  <Card title="Node.js" icon="node-js">
+    v18 或更高版本
+  </Card>
+  <Card title="Git" icon="git-alt">
+    命令行可用即可
+  </Card>
+</CardGroup>
+
+## 一键安装
+
+打开终端，运行：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Gucc111/PilotDeck/main/install.sh | bash
+```
+
+<Tip>
+如果你还没有安装 Node.js，安装脚本会自动通过 fnm (Fast Node Manager) 为你安装 Node.js 22。
+</Tip>
+
+安装脚本会自动执行以下步骤：
+
+<Steps>
+  <Step title="环境检查">
+    检测 macOS 系统、Node.js 版本 (≥18)、Git 是否可用
+  </Step>
+  <Step title="拉取代码">
+    将 PilotDeck 仓库克隆到 `~/.pilotdeck/app`
+  </Step>
+  <Step title="安装依赖 & 编译">
+    安装 npm 依赖，编译 Gateway 后端和 Web UI 前端
+  </Step>
+  <Step title="创建 CLI 命令">
+    将 `pilotdeck` 命令链接到 `/usr/local/bin`（或 `~/.local/bin`）
+  </Step>
+  <Step title="启动服务">
+    自动启动 PilotDeck，可通过浏览器访问
+  </Step>
+</Steps>
+
+## 手动安装
+
+如果你需要更多控制，可以手动安装：
+
+```bash
+# 1. 克隆仓库
+git clone https://github.com/Gucc111/PilotDeck.git ~/.pilotdeck/app
+cd ~/.pilotdeck/app
+
+# 2. 安装依赖 & 编译后端
+npm install
+npm run build
+
+# 3. 安装 & 编译 Web UI
+cd ui
+npm install
+npm run build
+cd ..
+
+# 4. 启动服务
+npm run server
+```
+
+## 配置 API Key
+
+PilotDeck 启动前需要配置至少一个模型 Provider 的 API Key。编辑配置文件：
+
+```bash
+# 配置文件位于 ~/.pilotdeck/pilotdeck.yaml
+vim ~/.pilotdeck/pilotdeck.yaml
+```
+
+最小配置示例：
+
+```yaml pilotdeck.yaml
+schemaVersion: 1
+
+agent:
+  model: anthropic-main/claude-sonnet-4-5
+
+model:
+  providers:
+    anthropic-main:
+      protocol: anthropic
+      url: https://api.anthropic.com
+      apiKey: ${ANTHROPIC_API_KEY}
+      models:
+        claude-sonnet-4-5:
+          displayName: Claude Sonnet 4.5
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            maxContextTokens: 200000
+            maxOutputTokens: 8192
+```
+
+然后设置环境变量：
+
+```bash
+export ANTHROPIC_API_KEY="your-api-key-here"
+```
+
+<Tip>
+建议将 API Key 写入 shell profile（如 `~/.zshrc`），避免每次手动设置。
+</Tip>
+
+## 启动服务
+
+```bash
+# 启动 Gateway 服务（默认端口 18789）
+pilotdeck server
+
+# 或指定端口
+pilotdeck server --port 8080
+```
+
+启动成功后你会看到：
+
+```
+PilotDeck server listening: http://127.0.0.1:18789
+WebSocket: ws://127.0.0.1:18789/ws
+```
+
+打开浏览器访问 `http://127.0.0.1:18789` 即可使用 Web UI。
+
+## 使用 CLI / TUI
+
+除了 Web UI，你还可以直接在终端中使用：
+
+```bash
+# CLI 模式：直接提问
+pilotdeck "帮我分析一下当前项目的代码结构"
+
+# TUI 模式：交互式终端界面
+pilotdeck tui
+```
+
+## 目录结构
+
+安装完成后的文件布局：
+
+```
+~/.pilotdeck/
+├── app/                    # PilotDeck 源码和编译产物
+├── pilotdeck.yaml          # 全局配置文件
+├── server-token             # Gateway 鉴权 token
+├── memory/                  # 长期记忆数据
+├── projects/                # 按 WorkSpace 分组的会话记录
+│   └── <project-id>/
+│       └── chats/
+├── plugins/                 # 全局插件目录
+└── skills/                  # 全局技能目录
+```
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="了解 Gateway" icon="tower-broadcast" href="/pages/features/gateway">
+    理解消息网关的工作原理
+  </Card>
+  <Card title="配置路由" icon="route" href="/pages/features/router">
+    设置模型路由以节省费用
+  </Card>
+</CardGroup>

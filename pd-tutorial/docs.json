@@ -1,0 +1,113 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "PilotDeck",
+  "colors": {
+    "primary": "#2563EB",
+    "dark": "#3B82F6",
+    "light": "#93C5FD"
+  },
+  "logo": {
+    "light": "/logo/logo-light.png",
+    "dark": "/logo/logo-dark.png"
+  },
+  "favicon": "/favicon.png",
+  "navigation": {
+    "languages": [
+      {
+        "language": "zh-Hans",
+        "default": true,
+        "groups": [
+          {
+            "group": "开始使用",
+            "pages": [
+              "pages/introduction",
+              "pages/quickstart-web",
+              "pages/quickstart-desktop"
+            ]
+          },
+          {
+            "group": "核心功能",
+            "pages": [
+              "pages/features/projects",
+              "pages/features/gateway",
+              "pages/features/router",
+              "pages/features/memory",
+              "pages/features/always-on"
+            ]
+          },
+          {
+            "group": "架构说明",
+            "pages": [
+              "pages/architecture/overview",
+              "pages/architecture/configuration"
+            ]
+          },
+          {
+            "group": "参考",
+            "pages": [
+              "pages/reference/cli",
+              "pages/reference/config-yaml",
+              "pages/reference/troubleshooting"
+            ]
+          },
+          {
+            "group": "开发指南",
+            "pages": [
+              "pages/development/contributing",
+              "pages/development/module-guide"
+            ]
+          }
+        ]
+      },
+      {
+        "language": "en",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "en/introduction",
+              "en/quickstart-web",
+              "en/quickstart-desktop"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "en/features/projects",
+              "en/features/gateway",
+              "en/features/router",
+              "en/features/memory",
+              "en/features/always-on"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "en/architecture/overview",
+              "en/architecture/configuration"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "en/reference/cli",
+              "en/reference/config-yaml",
+              "en/reference/troubleshooting"
+            ]
+          },
+          {
+            "group": "Development Guide",
+            "pages": [
+              "en/development/contributing",
+              "en/development/module-guide"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footerSocials": {
+    "github": "https://github.com/Gucc111/PilotDeck"
+  }
+}

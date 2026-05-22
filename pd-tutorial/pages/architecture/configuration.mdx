@@ -1,0 +1,260 @@
+---
+title: "配置流程"
+description: "PilotDeck 配置系统的架构、加载流程和热重载机制"
+icon: "gears"
+---
+
+# 配置流程
+
+PilotDeck 使用 YAML 格式的集中式配置系统。配置的唯一入口是 `pilot/config` 模块，负责加载、校验、合并和分发配置。
+
+## PilotHome
+
+**PilotHome** 是 PilotDeck 的用户级数据根目录，默认为：
+
+```
+~/.pilotdeck
+```
+
+可通过环境变量覆盖：
+
+```bash
+export PILOT_HOME=/path/to/custom-home
+```
+
+<Warning>
+PilotHome **不允许** 在 YAML 配置中设置，避免"先读 YAML 才知道 YAML 在哪"的循环依赖。
+</Warning>
+
+## 配置文件
+
+主配置文件位于 PilotHome 目录下：
+
+```
+~/.pilotdeck/pilotdeck.yaml
+```
+
+### 完整配置结构
+
+```yaml
+schemaVersion: 1        # 配置 Schema 版本（当前仅支持 1）
+
+# ── Agent 配置 ──────────────────────────
+agent:
+  model: anthropic-main/claude-sonnet-4-5   # 默认 provider/model
+
+# ── Model 配置 ──────────────────────────
+model:
+  providers:
+    anthropic-main:
+      protocol: anthropic
+      url: https://api.anthropic.com
+      apiKey: ${ANTHROPIC_API_KEY}
+      timeoutMs: 120000
+      headers:
+        anthropic-version: "2023-06-01"
+      models:
+        claude-sonnet-4-5:
+          displayName: Claude Sonnet 4.5
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            supportsThinking: true
+            supportsPromptCache: true
+            maxContextTokens: 200000
+            maxOutputTokens: 8192
+          multimodal:
+            input: [text, image, pdf]
+
+# ── Router 配置 ─────────────────────────
+router:
+  tokenSaver:
+    enabled: true
+  fallback:
+    default:
+      - provider: openai-backup
+        model: gpt-4o
+  autoOrchestrate:
+    enabled: false
+
+# ── Gateway 配置 ────────────────────────
+gateway:
+  port: 18789
+
+# ── Memory 配置 ─────────────────────────
+memory:
+  enabled: true
+  retrievalMode: auto
+
+# ── Always-On 配置 ──────────────────────
+alwaysOn:
+  enabled: false
+  trigger:
+    cooldownMinutes: 60
+    dailyBudget: 5
+
+# ── Cron 配置 ───────────────────────────
+cron:
+  enabled: false
+
+# ── Extension 配置 ──────────────────────
+extension:
+  # 插件和技能配置
+```
+
+## 配置来源与优先级
+
+配置按以下优先级从低到高合并：
+
+```
+默认 YAML (~/.pilotdeck/pilotdeck.yaml)
+  ↓ 被覆盖
+环境变量覆盖 (env overrides)
+```
+
+### 环境变量覆盖
+
+| 环境变量 | 覆盖目标 | 阶段 |
+|----------|----------|------|
+| `PILOT_HOME` | PilotHome 目录 | Bootstrap（YAML 加载前） |
+| `PILOT_AGENT_MODEL` | `agent.model` | Merge（YAML 加载后） |
+| `PILOTDECK_GATEWAY_PORT` | Gateway 端口 | Merge |
+
+### Secret 引用
+
+API Key 支持环境变量引用语法：
+
+```yaml
+model:
+  providers:
+    anthropic-main:
+      apiKey: ${ANTHROPIC_API_KEY}   # 从环境变量读取
+      # 或直接写入（不推荐）
+      apiKey: sk-ant-xxx...
+```
+
+<Note>
+日志、诊断输出中的 Secret 值会自动脱敏。
+</Note>
+
+## 配置加载流程
+
+```
+1. 解析 PilotHome
+   │  来源: 默认值 + PILOT_HOME 环境变量
+   │
+   ▼
+2. 加载 YAML
+   │  路径: ${PilotHome}/pilotdeck.yaml
+   │
+   ▼
+3. 收集环境变量覆盖
+   │  PILOT_AGENT_MODEL 等
+   │
+   ▼
+4. 合并配置
+   │  map 深度合并, scalar 高优先级覆盖
+   │  array 整体替换
+   │
+   ▼
+5. 解析 Secret 引用
+   │  ${ENV_NAME} → 环境变量值
+   │
+   ▼
+6. 结构校验
+   │  字段类型, 枚举值, 必填字段, 默认值
+   │
+   ▼
+7. 语义校验
+   │  agent.model 必须匹配 provider/model
+   │  provider protocol 必须是支持的协议
+   │  model 引用必须存在
+   │
+   ▼
+8. 生成不可变 PilotConfigSnapshot
+   │  version, contentHash, loadedAt
+   │
+   ▼
+9. 分发到各模块
+   model → ModelRuntime
+   router → RouterRuntime
+   gateway → GatewayServer
+   alwaysOn → AlwaysOnManager
+   cron → CronRuntime
+```
+
+## PilotConfigSnapshot
+
+`PilotConfigSnapshot` 是所有业务模块唯一消费的配置对象。
+
+特点：
+- **不可变**：发布后不可修改
+- **有版本号**：每次 reload 递增
+- **有内容 hash**：检测配置是否真正变化
+- **有来源摘要**：每个字段可追溯来源
+- **有诊断信息**：记录 warning 和 error
+
+```typescript
+interface PilotConfigSnapshot {
+  version: number;
+  schemaVersion: number;
+  loadedAt: string;         // ISO timestamp
+  contentHash: string;
+  sources: PilotConfigSource[];
+  diagnostics: PilotConfigDiagnostic[];
+  config: {
+    model: ModelConfig;
+    agent: AgentConfig;
+    router?: RouterConfig;
+    gateway?: GatewayConfig;
+    memory?: MemoryConfig;
+    alwaysOn?: AlwaysOnConfig;
+    cron?: CronConfig;
+    extension?: ExtensionConfig;
+  };
+}
+```
+
+## 热重载
+
+PilotDeck 支持配置文件的热重载：
+
+1. **文件监听**：`PilotConfigWatcher` 监听配置文件变化
+2. **防抖加载**：变化后经过短暂 debounce 再加载
+3. **安全发布**：新配置通过校验后才替换旧配置
+4. **失败保持**：如果新配置校验失败，保留旧配置继续运行
+
+<Info>
+热重载只影响后续请求。当前正在进行的模型请求使用启动时绑定的配置快照。
+</Info>
+
+## 诊断信息
+
+配置校验产生的诊断信息分为四个级别：
+
+| 级别 | 说明 | 影响 |
+|------|------|------|
+| `info` | 信息性提示 | 无影响 |
+| `warning` | 可能的问题 | 配置继续加载 |
+| `error` | 配置错误 | 对应功能可能不可用 |
+| `fatal` | 严重错误 | 启动时抛出异常，热重载时保留旧配置 |
+
+### 常见诊断
+
+| 代码 | 说明 |
+|------|------|
+| `missing_provider` | `agent.model` 引用了不存在的 provider |
+| `missing_model` | `agent.model` 引用了不存在的 model |
+| `invalid_api_key_ref` | API Key 环境变量未设置 |
+| `deprecated_field` | 使用了已废弃的字段（如 `agent.fallbackModel`） |
+| `unknown_field` | 出现了未知的配置字段 |
+
+## 模块边界规则
+
+<Warning>
+以下规则确保配置系统的安全和一致性：
+- 业务模块**不能**绕过 `pilot/config` 自行读取 YAML
+- 业务模块**不能**将运行时状态写回配置对象
+- `pilot/config` **不能**调用业务执行代码（ModelRuntime 等）
+- PilotHome 相关路径**不能**出现在 YAML 中
+</Warning>

@@ -1,0 +1,174 @@
+---
+title: "CLI Reference"
+description: "Complete PilotDeck command-line reference"
+icon: "terminal"
+---
+
+# CLI Reference
+
+PilotDeck provides the `pilotdeck` command with multiple runtime modes and subcommands.
+
+## Global Entry
+
+```bash
+pilotdeck [command] [options]
+```
+
+Without a subcommand, PilotDeck enters **CLI Channel** mode and sends the arguments as user input to the agent.
+
+## Commands
+
+| Command | Description | Requires Server |
+|---------|-------------|:---------------:|
+| `pilotdeck "<message>"` | One-shot CLI interaction | No |
+| `pilotdeck server` | Start the Gateway service | — |
+| `pilotdeck tui` | Start the interactive terminal UI | No |
+| `pilotdeck cron list` | List scheduled tasks | Yes |
+| `pilotdeck cron create` | Create a scheduled task | Yes |
+| `pilotdeck cron delete` | Delete a scheduled task | Yes |
+| `pilotdeck cron stop` | Stop a running task | Yes |
+
+## `pilotdeck`
+
+Start a one-shot conversation from the command line:
+
+```bash
+pilotdeck "Analyze the directory structure of the current project"
+```
+
+Behavior:
+- Creates an in-process Gateway in the current directory
+- Creates a temporary CLI Channel session
+- Exits after printing the agent response
+
+<Tip>
+CLI mode is good for scripting and automation. For multi-turn interaction, use `pilotdeck tui`.
+</Tip>
+
+## `pilotdeck server`
+
+Start the long-running Gateway service for WebSocket and HTTP connections.
+
+```bash
+pilotdeck server [--port <port>]
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--port <port>` | Listen port | `18789` |
+
+| Environment variable | Description |
+|----------------------|-------------|
+| `PILOTDECK_GATEWAY_PORT` | Equivalent to `--port`, lower priority than CLI args |
+
+Example output:
+
+```
+PilotDeck server listening: http://127.0.0.1:18789
+WebSocket: ws://127.0.0.1:18789/ws
+Token: /Users/me/.pilotdeck/server-token
+```
+
+Server mode initializes Gateway + SessionRouter, Web UI static files, Always-On Manager when enabled, Cron Runtime when configured, and Feishu Channel.
+
+## `pilotdeck tui`
+
+Start the Ink/React-based interactive terminal UI:
+
+```bash
+pilotdeck tui
+```
+
+Requirements:
+- Must run inside an interactive TTY
+- Non-TTY environments exit with an error
+
+Connection logic:
+
+```
+Try In-Process Gateway
+        │
+        ├── success → use local Gateway
+        │
+        └── failure → probe http://127.0.0.1:<port>
+                     │
+                     ├── server found → connect to remote Gateway
+                     │
+                     └── no server → use limited fallback Gateway
+```
+
+## `pilotdeck cron`
+
+Cron subcommands require a running `pilotdeck server`.
+
+### `pilotdeck cron list`
+
+```bash
+pilotdeck cron list [--history] [--limit <n>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--history` | Include execution history |
+| `--limit <n>` | Limit returned records |
+
+### `pilotdeck cron create`
+
+```bash
+pilotdeck cron create   --session <sessionKey>   --message <text>   [--once <iso-datetime> | --cron <expression>]   [--channel <channelKey>]   [--project <projectKey>]   [--timezone <tz>]
+```
+
+| Option | Required | Description |
+|--------|:--------:|-------------|
+| `--session` | yes | Target sessionKey |
+| `--message` | yes | Message to execute |
+| `--once` | yes* | One-time ISO datetime |
+| `--cron` | yes* | Recurring Cron expression |
+| `--channel` | no | Channel key, inferred from sessionKey by default |
+| `--project` | no | Project path, current directory by default |
+| `--timezone` | no | Time zone |
+
+<Note>
+Choose exactly one of `--once` and `--cron`.
+</Note>
+
+Examples:
+
+```bash
+# Run tests every Monday at 9 AM
+pilotdeck cron create   --session "cli:project=/Users/me/app:s_main"   --message "Run all tests and report failures"   --cron "0 9 * * 1"
+
+# Run once tomorrow at 3 PM
+pilotdeck cron create   --session "cli:project=/Users/me/app:s_main"   --message "Generate this week's code review report"   --once "2025-06-01T15:00:00+08:00"
+```
+
+### `pilotdeck cron delete`
+
+```bash
+pilotdeck cron delete <taskId> [--stop-running]
+```
+
+### `pilotdeck cron stop`
+
+```bash
+pilotdeck cron stop <taskId>
+pilotdeck cron stop --run <runId>
+```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PILOT_HOME` | PilotHome directory | `~/.pilotdeck` |
+| `PILOT_AGENT_MODEL` | Override `agent.model` | — |
+| `PILOTDECK_GATEWAY_PORT` | Server listen port | `18789` |
+| `PILOTDECK_CONFIG_PATH` | Config file path override | — |
+| `ANTHROPIC_API_KEY` | Anthropic API key | — |
+| `OPENAI_API_KEY` | OpenAI API key | — |
+
+## Exit Codes
+
+| Code | Description |
+|------|-------------|
+| `0` | Completed successfully |
+| `1` | Error, such as argument error, config error, or runtime failure |

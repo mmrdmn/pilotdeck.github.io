@@ -1,0 +1,186 @@
+---
+title: "Configuration Flow"
+description: "PilotDeck configuration loading, validation, merge, and hot reload"
+icon: "gears"
+---
+
+# Configuration Flow
+
+PilotDeck uses a centralized YAML configuration system. The single entry point is the `pilot/config` module, which loads, validates, merges, and distributes config snapshots.
+
+## PilotHome
+
+**PilotHome** is the user-level data root. By default:
+
+```
+~/.pilotdeck
+```
+
+Override it with an environment variable:
+
+```bash
+export PILOT_HOME=/path/to/custom-home
+```
+
+<Warning>
+PilotHome **cannot** be set in YAML config. Otherwise the system would need to read YAML before knowing where YAML lives.
+</Warning>
+
+## Config File
+
+The main config file is located under PilotHome:
+
+```
+~/.pilotdeck/pilotdeck.yaml
+```
+
+### Full Structure
+
+```yaml
+schemaVersion: 1
+
+agent:
+  model: anthropic-main/claude-sonnet-4-5
+
+model:
+  providers:
+    anthropic-main:
+      protocol: anthropic
+      url: https://api.anthropic.com
+      apiKey: ${ANTHROPIC_API_KEY}
+      timeoutMs: 120000
+      headers:
+        anthropic-version: "2023-06-01"
+      models:
+        claude-sonnet-4-5:
+          displayName: Claude Sonnet 4.5
+          capabilities:
+            supportsToolUse: true
+            supportsStreaming: true
+            supportsThinking: true
+            supportsPromptCache: true
+            maxContextTokens: 200000
+            maxOutputTokens: 8192
+          multimodal:
+            input: [text, image, pdf]
+
+router:
+  tokenSaver:
+    enabled: true
+  fallback:
+    default:
+      - provider: openai-backup
+        model: gpt-4o
+  autoOrchestrate:
+    enabled: false
+
+gateway:
+  port: 18789
+
+memory:
+  enabled: true
+  retrievalMode: auto
+
+alwaysOn:
+  enabled: false
+  trigger:
+    cooldownMinutes: 60
+    dailyBudget: 5
+
+cron:
+  enabled: false
+
+extension:
+  # plugins and skills
+```
+
+## Sources and Priority
+
+Configuration is merged from low to high priority:
+
+```
+Default YAML (~/.pilotdeck/pilotdeck.yaml)
+  ↓ overridden by
+Environment variable overrides
+```
+
+| Environment variable | Target | Stage |
+|----------------------|--------|-------|
+| `PILOT_HOME` | PilotHome directory | Bootstrap |
+| `PILOT_AGENT_MODEL` | `agent.model` | Merge |
+| `PILOTDECK_GATEWAY_PORT` | Gateway port | Merge |
+
+## Secret References
+
+API keys support environment variable references:
+
+```yaml
+model:
+  providers:
+    anthropic-main:
+      apiKey: ${ANTHROPIC_API_KEY}
+      # or inline plaintext, not recommended
+      apiKey: sk-ant-xxx...
+```
+
+<Note>
+Secrets are redacted in logs and diagnostics.
+</Note>
+
+## Loading Flow
+
+```
+1. Resolve PilotHome
+2. Load YAML from ${PilotHome}/pilotdeck.yaml
+3. Collect environment overrides
+4. Merge config
+5. Resolve secret references
+6. Validate structure
+7. Validate semantics
+8. Create immutable PilotConfigSnapshot
+9. Distribute it to model, router, gateway, alwaysOn, and cron
+```
+
+## PilotConfigSnapshot
+
+`PilotConfigSnapshot` is the only config object consumed by business modules.
+
+Characteristics:
+- **Immutable** after publication
+- **Versioned** for each reload
+- **Content hashed** to detect real changes
+- **Traceable sources** for field provenance
+- **Diagnostics** for warnings and errors
+
+## Hot Reload
+
+PilotDeck supports config hot reload:
+
+1. `PilotConfigWatcher` watches config file changes
+2. A short debounce prevents excessive reloads
+3. New config is published only after validation succeeds
+4. If validation fails, the old config remains active
+
+<Info>
+Hot reload only affects future requests. In-flight model requests keep the config snapshot they started with.
+</Info>
+
+## Diagnostics
+
+| Level | Meaning | Impact |
+|-------|---------|--------|
+| `info` | Informational | No impact |
+| `warning` | Potential issue | Config continues loading |
+| `error` | Config issue | Related capability may be unavailable |
+| `fatal` | Severe issue | Startup throws; hot reload keeps old config |
+
+Common diagnostic codes include `missing_provider`, `missing_model`, `invalid_api_key_ref`, `deprecated_field`, and `unknown_field`.
+
+## Module Boundary Rules
+
+<Warning>
+- Business modules must not bypass `pilot/config` to read YAML directly.
+- Business modules must not write runtime state back into config objects.
+- `pilot/config` must not call business execution code.
+- PilotHome-related paths must not appear in YAML.
+</Warning>
