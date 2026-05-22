@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" width="600" height="480">
+  <rect width="600" height="480" fill="#f8fafc"/>
+
+  <!-- Timeline -->
+  <g>
+    <line x1="60" y1="240" x2="540" y2="240" stroke="#cbd5e1" stroke-width="2"/>
+    <g font-family="-apple-system, sans-serif" font-size="10" fill="#94a3b8" font-weight="600">
+      <text x="60"  y="270">09:00 sign off</text>
+      <text x="200" y="270">12:00</text>
+      <text x="330" y="270">15:00</text>
+      <text x="460" y="270">18:00 wake up</text>
+    </g>
+    <!-- ticks -->
+    <g stroke="#cbd5e1" stroke-width="2">
+      <line x1="60"  y1="234" x2="60"  y2="246"/>
+      <line x1="200" y1="234" x2="200" y2="246"/>
+      <line x1="330" y1="234" x2="330" y2="246"/>
+      <line x1="460" y1="234" x2="460" y2="246"/>
+    </g>
+  </g>
+
+  <!-- Tasks discovered & executed -->
+  <g font-family="-apple-system, sans-serif" font-size="11">
+    <!-- discovery 1 -->
+    <g>
+      <circle cx="120" cy="240" r="8" fill="#2563eb"/>
+      <line x1="120" y1="240" x2="120" y2="170" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <rect x="60" y="120" width="140" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+      <text x="72" y="138" font-size="10" font-weight="700" fill="#2563eb">DISCOVERY</text>
+      <text x="72" y="158" fill="#1e3a8a">RFP deadline detected</text>
+    </g>
+    <!-- discovery 2 -->
+    <g>
+      <circle cx="260" cy="240" r="8" fill="#16a34a"/>
+      <line x1="260" y1="240" x2="260" y2="310" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <rect x="200" y="310" width="140" height="50" rx="8" fill="#f0fdf4" stroke="#bbf7d0"/>
+      <text x="212" y="328" font-size="10" font-weight="700" fill="#15803d">DRAFT WRITTEN</text>
+      <text x="212" y="348" fill="#14532d">v1 saved to /docs</text>
+    </g>
+    <!-- discovery 3 -->
+    <g>
+      <circle cx="380" cy="240" r="8" fill="#a855f7"/>
+      <line x1="380" y1="240" x2="380" y2="170" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <rect x="320" y="120" width="140" height="50" rx="8" fill="#faf5ff" stroke="#e9d5ff"/>
+      <text x="332" y="138" font-size="10" font-weight="700" fill="#7e22ce">MONITOR</text>
+      <text x="332" y="158" fill="#581c87">API rate-limit fixed</text>
+    </g>
+    <!-- discovery 4 -->
+    <g>
+      <circle cx="490" cy="240" r="8" fill="#f59e0b"/>
+      <line x1="490" y1="240" x2="490" y2="310" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <rect x="430" y="310" width="140" height="50" rx="8" fill="#fffbeb" stroke="#fde68a"/>
+      <text x="442" y="328" font-size="10" font-weight="700" fill="#b45309">REPORT</text>
+      <text x="442" y="348" fill="#78350f">summary ready</text>
+    </g>
+  </g>
+
+  <!-- title chip -->
+  <g>
+    <rect x="220" y="50" width="160" height="32" rx="16" fill="#0f172a"/>
+    <circle cx="240" cy="66" r="4" fill="#22c55e"/>
+    <text x="252" y="70" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#fff">Always-on · Active</text>
+  </g>
+
+  <!-- bottom caption -->
+  <text x="300" y="430" text-anchor="middle" font-family="-apple-system, sans-serif"
+        font-size="13" fill="#64748b">discover · execute · land files · summarize  without you</text>
+</svg>

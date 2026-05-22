@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 60" width="220" height="60">
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" fill="#111">
+    <rect x="6" y="18" width="24" height="24" rx="4" fill="#7e1010"/>
+    <text x="40" y="28" font-size="14" font-weight="700">THUNLP</text>
+    <text x="40" y="44" font-size="10" font-weight="500" fill="#666">Tsinghua University · NLP Lab</text>
+  </g>
+</svg>

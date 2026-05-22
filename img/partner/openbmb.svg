@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 60" width="220" height="60">
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" fill="#111">
+    <g transform="translate(6 18)">
+      <circle cx="12" cy="12" r="11" fill="none" stroke="#000" stroke-width="2"/>
+      <circle cx="12" cy="12" r="4" fill="#2563eb"/>
+    </g>
+    <text x="40" y="28" font-size="14" font-weight="700">OpenBMB</text>
+    <text x="40" y="44" font-size="10" font-weight="500" fill="#666">Open Lab for Big Model Base</text>
+  </g>
+</svg>

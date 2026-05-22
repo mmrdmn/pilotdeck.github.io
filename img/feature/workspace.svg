@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" width="600" height="480">
+  <rect width="600" height="480" fill="#f8fafc"/>
+  <!-- Three isolated workspace cards in a row, no overlap -->
+  <g stroke="#000" stroke-width="2" fill="#fff">
+    <rect x="50"  y="120" width="150" height="220" rx="14"/>
+    <rect x="225" y="120" width="150" height="220" rx="14"/>
+    <rect x="400" y="120" width="150" height="220" rx="14"/>
+  </g>
+  <!-- Title labels on each card -->
+  <g font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#64748b" letter-spacing="0.05em">
+    <text x="62"  y="100" text-transform="uppercase">Project A</text>
+    <text x="237" y="100" text-transform="uppercase">Project B</text>
+    <text x="412" y="100" text-transform="uppercase">Project C</text>
+  </g>
+  <!-- Decorative items inside cards -->
+  <g fill="#e5e7eb">
+    <!-- card A: files -->
+    <rect x="70"  y="140" width="110" height="8" rx="2"/>
+    <rect x="70"  y="158" width="80"  height="8" rx="2"/>
+    <rect x="70"  y="176" width="100" height="8" rx="2"/>
+    <!-- card B: memory -->
+    <rect x="245" y="140" width="110" height="8" rx="2"/>
+    <rect x="245" y="158" width="60"  height="8" rx="2"/>
+    <rect x="245" y="176" width="90"  height="8" rx="2"/>
+    <!-- card C: skills -->
+    <rect x="420" y="140" width="110" height="8" rx="2"/>
+    <rect x="420" y="158" width="70"  height="8" rx="2"/>
+    <rect x="420" y="176" width="100" height="8" rx="2"/>
+  </g>
+  <!-- Accent dots representing isolated state -->
+  <g>
+    <circle cx="70"  cy="140" r="3" fill="#2563eb"/>
+    <circle cx="245" cy="140" r="3" fill="#16a34a"/>
+    <circle cx="420" cy="140" r="3" fill="#ea580c"/>
+  </g>
+  <!-- Skills section -->
+  <g fill="#f1f5f9" stroke="#e2e8f0">
+    <rect x="70"  y="230" width="50" height="22" rx="11"/>
+    <rect x="130" y="230" width="40" height="22" rx="11"/>
+    <rect x="245" y="230" width="50" height="22" rx="11"/>
+    <rect x="305" y="230" width="40" height="22" rx="11"/>
+    <rect x="420" y="230" width="50" height="22" rx="11"/>
+    <rect x="480" y="230" width="40" height="22" rx="11"/>
+  </g>
+  <!-- Isolation barriers - vertical dashed lines between cards -->
+  <g stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="3 4">
+    <line x1="212.5" y1="100" x2="212.5" y2="360"/>
+    <line x1="387.5" y1="100" x2="387.5" y2="360"/>
+  </g>
+  <!-- Lock icons on barriers -->
+  <g fill="#94a3b8">
+    <circle cx="212.5" cy="230" r="10"/>
+    <circle cx="387.5" cy="230" r="10"/>
+    <text x="208" y="234" font-family="-apple-system, sans-serif" font-size="11" fill="#fff" font-weight="700">Á</text>
+    <text x="383" y="234" font-family="-apple-system, sans-serif" font-size="11" fill="#fff" font-weight="700">Á</text>
+  </g>
+  <!-- bottom caption -->
+  <text x="300" y="400" text-anchor="middle" font-family="-apple-system, sans-serif"
+        font-size="14" fill="#64748b">files · memory · skills · scoped per WorkSpace</text>
+</svg>
