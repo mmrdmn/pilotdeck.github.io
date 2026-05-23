@@ -2,24 +2,53 @@
    HERO
    ============================================================ */
 .heroSection {
-  background-color: #ffffff;
-  padding: 60px 0 80px;
-  text-align: left;
+  height: clamp(520px, 60.9vw, 732px);
+  min-height: 0;
+  max-height: none;
+  display: flex;
+  align-items: flex-start;
+  padding: 0;
   position: relative;
   overflow: hidden;
+  background: #ffffff;
   border-bottom: 1px solid #f0f0f0;
+  isolation: isolate;
+}
+
+.heroBackground {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(108vw, 1300px);
+  height: auto;
+  max-width: none;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.heroSection::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.9) 36%, rgba(255, 255, 255, 0.2) 62%, rgba(255, 255, 255, 0) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 82%, rgba(255, 255, 255, 0.24) 100%);
+  pointer-events: none;
 }
 
 .heroContent {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 40px;
-  position: relative;
-  z-index: 10;
+  padding: clamp(72px, 12vh, 120px) 0 0 clamp(30px, 4vw, 58px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 32px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .heroTextWrapper {
@@ -27,46 +56,46 @@
   max-width: 600px;
 }
 
+.heroBrand {
+  display: inline-block;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #1a3a6b;
+  margin-bottom: 12px;
+}
+
 .heroTitle {
-  font-size: 78px;
-  line-height: 1;
+  font-size: clamp(48px, 5.8vw, 74px);
+  line-height: 1.08;
   font-weight: 800;
   letter-spacing: -0.04em;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #000000;
-  margin-bottom: 24px;
+  color: #071225;
+  margin: 0 0 18px;
 }
 
-.heroTitleAccent {
-  color: var(--pd-accent);
-  font-size: 0.35em;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  vertical-align: middle;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: var(--pd-accent-soft);
-  margin-left: 12px;
-  text-transform: uppercase;
+.heroTitle span {
+  color: #3157f0;
 }
 
 .heroSubtitle {
-  font-size: 24px;
+  font-size: 18px;
   line-height: 1.4;
   font-weight: 500;
-  color: #111827;
-  margin-bottom: 16px;
+  color: #4b5563;
+  margin: 0 0 20px;
   max-width: 560px;
   letter-spacing: -0.01em;
 }
 
 .heroDesc {
-  font-size: 17px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.7;
   font-weight: 400;
-  color: #666;
-  margin-bottom: 40px;
-  max-width: 540px;
+  color: #6b7280;
+  margin: 0 0 32px;
+  max-width: 560px;
 }
 
 .heroButtons {
@@ -81,24 +110,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 28px;
-  height: 48px;
-  background-color: #000;
-  color: #fff !important;
-  font-size: 16px;
-  font-weight: 500;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.86);
+  color: #111827 !important;
+  font-size: 15px;
+  font-weight: 600;
   border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border: 1px solid #000;
+  text-decoration: none !important;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
   white-space: nowrap;
 }
 .btnPrimary:hover {
-  background-color: #333;
+  background: #ffffff;
+  border-color: rgba(17, 24, 39, 0.28);
   transform: translateY(-1px);
-  text-decoration: none;
-  color: #fff !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-decoration: none !important;
+  color: #111827 !important;
 }
 
 .btnSecondary {
@@ -106,40 +135,24 @@
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  height: 48px;
-  background-color: #fff;
-  color: #111 !important;
-  font-size: 16px;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.72);
+  color: #111827 !important;
+  font-size: 15px;
+  font-weight: 600;
   border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border: 1px solid #e5e5e5;
+  text-decoration: none !important;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.04);
+  backdrop-filter: blur(12px);
   white-space: nowrap;
 }
 .btnSecondary:hover {
-  border-color: #000;
-  background-color: #fff;
-  text-decoration: none;
-  color: #000 !important;
+  background: #ffffff;
+  border-color: rgba(17, 24, 39, 0.28);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.heroImage {
-  flex: 0.85;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-left: -40px;
-}
-.heroImgElement {
-  width: 100%;
-  height: auto;
-  max-width: 600px;
-  border-radius: 0;
-  box-shadow: none;
-  object-fit: contain;
+  text-decoration: none !important;
+  color: #111827 !important;
 }
 
 /* ============================================================
@@ -855,20 +868,30 @@
    MOBILE
    ============================================================ */
 @media screen and (max-width: 996px) {
-  .heroSection { padding: 40px 0 60px; }
-  .heroContent {
-    flex-direction: column-reverse;
-    text-align: center;
-    padding: 20px 24px 0;
-    gap: 24px;
+  .heroSection {
+    height: clamp(560px, 73.125vw, 760px);
+    padding: 0;
   }
-  .heroTextWrapper { max-width: 100%; }
+
+  .heroBackground {
+    width: min(130vw, 1320px);
+    height: auto;
+    right: 0;
+  }
+
+  .heroSection::after {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.96) 58%, rgba(255, 255, 255, 0.72) 100%);
+  }
+
+  .heroContent {
+    padding: 48px 24px 0;
+    align-items: flex-start;
+  }
+  .heroTextWrapper { max-width: 620px; text-align: left; }
   .heroTitle { font-size: 48px; }
   .heroSubtitle { font-size: 18px; margin-bottom: 12px; max-width: 100%; }
   .heroDesc { font-size: 15px; margin-bottom: 28px; max-width: 100%; }
-  .heroButtons { justify-content: center; flex-wrap: wrap; }
-  .heroImage { flex: none; margin-left: 0; justify-content: center; }
-  .heroImgElement { max-width: 420px; }
+  .heroButtons { justify-content: flex-start; flex-wrap: wrap; }
 
   .gridSection,
   .numbersSection,
@@ -926,20 +949,35 @@
 
 @media screen and (max-width: 480px) {
   .heroTitle { font-size: 40px; margin-bottom: 16px; }
-  .heroTitleAccent { font-size: 0.3em; padding: 4px 10px; }
   .heroSubtitle { font-size: 16px; }
   .heroDesc { font-size: 14px; margin-bottom: 24px; }
+
+  .heroSection {
+    height: auto;
+    min-height: 560px;
+  }
+
+  .heroBackground {
+    height: auto;
+    width: 967px;
+    right: -710px;
+    bottom: 0;
+    top: auto;
+    transform: none;
+    opacity: 0.28;
+  }
+
+  .heroSection::after {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.98) 78%, rgba(255, 255, 255, 0.9) 100%);
+  }
 
   .heroButtons { flex-direction: column; width: 100%; gap: 10px; }
   .btnPrimary, .btnSecondary {
     width: 100%;
     justify-content: center;
-    height: 44px;
     font-size: 15px;
     padding: 10px 20px;
   }
-
-  .heroImgElement { max-width: 100%; }
 
   .sectionTitle { font-size: 26px; }
   .carouselImageWrapper { height: 200px; }

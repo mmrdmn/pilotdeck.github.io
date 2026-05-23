@@ -5,7 +5,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 const config = {
   title: 'PilotDeck',
   tagline: 'Task-oriented AI Agent productivity platform — one WorkSpace at a time.',
-  favicon: 'img/favicon.svg',
+  favicon: 'img/favicon.png',
 
   url: 'https://pilotdeck.github.io',
   baseUrl: '/',
@@ -57,7 +57,7 @@ const config = {
       navbar: {
         logo: {
           alt: 'PilotDeck Logo',
-          src: 'img/logo.svg',
+          src: 'img/logo-dark.png',
         },
         items: [
           {

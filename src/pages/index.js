@@ -383,17 +383,43 @@ function HeroSection() {
   const t = isZh ? HERO.zh : HERO.en;
   return (
     <header className={styles.heroSection}>
+      <img
+        className={styles.heroBackground}
+        src={useBaseUrl('img/hero-flight-deck.png')}
+        alt=""
+        aria-hidden="true"
+      />
       <div className={styles.heroContent}>
         <div className={styles.heroTextWrapper}>
+          <div className={styles.heroBrand}>PilotDeck</div>
           <h1 className={styles.heroTitle}>
-            {t.title} <span className={styles.heroTitleAccent}>{t.versionTag}</span>
+            {isZh ? (
+              <>
+                从一个控制台<br />调度所有 Agent
+              </>
+            ) : (
+              <>
+                Pilot Every Agent<br />from <span>One Deck</span>
+              </>
+            )}
           </h1>
-          <p className={styles.heroSubtitle}>{t.subtitle}</p>
-          <p className={styles.heroDesc}>{t.desc}</p>
+          <p className={styles.heroSubtitle}>
+            {isZh
+              ? '一个座舱。所有 Agent。统一控制。最大影响。'
+              : 'One cockpit. All agents. Unified control. Maximum impact.'}
+          </p>
+          <p className={styles.heroDesc}>
+            {isZh
+              ? '一站式 AI Agent 指挥中心。运行、观察、调控跨项目的所有 Agent，让每一次会话、工具调用和交接都尽在掌握。'
+              : 'A unified command center for running, observing, and steering AI agents across projects. Keep every session, tool call, and handoff visible from one focused control surface.'}
+          </p>
 
           <div className={styles.heroButtons}>
             <Link className={styles.btnPrimary} to="http://58.57.119.12:52006/">
-              <span style={{ marginRight: 6 }}>▶</span> {t.tryDemo}
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ marginRight: 6 }}>
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+              {t.tryDemo}
             </Link>
             <Link className={styles.btnSecondary} to="#quick-start">
               {t.quickStart}
@@ -412,13 +438,6 @@ function HeroSection() {
               {t.github}
             </Link>
           </div>
-        </div>
-        <div className={styles.heroImage}>
-          <img
-            src={useBaseUrl('img/home/hero.svg')}
-            className={styles.heroImgElement}
-            alt="PilotDeck WorkSpace overview"
-          />
         </div>
       </div>
     </header>
