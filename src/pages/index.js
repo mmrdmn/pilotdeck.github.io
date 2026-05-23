@@ -662,7 +662,7 @@ pilotdeck status     # check runtime status`}
         </div>
         <div className={styles.quickStartImageWrapper}>
           <img
-            src={useBaseUrl('img/home/ui-preview.svg')}
+            src={useBaseUrl('img/home/ui-preview.png')}
             className={styles.quickStartImage}
             alt="PilotDeck UI preview"
           />
