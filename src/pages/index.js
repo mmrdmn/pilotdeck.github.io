@@ -197,7 +197,7 @@ const USECASES = {
         tag: 'Knowledge Work',
         quote: 'Survey the Chinese LLM application market and turn it into a formal HTML white paper.',
         title: 'Work Document Generation',
-        image: 'img/usecase/document.svg',
+        image: 'img/usecase/document-preview.png',
         href: '/docs/en/showcase/ppt-whitepaper',
       },
       {
@@ -211,14 +211,14 @@ const USECASES = {
         tag: 'Engineering',
         quote: 'Build a low-code embedding fine-tuning platform from scratch.',
         title: 'AI Engineering Platform',
-        image: 'img/usecase/aiplatform.svg',
+        image: 'img/usecase/aiplatform-preview.png',
         href: '/docs/en/showcase/model-training',
       },
       {
         tag: 'Media',
         quote: 'Push this English podcast to a global audience in Chinese / Japanese / French / Korean / Spanish / Arabic.',
         title: 'Audio-Video & Social Ops',
-        image: 'img/usecase/podcast.svg',
+        image: 'img/usecase/podcast-preview.png',
         href: '/docs/en/showcase/podcast-multilingual',
       },
     ],
@@ -234,7 +234,7 @@ const USECASES = {
         tag: '知识工作',
         quote: '调研中国 LLM 应用市场，并生成一份正式的 HTML 白皮书。',
         title: '办公文档生成',
-        image: 'img/usecase/document.svg',
+        image: 'img/usecase/document-preview.png',
         href: '/docs/showcase/ppt-whitepaper',
       },
       {
@@ -248,14 +248,14 @@ const USECASES = {
         tag: '工程化',
         quote: '从零搭一个低代码的 Embedding 微调平台。',
         title: 'AI 工程平台搭建',
-        image: 'img/usecase/aiplatform.svg',
+        image: 'img/usecase/aiplatform-preview.png',
         href: '/docs/showcase/model-training',
       },
       {
         tag: '媒体运营',
         quote: '把这期英文播客同步推给中 / 日 / 法 / 韩 / 西 / 阿语全球听众。',
         title: '音视频与社媒运营',
-        image: 'img/usecase/podcast.svg',
+        image: 'img/usecase/podcast-preview.png',
         href: '/docs/showcase/podcast-multilingual',
       },
     ],
@@ -596,7 +596,16 @@ function UseCasesSection() {
           return (
           <LinkEl key={idx} {...linkProps} className={styles.useCaseCard}>
             <div className={styles.useCaseImageWrapper}>
-              <img src={useBaseUrl(item.image)} alt={item.title} className={styles.useCaseImage} />
+              <img
+                src={useBaseUrl(item.image)}
+                alt={item.title}
+                className={clsx(
+                  styles.useCaseImage,
+                  item.image === 'img/usecase/document-preview.png' && styles.useCaseImageDocument,
+                  item.image === 'img/usecase/aiplatform-preview.png' && styles.useCaseImageAiPlatform,
+                  item.image === 'img/usecase/podcast-preview.png' && styles.useCaseImagePodcast,
+                )}
+              />
             </div>
             <div className={styles.useCaseBody}>
               <div className={styles.useCaseTag}>{item.tag}</div>

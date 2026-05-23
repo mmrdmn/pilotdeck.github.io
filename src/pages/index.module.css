@@ -544,8 +544,27 @@
   object-fit: cover;
   transition: transform 0.5s ease;
 }
+.useCaseImageDocument {
+  transform: scale(1.12);
+}
+.useCaseImageAiPlatform {
+  object-position: center 45%;
+}
+.useCaseImagePodcast {
+  object-position: center 10%;
+  transform: scale(1.03);
+}
 .useCaseCard:hover .useCaseImage {
   transform: scale(1.04);
+}
+.useCaseCard:hover .useCaseImageDocument {
+  transform: scale(1.16);
+}
+.useCaseCard:hover .useCaseImageAiPlatform {
+  transform: scale(1.04);
+}
+.useCaseCard:hover .useCaseImagePodcast {
+  transform: scale(1.07);
 }
 
 .useCaseBody {
