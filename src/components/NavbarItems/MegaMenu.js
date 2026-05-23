@@ -8,6 +8,20 @@ export default function MegaMenu({ label, labelZh, items, position, to: triggerT
   const { lang } = useLanguage();
   const isZh = lang === 'zh';
   const displayLabel = isZh ? (labelZh || label) : label;
+  const localizeDocsPath = (url) => {
+    if (!url || !url.startsWith('/docs/')) return url;
+
+    if (!isZh && !url.startsWith('/docs/en/')) {
+      return `/docs/en${url.slice('/docs'.length)}`;
+    }
+
+    if (isZh && url.startsWith('/docs/en/')) {
+      return `/docs${url.slice('/docs/en'.length)}`;
+    }
+
+    return url;
+  };
+  const localizedTriggerTo = localizeDocsPath(triggerTo);
 
   const localizedItems = items.map((column) => ({
     ...column,
@@ -15,6 +29,7 @@ export default function MegaMenu({ label, labelZh, items, position, to: triggerT
     items: column.items.map((item) => ({
       ...item,
       label: isZh ? (item.labelZh || item.label) : item.label,
+      to: localizeDocsPath(item.to),
     })),
   }));
 
@@ -52,7 +67,7 @@ export default function MegaMenu({ label, labelZh, items, position, to: triggerT
     >
       {triggerTo ? (
         <Link
-          to={triggerTo}
+          to={localizedTriggerTo}
           className={clsx('navbar__link', styles.megaMenuTrigger, {
             [styles.active]: isOpen,
           })}
