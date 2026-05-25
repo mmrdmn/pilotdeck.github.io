@@ -125,15 +125,16 @@ const CONTACT = {
   },
 };
 
-export default function ConnectPage() {
+export default function ConnectPage({ title, titleZh }) {
   const isZh = useIsZh();
   const community = isZh ? COMMUNITY.zh : COMMUNITY.en;
   const contribute = isZh ? CONTRIBUTE.zh : CONTRIBUTE.en;
   const contact = isZh ? CONTACT.zh : CONTACT.en;
+  const displayTitle = isZh ? (titleZh || '连接') : (title || 'Connect');
 
   return (
     <Layout
-      title={isZh ? '连接' : 'Connect'}
+      title={displayTitle}
       description={isZh ? '加入社区、参与贡献' : 'Join the community and contribute to PilotDeck.'}
     >
       <main className={styles.connectPage}>

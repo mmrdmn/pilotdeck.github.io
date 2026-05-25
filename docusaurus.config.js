@@ -132,19 +132,26 @@ const config = {
             ],
           },
           {
+            type: 'custom-homeLink',
+            position: 'left',
+            label: 'Research',
+            labelZh: '研究',
+            to: '/research',
+          },
+          {
             type: 'custom-megaMenu',
             position: 'left',
-            label: 'Connect',
-            labelZh: '加入我们',
-            to: '/connect',
+            label: 'Team',
+            labelZh: '团队',
+            to: '/team',
             items: [
               {
                 title: 'Community',
                 titleZh: '社区',
                 items: [
-                  { label: 'Discord', labelZh: 'Discord 群组', to: '/connect#community' },
-                  { label: 'Feishu', labelZh: '飞书群', to: '/connect#community' },
-                  { label: 'WeChat', labelZh: '微信群', to: '/connect#community' },
+                  { label: 'Discord', labelZh: 'Discord 群组', to: '/team#community' },
+                  { label: 'Feishu', labelZh: '飞书群', to: '/team#community' },
+                  { label: 'WeChat', labelZh: '微信群', to: '/team#community' },
                 ],
               },
               {
