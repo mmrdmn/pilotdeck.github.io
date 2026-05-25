@@ -109,84 +109,6 @@ const FEATURES = {
   ],
 };
 
-const NUMBERS = {
-  en: {
-    title: 'Real-world Numbers',
-    desc: 'The three pillar capabilities have shown clear advantages in production-grade workflows.',
-    cards: [
-      {
-        big: '~70%',
-        unit: 'spend savings',
-        title: 'Smart Routing · social media ops',
-        rows: [
-          { label: 'Smart Routing ON  (Opus + Sonnet)', value: '$2.83', mark: 'best' },
-          { label: 'Smart Routing OFF (all Opus)', value: '$12.58' },
-          { label: 'Monolithic       (single Opus)', value: '$12.20' },
-        ],
-      },
-      {
-        big: '1/6',
-        unit: 'cost vs frontier',
-        title: 'Beats frontier model on 7 hard tasks',
-        rows: [
-          { label: 'MiniMax-M2.7  single-agent', value: '37.1 · $1.90' },
-          { label: 'Sonnet 4.6    single-agent', value: '69.1 · $18.36' },
-          { label: 'Sonnet (main) + MiniMax (sub)', value: '70.6 · $3.15', mark: 'best' },
-        ],
-      },
-      {
-        big: '5 dim',
-        unit: 'white-box wins',
-        title: 'Memory: black-box vs PilotDeck',
-        rows: [
-          { label: 'Visibility', value: '✓ every entry visible' },
-          { label: 'Control', value: '✓ edit, delete, pin' },
-          { label: 'Traceability', value: '✓ full audit trail' },
-          { label: 'Isolation', value: '✓ scoped per WorkSpace' },
-          { label: 'Reversible', value: '✓ one-click rollback' },
-        ],
-      },
-    ],
-  },
-  zh: {
-    title: '实战数据',
-    desc: '三大支柱能力在生产级工作流中已展现明显优势。',
-    cards: [
-      {
-        big: '~70%',
-        unit: '成本下降',
-        title: '智能路由 · 社媒运营场景',
-        rows: [
-          { label: '智能路由 开启 (Opus + Sonnet)', value: '$2.83', mark: 'best' },
-          { label: '智能路由 关闭 (全 Opus)', value: '$12.58' },
-          { label: '单模型 长 React (Opus)', value: '$12.20' },
-        ],
-      },
-      {
-        big: '1/6',
-        unit: '成本击败 frontier',
-        title: '7 项复杂任务超越单一旗舰模型',
-        rows: [
-          { label: 'MiniMax-M2.7  单 agent', value: '37.1 · $1.90' },
-          { label: 'Sonnet 4.6    单 agent', value: '69.1 · $18.36' },
-          { label: 'Sonnet 主 + MiniMax 子', value: '70.6 · $3.15', mark: 'best' },
-        ],
-      },
-      {
-        big: '5 维',
-        unit: '白盒优势',
-        title: '记忆系统：黑盒 vs PilotDeck',
-        rows: [
-          { label: '可见性', value: '✓ 每条记忆可视' },
-          { label: '可控性', value: '✓ 编辑、删除、固定' },
-          { label: '可溯源', value: '✓ 全链路审计' },
-          { label: '隔离性', value: '✓ 按 WorkSpace 隔离' },
-          { label: '可回滚', value: '✓ 一键回滚' },
-        ],
-      },
-    ],
-  },
-};
 
 const USECASES = {
   en: {
@@ -545,35 +467,6 @@ function FeatureCarousel() {
   );
 }
 
-function NumbersSection() {
-  const isZh = useIsZh();
-  const t = isZh ? NUMBERS.zh : NUMBERS.en;
-  return (
-    <section id="numbers" className={styles.numbersSection}>
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>{t.title}</h2>
-        <p className={styles.sectionDesc}>{t.desc}</p>
-      </div>
-      <div className={styles.numbersGrid}>
-        {t.cards.map((card, idx) => (
-          <div key={idx} className={styles.numberCard}>
-            <div className={styles.numberBig}>{card.big}</div>
-            <div className={styles.numberUnit}>{card.unit}</div>
-            <div className={styles.numberTitle}>{card.title}</div>
-            <ul className={styles.numberRows}>
-              {card.rows.map((row, i) => (
-                <li key={i} className={clsx(styles.numberRow, row.mark === 'best' && styles.numberRowBest)}>
-                  <span className={styles.numberRowLabel}>{row.label}</span>
-                  <span className={styles.numberRowValue}>{row.value}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 function UseCasesSection() {
   const isZh = useIsZh();
@@ -751,7 +644,6 @@ export default function Home() {
       <main>
         <HeroSection />
         <FeatureCarousel />
-        <NumbersSection />
         <UseCasesSection />
         <QuickStartSection />
         <CommunitySection />
