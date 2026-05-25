@@ -541,7 +541,7 @@ function renderMarkdown(text) {
 }
 
 // ===== I18N =====
-let currentLang = localStorage.getItem('case_square_lang') || 'zh';
+let currentLang = localStorage.getItem('pilotdeck_lang') || localStorage.getItem('case_square_lang') || 'zh';
 
 const I18N = {
   zh: {
@@ -580,6 +580,7 @@ const I18N = {
 
 function switchLang(lang) {
   currentLang = lang;
+  localStorage.setItem('pilotdeck_lang', lang);
   localStorage.setItem('case_square_lang', lang);
   // Update lang switch buttons
   document.querySelectorAll('#langSwitch button').forEach(btn => {
@@ -936,8 +937,8 @@ function openPreviewVariant(cidx,vi){
 
 // ===== INIT =====
 function init(){
-  // Restore saved language preference
-  const saved = localStorage.getItem('case_square_lang');
+  // Restore saved language preference (sync with main site)
+  const saved = localStorage.getItem('pilotdeck_lang') || localStorage.getItem('case_square_lang');
   if (saved) currentLang = saved;
   // Set initial lang switch state
   document.querySelectorAll('#langSwitch button').forEach(btn => {
