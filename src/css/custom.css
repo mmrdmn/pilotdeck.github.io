@@ -214,3 +214,14 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   margin: 1.5em 0;
 }
+
+.markdown img.quickstartImage,
+.markdown video.quickstartImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  margin: 1.5em 0;
+}

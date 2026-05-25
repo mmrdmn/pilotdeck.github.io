@@ -8,7 +8,7 @@ const sidebars = {
       type: 'category',
       label: '开始使用',
       collapsed: false,
-      items: ['introduction', 'quickstart-web', 'quickstart-desktop'],
+      items: ['introduction', 'quickstart-web', 'quickstart-desktop', 'quickstart'],
     },
     {
       type: 'category',
@@ -55,7 +55,7 @@ const sidebars = {
       type: 'category',
       label: 'Getting Started',
       collapsed: false,
-      items: ['en/introduction', 'en/quickstart-web', 'en/quickstart-desktop'],
+      items: ['en/introduction', 'en/quickstart-web', 'en/quickstart-desktop', 'en/quickstart'],
     },
     {
       type: 'category',

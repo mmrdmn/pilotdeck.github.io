@@ -1,10 +1,10 @@
 ---
-title: "Web Install & Quick Start"
-description: "Install PilotDeck with one script and use it in your browser"
+title: "Web Install"
+description: "Install the PilotDeck Web version with one script"
 icon: "globe"
 ---
 
-# Web Install & Quick Start
+# Web Install
 
 PilotDeck provides a one-line install script that checks dependencies, pulls the code, builds the project, and starts the service.
 
@@ -77,6 +77,23 @@ cd ..
 npm run server
 ```
 
+## File Layout
+
+After installation, files are arranged as follows:
+
+```
+~/.pilotdeck/
+├── app/                    # PilotDeck source and build artifacts
+├── pilotdeck.yaml          # Global config file
+├── server-token             # Gateway auth token
+├── memory/                  # Long-term memory data
+├── projects/                # Session records grouped by WorkSpace
+│   └── <project-id>/
+│       └── chats/
+├── plugins/                 # Global plugin directory
+└── skills/                  # Global skill directory
+```
+
 ## Configure an API Key
 
 Before starting PilotDeck, configure at least one model provider API key. Edit the config file:
@@ -132,7 +149,7 @@ pilotdeck server --port 8080
 
 When startup succeeds, you will see:
 
-```
+```text
 PilotDeck server listening: http://127.0.0.1:18789
 WebSocket: ws://127.0.0.1:18789/ws
 ```
@@ -149,23 +166,6 @@ pilotdeck "Analyze the structure of the current project"
 
 # TUI mode: interactive terminal UI
 pilotdeck tui
-```
-
-## File Layout
-
-After installation, files are arranged as follows:
-
-```
-~/.pilotdeck/
-├── app/                    # PilotDeck source and build artifacts
-├── pilotdeck.yaml          # Global config file
-├── server-token             # Gateway auth token
-├── memory/                  # Long-term memory data
-├── projects/                # Session records grouped by WorkSpace
-│   └── <project-id>/
-│       └── chats/
-├── plugins/                 # Global plugin directory
-└── skills/                  # Global skill directory
 ```
 
 ## Next Steps

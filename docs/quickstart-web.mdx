@@ -1,10 +1,10 @@
 ---
-title: "Web 安装 & 快速开始"
-description: "通过一键脚本安装 PilotDeck，在浏览器中使用"
+title: "Web 安装"
+description: "通过一键脚本安装 PilotDeck Web 版"
 icon: "globe"
 ---
 
-# Web 安装 & 快速开始
+# Web 安装
 
 PilotDeck 提供一键安装脚本，自动完成依赖检查、代码拉取、编译和启动。
 
@@ -77,6 +77,23 @@ cd ..
 npm run server
 ```
 
+## 目录结构
+
+安装完成后的文件布局：
+
+```
+~/.pilotdeck/
+├── app/                    # PilotDeck 源码和编译产物
+├── pilotdeck.yaml          # 全局配置文件
+├── server-token             # Gateway 鉴权 token
+├── memory/                  # 长期记忆数据
+├── projects/                # 按 WorkSpace 分组的会话记录
+│   └── <project-id>/
+│       └── chats/
+├── plugins/                 # 全局插件目录
+└── skills/                  # 全局技能目录
+```
+
 ## 配置 API Key
 
 PilotDeck 启动前需要配置至少一个模型 Provider 的 API Key。编辑配置文件：
@@ -132,7 +149,7 @@ pilotdeck server --port 8080
 
 启动成功后你会看到：
 
-```
+```text
 PilotDeck server listening: http://127.0.0.1:18789
 WebSocket: ws://127.0.0.1:18789/ws
 ```
@@ -149,23 +166,6 @@ pilotdeck "帮我分析一下当前项目的代码结构"
 
 # TUI 模式：交互式终端界面
 pilotdeck tui
-```
-
-## 目录结构
-
-安装完成后的文件布局：
-
-```
-~/.pilotdeck/
-├── app/                    # PilotDeck 源码和编译产物
-├── pilotdeck.yaml          # 全局配置文件
-├── server-token             # Gateway 鉴权 token
-├── memory/                  # 长期记忆数据
-├── projects/                # 按 WorkSpace 分组的会话记录
-│   └── <project-id>/
-│       └── chats/
-├── plugins/                 # 全局插件目录
-└── skills/                  # 全局技能目录
 ```
 
 ## 下一步

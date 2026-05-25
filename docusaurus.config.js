@@ -98,8 +98,9 @@ const config = {
                 titleZh: '开始使用',
                 items: [
                   { label: 'Introduction', labelZh: '项目简介', to: '/docs/introduction' },
-                  { label: 'Quick Start (Web)', labelZh: '快速开始 (Web)', to: '/docs/quickstart-web' },
-                  { label: 'Quick Start (Desktop)', labelZh: '桌面版安装', to: '/docs/quickstart-desktop' },
+                  { label: 'Web Install', labelZh: 'Web 安装', to: '/docs/quickstart-web' },
+                  { label: 'Desktop Install', labelZh: '桌面安装', to: '/docs/quickstart-desktop' },
+                  { label: 'Quick Start', labelZh: '快速开始', to: '/docs/quickstart' },
                 ],
               },
               {
