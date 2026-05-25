@@ -209,68 +209,6 @@ const QUICKSTART = {
   },
 };
 
-const COMMUNITY = {
-  en: {
-    title: 'Join the Community',
-    desc: 'Talk to the team, share ideas, report bugs, or just hang out.',
-    cards: [
-      {
-        icon: 'img/community/discord.svg',
-        name: 'Discord',
-        desc: 'Real-time chat with the core team and other builders.',
-        cta: 'Join Discord',
-        href: 'https://github.com/OpenBMB/PilotDeck#-community',
-      },
-      {
-        icon: 'img/community/feishu.svg',
-        name: 'Feishu',
-        desc: '飞书社区群 — ideal for Chinese-speaking teams.',
-        cta: 'Join Feishu',
-        href: 'https://github.com/OpenBMB/PilotDeck#-community',
-      },
-      {
-        icon: 'img/community/wechat.svg',
-        name: 'WeChat',
-        desc: 'Scan to join our WeChat user group.',
-        cta: 'Join WeChat',
-        href: 'https://github.com/OpenBMB/PilotDeck#-community',
-      },
-    ],
-    contactTitle: 'Prefer email?',
-    contactDesc: 'For commercial collaboration or enterprise support:',
-    contactEmail: 'team@pilotdeck.ai',
-  },
-  zh: {
-    title: '加入社区',
-    desc: '与核心团队交流、分享想法、反馈问题，或仅仅来逛逛。',
-    cards: [
-      {
-        icon: 'img/community/discord.svg',
-        name: 'Discord',
-        desc: '与核心团队、开发者实时交流的英文社区。',
-        cta: '加入 Discord',
-        href: 'https://github.com/OpenBMB/PilotDeck#-community',
-      },
-      {
-        icon: 'img/community/feishu.svg',
-        name: '飞书',
-        desc: '中文用户首选 —— 飞书社区群。',
-        cta: '加入飞书群',
-        href: 'https://github.com/OpenBMB/PilotDeck#-community',
-      },
-      {
-        icon: 'img/community/wechat.svg',
-        name: '微信',
-        desc: '扫码加入微信用户群。',
-        cta: '加入微信群',
-        href: 'https://github.com/OpenBMB/PilotDeck#-community',
-      },
-    ],
-    contactTitle: '更喜欢邮件？',
-    contactDesc: '商务合作或企业支持，请联系：',
-    contactEmail: 'team@pilotdeck.ai',
-  },
-};
 
 const PARTNERS = {
   en: {
@@ -588,37 +526,6 @@ pilotdeck status     # check runtime status`}
   );
 }
 
-function CommunitySection() {
-  const isZh = useIsZh();
-  const t = isZh ? COMMUNITY.zh : COMMUNITY.en;
-  return (
-    <section id="community" className={styles.communitySection}>
-      <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>{t.title}</h2>
-        <p className={styles.sectionDesc}>{t.desc}</p>
-      </div>
-      <div className={styles.communityGrid}>
-        {t.cards.map((card, idx) => (
-          <div key={idx} className={styles.communityCard}>
-            <img src={useBaseUrl(card.icon)} alt={card.name} className={styles.communityIcon} />
-            <h3 className={styles.communityName}>{card.name}</h3>
-            <p className={styles.communityDesc}>{card.desc}</p>
-            <Link className={styles.btnSecondary} to={card.href}>
-              {card.cta}
-            </Link>
-          </div>
-        ))}
-      </div>
-      <div className={styles.contactBar}>
-        <span className={styles.contactBarTitle}>{t.contactTitle}</span>
-        <span className={styles.contactBarDesc}>{t.contactDesc}</span>
-        <a href={`mailto:${t.contactEmail}`} className={styles.contactBarEmail}>
-          {t.contactEmail}
-        </a>
-      </div>
-    </section>
-  );
-}
 
 function PartnersSection() {
   const isZh = useIsZh();
@@ -661,7 +568,6 @@ export default function Home() {
         <FeatureCarousel />
         <UseCasesSection />
         <QuickStartSection />
-        <CommunitySection />
         <PartnersSection />
       </main>
     </Layout>

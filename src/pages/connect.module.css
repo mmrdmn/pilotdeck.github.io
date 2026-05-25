@@ -1,0 +1,203 @@
+.connectPage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px 60px;
+}
+
+.section {
+  margin-bottom: 80px;
+}
+
+.sectionHeader {
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  font-size: 36px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.sectionDesc {
+  font-size: 17px;
+  color: #666;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  padding: 40px 32px;
+  text-align: center;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  border-color: #e5e7eb;
+}
+
+.cardIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.cardEmoji {
+  font-size: 48px;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.cardName {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 12px;
+}
+
+.cardDesc {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  min-height: 48px;
+}
+
+.cardBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #111827 !important;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none !important;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.04);
+  backdrop-filter: blur(12px);
+  white-space: nowrap;
+}
+
+.cardBtn:hover {
+  background: #ffffff;
+  border-color: rgba(17, 24, 39, 0.28);
+  transform: translateY(-1px);
+  text-decoration: none !important;
+  color: #111827 !important;
+}
+
+.qrWrapper {
+  margin-top: auto;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qrCode {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.contactBar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 32px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.contactTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+}
+
+.contactDesc {
+  font-size: 15px;
+  color: #666;
+}
+
+.contactEmail {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--pd-accent);
+  text-decoration: none;
+}
+
+.contactEmail:hover {
+  text-decoration: underline;
+  color: var(--pd-accent);
+}
+
+@media screen and (max-width: 996px) {
+  .connectPage {
+    padding: 60px 24px 40px;
+  }
+
+  .section {
+    margin-bottom: 60px;
+  }
+
+  .sectionTitle {
+    font-size: 28px;
+  }
+
+  .cardGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .connectPage {
+    padding: 40px 16px 32px;
+  }
+
+  .sectionTitle {
+    font-size: 24px;
+  }
+
+  .sectionDesc {
+    font-size: 15px;
+  }
+
+  .card {
+    padding: 32px 24px;
+  }
+
+  .contactBar {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}

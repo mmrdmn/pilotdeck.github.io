@@ -152,22 +152,22 @@ const config = {
           {
             type: 'custom-megaMenu',
             position: 'left',
-            label: 'Community',
-            labelZh: '社区',
-            to: '/#community',
+            label: 'Connect',
+            labelZh: '连接',
+            to: '/connect',
             items: [
               {
-                title: 'Join',
-                titleZh: '加入我们',
+                title: 'Community',
+                titleZh: '社区',
                 items: [
-                  { label: 'Discord', labelZh: 'Discord 群组', to: '/#community' },
-                  { label: 'Feishu', labelZh: '飞书群', to: '/#community' },
-                  { label: 'WeChat', labelZh: '微信群', to: '/#community' },
+                  { label: 'Discord', labelZh: 'Discord 群组', to: '/connect#community' },
+                  { label: 'Feishu', labelZh: '飞书群', to: '/connect#community' },
+                  { label: 'WeChat', labelZh: '微信群', to: '/connect#community' },
                 ],
               },
               {
                 title: 'Contribute',
-                titleZh: '参与建设',
+                titleZh: '参与贡献',
                 items: [
                   { label: 'GitHub Issues', labelZh: '提交 Issue', href: 'https://github.com/OpenBMB/PilotDeck/issues', target: '_blank' },
                   { label: 'Pull Requests', labelZh: '提交 PR', href: 'https://github.com/OpenBMB/PilotDeck/pulls', target: '_blank' },

@@ -738,95 +738,6 @@
   transform: scale(1.02);
 }
 
-/* ============================================================
-   COMMUNITY
-   ============================================================ */
-.communitySection {
-  padding: 100px 0;
-  background: #fafafa;
-  border-top: 1px solid #f0f0f0;
-}
-
-.communityGrid {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.communityCard {
-  background: #fff;
-  border: 1px solid #f0f0f0;
-  border-radius: 16px;
-  padding: 40px 32px;
-  text-align: center;
-  transition: all 0.25s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.communityCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
-  border-color: #e5e7eb;
-}
-
-.communityIcon {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  margin-bottom: 20px;
-}
-
-.communityName {
-  font-size: 22px;
-  font-weight: 700;
-  color: #000;
-  margin-bottom: 12px;
-}
-
-.communityDesc {
-  font-size: 15px;
-  color: #666;
-  line-height: 1.6;
-  margin-bottom: 24px;
-  min-height: 48px;
-}
-
-.contactBar {
-  max-width: 1200px;
-  margin: 48px auto 0;
-  padding: 24px 32px;
-  background: #fff;
-  border: 1px solid #f0f0f0;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.contactBarTitle {
-  font-size: 16px;
-  font-weight: 700;
-  color: #000;
-}
-.contactBarDesc {
-  font-size: 15px;
-  color: #666;
-}
-.contactBarEmail {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--pd-accent);
-  text-decoration: none;
-}
-.contactBarEmail:hover {
-  text-decoration: underline;
-  color: var(--pd-accent);
-}
 
 /* ============================================================
    PARTNERS
@@ -923,8 +834,7 @@
   .gridSection,
   .numbersSection,
   .useCasesSection,
-  .quickStartSection,
-  .communitySection { padding: 60px 0; }
+  .quickStartSection { padding: 60px 0; }
 
   .sectionHeader { padding: 0 24px; margin-bottom: 40px; }
   .sectionTitle { font-size: 32px; }
@@ -963,12 +873,6 @@
   .quickStartCode { width: 100%; text-align: left; }
   .quickStartTitle { font-size: 32px; }
   .quickStartDesc { font-size: 16px; }
-
-  .communityGrid {
-    grid-template-columns: 1fr;
-    padding: 0 24px;
-    gap: 16px;
-  }
 
   .partnersGrid { gap: 24px 40px; }
   .partnerLogo { height: 36px; }
