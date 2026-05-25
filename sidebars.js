@@ -16,10 +16,18 @@ const sidebars = {
       collapsed: false,
       items: [
         'features/projects',
-        'features/gateway',
         'features/router',
         'features/memory',
         'features/always-on',
+        {
+          type: 'category',
+          label: 'Gateway 消息网关',
+          link: { type: 'doc', id: 'features/gateway/index' },
+          items: [
+            'features/gateway/wechat',
+            'features/gateway/feishu',
+          ],
+        },
       ],
     },
     {
@@ -63,10 +71,18 @@ const sidebars = {
       collapsed: false,
       items: [
         'en/features/projects',
-        'en/features/gateway',
         'en/features/router',
         'en/features/memory',
         'en/features/always-on',
+        {
+          type: 'category',
+          label: 'Gateway',
+          link: { type: 'doc', id: 'en/features/gateway/index' },
+          items: [
+            'en/features/gateway/wechat',
+            'en/features/gateway/feishu',
+          ],
+        },
       ],
     },
     {

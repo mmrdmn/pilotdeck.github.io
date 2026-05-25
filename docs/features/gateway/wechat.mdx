@@ -1,0 +1,298 @@
+---
+title: "微信 Channel 接入"
+description: "通过微信 iLink Bot API 实现微信消息收发的完整部署教程"
+---
+
+# 微信 Channel 接入手册
+
+PilotDeck 通过 **微信 iLink Bot API**（腾讯官方个人号机器人接口）实现微信消息收发。本文档覆盖从零部署到正常运行的全流程，以及可能遇到的坑。
+
+---
+
+## 前置条件
+
+| 条件 | 说明 |
+|------|------|
+| **Node.js ≥ 18** | 需要原生 `fetch` 支持 |
+| **微信 ClawBot 灰度资格** | 你的微信号必须在 iLink Bot 灰度名单中 |
+| **微信客户端版本** | iOS ≥ 8.0.53 / Android ≥ 8.0.53 / macOS ≥ 3.8.9 |
+| **网络** | 服务器能访问 `https://szextshort.weixin.qq.com`（iLink API 端点） |
+| **LLM API Key** | OpenRouter / Anthropic / 自建 provider 的有效 key |
+
+:::warning 重要
+如果你的微信号不在 ClawBot 灰度名单中，扫码后会出现 `errcode: -14 session timeout` 错误，这不是代码问题。需要联系腾讯/OpenClaw 申请白名单。
+:::
+
+---
+
+## 架构概览
+
+```
+微信用户
+   │
+   │ (微信 iLink Bot API / HTTPS long-poll)
+   ▼
+┌────────────────────┐
+│  WeixinChannel     │ ← ChannelAdapter 实现
+│  (long-poll loop)  │
+└────────┬───────────┘
+         │ gateway.submitTurn()
+         ▼
+┌────────────────────┐
+│  PilotDeck Gateway │ ← 路由到 LLM provider
+└────────┬───────────┘
+         │ AsyncIterable<GatewayEvent>
+         ▼
+┌────────────────────┐
+│  LLM (DeepSeek /   │
+│  Claude / GPT)     │
+└────────────────────┘
+```
+
+流程：
+1. `WeixinChannel.start()` → 检查本地凭证 → 若无则触发 QR 登录
+2. 登录后进入 `pollLoop()`，通过 `ILinkClient.poll()` 长轮询获取新消息
+3. 收到用户消息 → `gateway.submitTurn()` 提交给 LLM
+4. 流式接收 `GatewayEvent` → `renderWeixinEvent()` 拼接回复文本
+5. 通过 `client.sendTextChunked()` 分段发送回微信（每段 ≤ 2000 字符）
+
+---
+
+## 环境准备
+
+```bash
+cd /path/to/PilotDeck
+
+# 安装依赖（包含 weixin-ilink SDK）
+pnpm install
+
+# 编译
+pnpm build
+```
+
+关键依赖：
+- `weixin-ilink` (^0.1.0) — iLink Bot 协议的 TypeScript SDK
+
+---
+
+## 配置 LLM Provider
+
+编辑 `~/.pilotdeck/pilotdeck.yaml`：
+
+```yaml
+schemaVersion: 1
+agent:
+  model: openrouter/deepseek/deepseek-v4-flash  # 或 anthropic/claude-sonnet-4.6
+
+model:
+  providers:
+    openrouter:
+      protocol: openai
+      url: https://openrouter.ai/api/v1
+      apiKey: sk-or-v1-xxxxxxxxxxxxxxxx  # 你的 OpenRouter API key
+      models:
+        deepseek/deepseek-v4-flash:
+          capabilities:
+            maxOutputTokens: 32768
+```
+
+:::tip
+OpenRouter 免费额度用完后会报 `Insufficient credits`，需要到 https://openrouter.ai/settings/credits 充值。
+:::
+
+---
+
+## 启动与扫码登录
+
+```bash
+# 启动 PilotDeck server（默认端口 18789）
+cd /path/to/PilotDeck
+node dist/cli/pilotdeck.js server
+```
+
+首次启动时，终端会显示：
+
+```
+╔══════════════════════════════════════════════╗
+║  微信 iLink 登录 — 请用微信扫描二维码        ║
+╚══════════════════════════════════════════════╝
+
+[weixin] 扫码登录链接:
+https://szextshort.weixin.qq.com/mmcgiqrcode/...
+[weixin] 等待扫码...
+```
+
+操作步骤：
+1. 复制终端中的链接，在浏览器打开（会显示二维码图片）
+2. 用**已加入灰度名单的微信号**扫描二维码
+3. 在微信中确认登录
+4. 终端显示 `[weixin] 登录成功! accountId: xxx`
+
+登录成功后凭证自动保存，下次启动无需重新扫码。
+
+---
+
+## 消息交互说明
+
+| 操作 | 方式 | 说明 |
+|------|------|------|
+| 普通对话 | 直接发送文字 | 在同一 session 中继续对话 |
+| 新建会话 | 发送 `/new` | 创建一个全新的 session，之后消息进入新 session |
+| 新建 + 首条消息 | 发送 `/new 你好` | 创建新 session 并以"你好"作为第一条消息 |
+
+- 每个微信用户（`from_user_id`）独立管理 session
+- session key 格式：`weixin:chat={userId}:general` 或 `weixin:chat={userId}:s_{uuid}`
+- 同一用户的消息按顺序处理（不会并发响应同一用户的多条消息）
+
+---
+
+## 凭证管理
+
+凭证文件位置：`~/.pilotdeck/weixin-credentials.json`
+
+```json
+{
+  "baseUrl": "https://szextshort.weixin.qq.com",
+  "botToken": "xxxxxxxx",
+  "accountId": "wxid_xxxxxxxx",
+  "cursor": "..."
+}
+```
+
+| 字段 | 说明 |
+|------|------|
+| `baseUrl` | iLink API 端点 |
+| `botToken` | 登录后获得的 bot token |
+| `accountId` | 登录微信号的 wxid |
+| `cursor` | 长轮询游标（用于断点续传，避免重复消息） |
+
+**操作：**
+
+```bash
+# 查看当前凭证
+cat ~/.pilotdeck/weixin-credentials.json
+
+# 强制重新登录（删除凭证后重启）
+rm ~/.pilotdeck/weixin-credentials.json
+# 然后重启 PilotDeck server
+```
+
+---
+
+## 代理（Proxy）配置
+
+PilotDeck 支持通过环境变量配置全局 HTTP 代理（影响所有 `fetch()` 调用）：
+
+```bash
+# 优先级：PILOTDECK_PROXY > https_proxy > HTTPS_PROXY > http_proxy > HTTP_PROXY
+export PILOTDECK_PROXY=http://127.0.0.1:7890
+```
+
+:::caution 注意
+如果设置了代理但代理服务器未运行，`fetch` 会直接报 `fetch failed`。iLink API 不需要代理（国内直连），只有调用海外 LLM API 时才需要。
+
+**解决方案：** 如果只需要代理 LLM 请求而不代理 iLink，**不要设置全局代理环境变量**。当前实现中，代理只在环境变量存在时才加载 `undici`，不设置则不影响原生 `fetch`。
+:::
+
+---
+
+## 常见问题与踩坑记录
+
+### 1. `errcode: -14 session timeout`
+
+**原因：** 微信号不在 ClawBot 灰度名单中，或 session 已过期。
+
+**解决：**
+- 确认微信号已通过灰度申请
+- 确认微信客户端版本满足最低要求
+- 删除凭证并重新扫码：`rm ~/.pilotdeck/weixin-credentials.json`
+
+### 2. `fetch failed` / 网络错误
+
+**原因：** 全局代理干扰了 iLink 的 long-poll 请求。
+
+**解决：**
+- 确认 `PILOTDECK_PROXY`、`HTTPS_PROXY` 等环境变量未设置（或指向有效代理）
+- 如果不需要代理，确保这些变量为空：`unset PILOTDECK_PROXY HTTPS_PROXY HTTP_PROXY`
+
+### 3. `Insufficient credits` (OpenRouter)
+
+**原因：** OpenRouter 账户余额不足。
+
+**解决：**
+- 到 https://openrouter.ai/settings/credits 充值
+- 或切换到其他 provider（如自建 edgeclaw）
+
+### 4. `invalid x-api-key`
+
+**原因：** `~/.pilotdeck/pilotdeck.yaml` 中的 API key 无效或为占位符。
+
+**解决：**
+- 检查 yaml 中 `apiKey` 字段是否为真实的 key
+- 不要留 `PLACEHOLDER_RUN_ONBOARDING_TO_REPLACE`
+
+### 5. QR 码过期
+
+**原因：** 扫码链接有效期约 3-5 分钟。
+
+**解决：**
+- SDK 会自动刷新二维码（终端显示"二维码已过期，正在刷新..."）
+- 如果持续失败，重启 server 重新触发登录流程
+
+### 6. 收到消息但无法回复 / `no context_token`
+
+**原因：** 每条来自用户的消息都携带 `context_token`，回复时必须使用此 token。如果首次消息丢失了 token，则无法回复。
+
+**解决：**
+- 这通常不会发生，除非 poll 中断后有历史消息未携带 token
+- 让用户重新发一条消息即可恢复
+
+### 7. 回复被截断
+
+**原因：** 微信单条消息有字符限制（~2048 字符）。
+
+**解决：**
+- `WeixinChannel` 已内置 `sendTextChunked()`，自动按 2000 字符分段发送
+- 如果 LLM 回复极长，会分成多条消息依次发送
+
+### 8. 重启后收到旧消息
+
+**原因：** `cursor` 游标未正确保存。
+
+**解决：**
+- 正常关闭 server（Ctrl+C）会自动保存 cursor
+- 如果异常退出，下次启动可能收到上次中断后的消息（通常无害，会正常处理）
+
+---
+
+## 文件结构参考
+
+```
+PilotDeck/
+├── src/adapters/channel/weixin/
+│   ├── WeixinChannel.ts        # 主逻辑：登录、轮询、消息分发、回复
+│   ├── WeixinSessionMapper.ts  # session 管理（/new 命令、session key 映射）
+│   └── weixin-render.ts        # GatewayEvent → 微信回复文本
+├── src/cli/
+│   ├── pilotdeck.ts            # CLI 入口，实例化 WeixinChannel
+│   ├── pilotdeckServer.ts      # 启动 server，调用 weixin.start()
+│   └── proxy.ts                # 全局代理安装（仅在有 env 时加载 undici）
+├── tests/adapters/
+│   └── channel-weixin.test.ts  # 单元测试
+└── ~/.pilotdeck/
+    ├── pilotdeck.yaml              # 主配置（provider keys）
+    └── weixin-credentials.json     # 微信登录凭证（自动生成）
+```
+
+---
+
+## 快速启动 Checklist
+
+- [ ] 确认微信号在 ClawBot 灰度名单中
+- [ ] 确认微信客户端版本 ≥ 要求
+- [ ] `~/.pilotdeck/pilotdeck.yaml` 配置了有效的 LLM provider 和 API key
+- [ ] `pnpm install && pnpm build` 成功
+- [ ] 未设置不必要的代理环境变量
+- [ ] 运行 `node dist/cli/pilotdeck.js server`
+- [ ] 用目标微信号扫码登录
+- [ ] 让别人给你发消息测试（或用另一个微信号发消息给已登录的号）
