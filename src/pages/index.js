@@ -43,8 +43,8 @@ const FEATURES = {
       desc: 'Every project gets its own file system, memory store and skill set. Parallel work no longer interferes with itself, retrieval has a bounded scope, and skills accrete naturally as each task grows.',
       image: 'img/feature/workspace-preview.png',
       cta: 'Learn More',
-      ctaTo: '/use-cases',
-      extra: { label: 'See Architecture', to: '/research' },
+      ctaTo: '/docs/en/features/projects',
+      extra: { label: 'See Architecture', to: '/docs/en/architecture/overview' },
     },
     {
       tag: 'White-box Memory',
@@ -52,7 +52,7 @@ const FEATURES = {
       desc: 'Memory generation, extraction, storage and retrieval are visible end-to-end. When the AI mis-remembers, you can pinpoint and fix the offending entry. Dream Mode consolidates memory in idle windows with one-click rollback.',
       image: 'img/feature/memory-preview.png',
       cta: 'Learn More',
-      ctaTo: '/use-cases',
+      ctaTo: '/docs/en/features/memory',
     },
     {
       tag: 'Smart Routing',
@@ -60,8 +60,7 @@ const FEATURES = {
       desc: 'Complex calls go to flagship models, simple ones drop to lighter models. Through on-device / cloud co-orchestration and precise matching, token spend shrinks dramatically without sacrificing quality.',
       image: 'img/feature/router-preview.png',
       cta: 'Learn More',
-      ctaTo: '/use-cases',
-      extra: { label: 'View Benchmarks', to: '#numbers' },
+      ctaTo: '/docs/en/features/router',
     },
     {
       tag: 'Always-on',
@@ -69,7 +68,7 @@ const FEATURES = {
       desc: 'PilotDeck breaks the "you ask, it answers" loop: after you sign off, the agent keeps discovering candidate tasks, running long-horizon monitors, and lands deliverables as local files with a summary report.',
       image: 'img/feature/alwayson-preview.png',
       cta: 'Learn More',
-      ctaTo: '/use-cases',
+      ctaTo: '/docs/en/features/always-on',
     },
   ],
   zh: [
@@ -79,8 +78,8 @@ const FEATURES = {
       desc: '每个项目独立的文件系统、记忆与技能。多项目并行不再互相干扰，检索范围有界，技能随任务自然沉淀——彻底告别全局上下文污染。',
       image: 'img/feature/workspace-preview.png',
       cta: '了解更多',
-      ctaTo: '/use-cases',
-      extra: { label: '查看架构', to: '/research' },
+      ctaTo: '/docs/features/projects',
+      extra: { label: '查看架构', to: '/docs/architecture/overview' },
     },
     {
       tag: '白盒记忆',
@@ -88,7 +87,7 @@ const FEATURES = {
       desc: '记忆生成、抽取、存储、检索全链路可见。AI 记错了，你能定位到具体条目并修复；Dream Mode 在空闲窗口整理记忆，并支持一键回滚。',
       image: 'img/feature/memory-preview.png',
       cta: '了解更多',
-      ctaTo: '/use-cases',
+      ctaTo: '/docs/features/memory',
     },
     {
       tag: '智能路由',
@@ -96,8 +95,7 @@ const FEATURES = {
       desc: '复杂调用走旗舰模型，简单调用降档到轻量模型。端云协同精准匹配，Token 开销大幅缩减，质量不打折。',
       image: 'img/feature/router-preview.png',
       cta: '了解更多',
-      ctaTo: '/use-cases',
-      extra: { label: '查看实测数据', to: '#numbers' },
+      ctaTo: '/docs/features/router',
     },
     {
       tag: '后台常驻',
@@ -105,7 +103,7 @@ const FEATURES = {
       desc: '打破"你问我答"的死循环：你下班后，Agent 持续发现可做任务、跑长程监控，把成果以文件形式落到本地，并附上一份摘要。',
       image: 'img/feature/alwayson-preview.png',
       cta: '了解更多',
-      ctaTo: '/use-cases',
+      ctaTo: '/docs/features/always-on',
     },
   ],
 };
