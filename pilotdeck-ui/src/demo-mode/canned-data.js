@@ -45,15 +45,16 @@ Full docs and one-line installer: [github.com/OpenBMB/PilotDeck](https://github.
 // WorkSpace / Project list
 // ──────────────────────────────────────────────────────────────────────────
 
-// Shape matches Project from src/types/app.ts. The demo ships exactly one
-// WorkSpace with one canned tutorial session — keeps the sidebar focused
-// and lets every visitor land on the same guided walkthrough.
+// Shape matches Project from src/types/app.ts. The demo ships a single
+// WorkSpace literally named `general` so it lands in V2's dedicated
+// "General" sidebar tab (SidebarV2 looks up that exact name to flatten
+// its sessions under the default scratchpad section).
 const PROJECTS = [
   {
-    name: 'pilotdeck-tutorial',
-    displayName: 'PilotDeck Tutorial',
-    fullPath: '~/pilotdeck/workspaces/pilotdeck-tutorial',
-    path: '~/pilotdeck/workspaces/pilotdeck-tutorial',
+    name: 'general',
+    displayName: 'general',
+    fullPath: '~/pilotdeck/workspaces/general',
+    path: '~/pilotdeck/workspaces/general',
   },
 ];
 
@@ -66,7 +67,7 @@ const PROJECTS = [
 // of the wire shape sent over the /api/projects payload.
 
 const SESSIONS = {
-  'pilotdeck-tutorial': [
+  general: [
     {
       id: 'demo-session-tutorial-01',
       summary: 'Welcome to PilotDeck',
