@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import { useLocation } from '@docusaurus/router';
 import Layout from '@theme/Layout';
 import CodeBlock from '@theme/CodeBlock';
 import { useIsZh } from '../i18n';
@@ -374,10 +375,25 @@ function FeatureCarousel() {
     ? '四大支柱重塑长程多项目场景下的智能体体验。'
     : 'Four pillars rebuild the agent experience for long-running, multi-project work.';
 
+  const SLUG_MAP = { workspace: 0, memory: 1, router: 2, alwayson: 3 };
+  const location = useLocation();
+
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
   const [slideDirection, setSlideDirection] = React.useState('right');
   const [animKey, setAnimKey] = React.useState(0);
+
+  React.useEffect(() => {
+    const hash = location.hash.replace('#feature-', '');
+    if (SLUG_MAP[hash] !== undefined) {
+      setActiveIndex(SLUG_MAP[hash]);
+      setAnimKey((k) => k + 1);
+      setPaused(true);
+      setTimeout(() => {
+        document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [location.hash]);
 
   React.useEffect(() => {
     if (paused) return;
@@ -472,7 +488,7 @@ function UseCasesSection() {
   const isZh = useIsZh();
   const t = isZh ? USECASES.zh : USECASES.en;
   return (
-    <section id="use-cases" className={styles.useCasesSection}>
+    <section id="usecases" className={styles.useCasesSection}>
       <div className={styles.sectionHeader}>
         <h2 className={styles.sectionTitle}>{t.title}</h2>
         <p className={styles.sectionDesc}>{t.desc}</p>

@@ -78,25 +78,10 @@ const config = {
                 title: 'Highlights',
                 titleZh: '核心能力',
                 items: [
-                  { label: 'WorkSpace Isolation', labelZh: 'WorkSpace 隔离', to: '/#features' },
-                  { label: 'White-box Memory', labelZh: '白盒记忆', to: '/#features' },
-                  { label: 'Smart Routing', labelZh: '智能路由', to: '/#features' },
-                  { label: 'Always-on', labelZh: '后台常驻', to: '/#features' },
-                ],
-              },
-              {
-                title: 'Proof',
-                titleZh: '实证数据',
-                items: [
-                  { label: 'Use Cases', labelZh: '应用场景', to: '/use-cases' },
-                ],
-              },
-              {
-                title: 'Try It',
-                titleZh: '上手体验',
-                items: [
-                  { label: 'Live Demo', labelZh: '在线 Demo', href: 'http://58.57.119.12:52006/', target: '_blank' },
-                  { label: 'Quick Start', labelZh: '快速开始', to: '/#quick-start' },
+                  { label: 'WorkSpace Isolation', labelZh: 'WorkSpace 隔离', to: '/#feature-workspace' },
+                  { label: 'White-box Memory', labelZh: '白盒记忆', to: '/#feature-memory' },
+                  { label: 'Smart Routing', labelZh: '智能路由', to: '/#feature-router' },
+                  { label: 'Always-on', labelZh: '后台常驻', to: '/#feature-alwayson' },
                 ],
               },
             ],
@@ -143,7 +128,7 @@ const config = {
             position: 'left',
             label: 'Showcase',
             labelZh: '案例广场',
-            to: '/use-cases',
+            to: '/#usecases',
             items: [
               {
                 title: 'Featured',
