@@ -1,5 +1,6 @@
 import React from 'react';
 import { useHistory, useLocation } from '@docusaurus/router';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import { useLanguage } from '@site/src/context/LanguageContext';
 import styles from './LanguageSwitcher.module.css';
 
@@ -7,16 +8,32 @@ export default function LanguageSwitcher() {
   const { lang, setLang } = useLanguage();
   const history = useHistory();
   const location = useLocation();
+  const baseUrl = useBaseUrl('/');
+
+  const stripBaseUrl = (pathname) => {
+    const normalizedBase = baseUrl.replace(/\/$/, '');
+    if (normalizedBase && pathname.startsWith(`${normalizedBase}/`)) {
+      return pathname.slice(normalizedBase.length);
+    }
+    return pathname;
+  };
+
+  const addBaseUrl = (pathname) => {
+    const normalizedBase = baseUrl.replace(/\/$/, '');
+    if (!normalizedBase || pathname.startsWith(`${normalizedBase}/`)) return pathname;
+    return `${normalizedBase}${pathname}`;
+  };
 
   const getLocalizedDocsPath = (pathname, nextLang) => {
-    if (!pathname.startsWith('/docs/')) return pathname;
+    const docsPath = stripBaseUrl(pathname);
+    if (!docsPath.startsWith('/docs/')) return pathname;
 
-    if (nextLang === 'en' && !pathname.startsWith('/docs/en/')) {
-      return `/docs/en${pathname.slice('/docs'.length)}`;
+    if (nextLang === 'en' && !docsPath.startsWith('/docs/en/')) {
+      return addBaseUrl(`/docs/en${docsPath.slice('/docs'.length)}`);
     }
 
-    if (nextLang === 'zh' && pathname.startsWith('/docs/en/')) {
-      return `/docs${pathname.slice('/docs/en'.length)}`;
+    if (nextLang === 'zh' && docsPath.startsWith('/docs/en/')) {
+      return addBaseUrl(`/docs${docsPath.slice('/docs/en'.length)}`);
     }
 
     return pathname;
