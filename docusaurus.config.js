@@ -27,6 +27,24 @@ const config = {
     locales: ['en'],
   },
 
+  plugins: [
+    function demoSpaFallbackPlugin() {
+      return {
+        name: 'demo-spa-fallback',
+        async postBuild({ outDir }) {
+          const fs = await import('fs');
+          const path = await import('path');
+          const notFoundPath = path.join(outDir, '404.html');
+          if (!fs.existsSync(notFoundPath)) return;
+          let html = fs.readFileSync(notFoundPath, 'utf8');
+          const script = `<script>(function(){var p=window.location.pathname;if(p.indexOf("/demo")!==-1){var base=p.substring(0,p.indexOf("/demo"));window.location.replace(base+"/demo/");}})();</script>`;
+          html = html.replace('</head>', script + '</head>');
+          fs.writeFileSync(notFoundPath, html);
+        },
+      };
+    },
+  ],
+
   presets: [
     [
       'classic',

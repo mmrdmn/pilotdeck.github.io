@@ -1,165 +1,210 @@
 ---
 title: "Gateway"
-description: "A unified multi-channel message gateway for CLI, TUI, Web UI, Desktop, and Feishu"
+description: "Configure Feishu, WeChat, QQ and other chat platforms in pilotdeck.yaml"
 icon: "tower-broadcast"
 ---
 
 # Gateway
 
-Gateway is PilotDeck's central communication hub. It exposes WebSocket and HTTP protocols so every channel, including CLI, TUI, Web UI, Desktop, and Feishu, can interact with agent sessions through one message model.
+PilotDeck ships with 16+ chat platform channels, all toggled by the `adapters.<name>` block in `~/.pilotdeck/pilotdeck.yaml`. This page covers **what to put in the YAML and how to start**, nothing more.
 
-## Architecture Overview
-
-```
-┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
-│  CLI    │  │  TUI    │  │ Web UI  │  │ Feishu  │
-│ Channel │  │ Channel │  │ Channel │  │ Channel │
-└────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘
-     │            │            │             │
-     └────────────┴─────┬──────┴─────────────┘
-                        │
-                ┌───────▼───────┐
-                │   Gateway     │
-                │  (WS + HTTP)  │
-                └───────┬───────┘
-                        │
-                ┌───────▼───────┐
-                │ SessionRouter │
-                └───────┬───────┘
-                        │
-           ┌────────────┼────────────┐
-           │            │            │
-     ┌─────▼─────┐ ┌───▼───┐ ┌─────▼─────┐
-     │ Session A │ │ Sess B│ │ Session C │
-     │ (Agent)   │ │(Agent)│ │ (Agent)   │
-     └───────────┘ └───────┘ └───────────┘
-```
-
-## Runtime Modes
-
-<Tabs>
-  <Tab title="In-Process Mode">
-    Gateway runs inside the current process. This is ideal for CLI and TUI single-user flows:
-
-    ```bash
-    # CLI creates an in-process gateway automatically
-    pilotdeck "Analyze this code for performance issues"
-
-    # TUI mode
-    pilotdeck tui
-    ```
-
-    Characteristics:
-    - No standalone server required
-    - Gateway is destroyed when the process exits
-    - Best for quick one-off interactions
-  </Tab>
-  <Tab title="Server Mode">
-    Gateway runs as a long-lived service and multiple channels connect over WebSocket:
-
-    ```bash
-    pilotdeck server --port 18789
-    ```
-
-    Characteristics:
-    - Multiple channels can connect at the same time
-    - Sessions are persisted
-    - Always On and Cron are supported
-    - Web UI and Feishu-style remote channels require this mode
-  </Tab>
-</Tabs>
-
-## Core Concepts
-
-### Session
-
-A Session is the runtime context for an agent. Each session is bound to:
-- a unique `sessionKey`
-- a WorkSpace directory (`projectKey`)
-- a channel type such as `cli`, `tui`, or `web`
-- a full transcript
-
-```
-sessionKey format: <channel>:project=<path>:s_<uuid>
-example: web:project=/Users/me/myapp:s_abc123
-```
-
-### Turn
-
-Each user input triggers one Turn. Gateway receives the input, routes it through `SessionRouter` to the right `AgentSession`, and streams events back to the client.
-
-### Protocol Events
-
-| Event type | Direction | Description |
-|------------|-----------|-------------|
-| `submit_turn` | client → gateway | Submit a user message |
-| `text_delta` | gateway → client | Streaming agent text |
-| `thinking_delta` | gateway → client | Thinking stream, when available |
-| `tool_call_start` | gateway → client | Tool call started |
-| `tool_call_end` | gateway → client | Tool call completed |
-| `turn_complete` | gateway → client | Current turn completed |
-| `error` | gateway → client | Error event |
-
-### Authentication
-
-In Server mode, Gateway authenticates with a token file:
+Same launch command for everything:
 
 ```bash
-# Token is generated automatically and saved at:
-~/.pilotdeck/server-token
-
-# WebSocket passes the token in the hello frame
-# HTTP requests pass it through the Authorization header
+cd /path/to/PilotDeck
+npm install
+npm run server
 ```
 
-## Supported Channels
+---
 
-<CardGroup cols={2}>
-  <Card title="CLI Channel" icon="terminal">
-    One-shot command-line interaction for scripting and automation
-  </Card>
-  <Card title="TUI Channel" icon="rectangle-terminal">
-    Ink-based interactive terminal UI with streaming output
-  </Card>
-  <Card title="Web Channel" icon="browser">
-    React + Vite Web UI connected to Gateway over WebSocket
-  </Card>
-  <Card title="Feishu Channel" icon="comments">
-    Feishu bot adapter for messaging and session management
-  </Card>
-</CardGroup>
+## Feishu / Lark (Recommended)
 
-## Start Gateway Server
+PilotDeck defaults to **Stream Mode**: it opens an outbound WSS to the Lark cloud — **no public URL, no ngrok, no reverse proxy required**.
+
+### 1. Lark Developer Console
+
+In [Lark Open Platform](https://open.feishu.cn/) (or [Lark international](https://open.larksuite.com/)) create a **self-built application**:
+
+| Step | What matters |
+|------|------|
+| Credentials | Note the `App ID` (`cli_xxx`) and `App Secret` |
+| Events & Callbacks → Subscription Mode | Pick **"Persistent connection"** (NOT Webhook) |
+| Event subscriptions | Add `im.message.receive_v1` |
+| Permissions | `im:message`, `im:message:send_as_bot`, `im:chat:readonly` |
+| Versions & Releases | **Create a version and publish**, otherwise the bot won't receive any events |
+
+:::warning
+Marketplace apps don't support persistent connections — they have to use Webhook mode (see bottom).
+:::
+
+### 2. YAML
+
+```yaml
+adapters:
+  feishu:
+    enabled: true
+    appId: cli_xxxxxxxxxxxx
+    appSecret: xxxxxxxxxxxxxxxxxxxxxxxx
+    defaultSessionLabel: default
+    # domainName: lark    # Use 'lark' for the international edition (default 'feishu')
+```
+
+When you see `feishu: stream mode connected (appId=...)` in the startup log, you're ready — go @-mention the bot in Lark.
+
+---
+
+## WeChat (iLink Bot)
+
+Requires being on the **ClawBot beta allowlist**. The WeChat channel is **disabled by default** to prevent stray QR-login flows on machines without access.
+
+### YAML
+
+```yaml
+adapters:
+  weixin:
+    enabled: true   # Required — without this WeixinChannel is never instantiated
+```
+
+No other credentials needed: at startup the terminal prints a QR-login URL, scan with an allowlisted WeChat account, and credentials get cached at `~/.pilotdeck/weixin-credentials.json` for subsequent runs. Send `/new` to start a fresh session; delete the credentials file to force re-login.
+
+---
+
+## QQ Official Bot
+
+Connects to the QQ Official Bot Gateway over WSS. Both group chats and DMs are supported. **Currently configured via environment variables** (not YAML).
+
+### 1. QQ Developer Console
+
+In [q.qq.com](https://q.qq.com/) create a bot, grab `AppId` / `AppSecret`, and subscribe to:
+
+- `GROUP_AT_MESSAGE_CREATE` — bot is @-mentioned in a group
+- `C2C_MESSAGE_CREATE` — direct message to bot
+
+### 2. Launch
 
 ```bash
-# Default port 18789
-pilotdeck server
+export QQ_BOT_APPID=102xxxxxxx
+export QQ_BOT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
+# Optional: restrict to specific groups
+# export QQ_ALLOW_GROUPS=GROUP_OPENID_A,GROUP_OPENID_B
 
-# Custom port
-pilotdeck server --port 8080
-
-# Port through environment variable
-PILOTDECK_GATEWAY_PORT=8080 pilotdeck server
+npm run server
 ```
 
-Startup output:
+When you see `qq: authenticated, listening for group messages`, the bot is online.
 
+> During the sandbox phase the bot only responds in your designated test groups; after store approval it can serve any group.
+
+---
+
+## Other Platforms (One-Block YAML)
+
+Telegram, Discord, Slack, Matrix, Mattermost, Signal, WhatsApp, BlueBubbles, DingTalk, WeCom, Email, SMS, HomeAssistant, ApiServer, and Webhook — 16 channels in total — all share the same schema:
+
+```yaml
+adapters:
+  <name>:
+    enabled: true
+    token: xxx           # Most platforms use a token
+    apiKey: xxx          # Some platforms
+    webhookUrl: https://...   # Some platforms
+    extra:
+      # Platform-specific fields (e.g. Slack's appToken, Matrix's homeserver)
 ```
-PilotDeck server listening: http://127.0.0.1:18789
-WebSocket: ws://127.0.0.1:18789/ws
-Token: ~/.pilotdeck/server-token
+
+The exact fields are wired in [`src/adapters/channel/loadEnabledChannels.ts`](https://github.com/Gucc111/PilotDeck/blob/feat/cleanup/src/adapters/channel/loadEnabledChannels.ts). Common examples:
+
+<details>
+<summary>Telegram</summary>
+
+```yaml
+adapters:
+  telegram:
+    enabled: true
+    token: 123456:ABC...   # From @BotFather
+```
+</details>
+
+<details>
+<summary>Discord</summary>
+
+```yaml
+adapters:
+  discord:
+    enabled: true
+    token: NTk3...         # Discord Developer Portal → Bot → Token
+```
+</details>
+
+<details>
+<summary>Slack</summary>
+
+```yaml
+adapters:
+  slack:
+    enabled: true
+    token: xoxb-...        # Bot User OAuth Token
+    extra:
+      appToken: xapp-...   # Socket Mode app-level token
+```
+</details>
+
+<details>
+<summary>DingTalk Stream</summary>
+
+```yaml
+adapters:
+  dingtalk:
+    enabled: true
+    extra:
+      clientId: dingxxxxxxxx
+      clientSecret: xxxxxxxxxxxxxxxxxxxxxxxx
+```
+</details>
+
+<details>
+<summary>Matrix</summary>
+
+```yaml
+adapters:
+  matrix:
+    enabled: true
+    token: syt_...                 # access token
+    extra:
+      homeserver: https://matrix.org
+      userId: "@bot:matrix.org"
+```
+</details>
+
+Each channel implementation lives in `src/adapters/channel/<name>/` as a trio: `<Name>Channel.ts` + `<Name>SessionMapper.ts` + `<name>-render.ts`.
+
+---
+
+## Conventions That Apply Everywhere
+
+| Behavior | Notes |
+|------|------|
+| `/new` | A user typing `/new` in any channel starts a fresh session; `/new hello` opens the new session and uses `hello` as the first message |
+| Session keys | Format `<channel>:chat=<id>:general` or `<channel>:chat=<id>:s_<uuid>` |
+| Concurrency guard | While a turn is running for a chat, new messages from the same chat are dropped (avoids out-of-order replies) |
+| Logging | Each channel prints `<channel>: ready` / `<channel>: connected` at startup; if you don't see it the channel isn't enabled or the credentials are wrong |
+
+---
+
+## Webhook Mode (Feishu Fallback)
+
+If your Feishu app is a marketplace app and must use webhooks:
+
+```yaml
+adapters:
+  feishu:
+    enabled: true
+    connectionMode: webhook
+    appId: cli_xxx
+    appSecret: xxx
+    encryptKey: xxx     # Only if encryption is enabled in the Lark console
+    verifyToken: xxx    # Only if verification token is enabled
 ```
 
-## API Overview
-
-| Method | Description |
-|--------|-------------|
-| `submitTurn` | Submit one user turn and receive streaming events |
-| `abortTurn` | Abort the currently running turn |
-| `newSession` | Create a new session |
-| `listSessions` | List all sessions under a WorkSpace |
-| `resumeSession` | Resume an existing session |
-| `closeSession` | Close a session and release resources |
-| `describeServer` | Get Gateway server status |
-| `listProjects` | List all known WorkSpaces |
-| `describeProject` | Get details for one WorkSpace |
+Point your Feishu console "Event Subscription URL" at `https://<your-tunnel>/feishu/webhook`. PilotDeck handles `url_verification`, AES-256-CBC encrypted events, and `event_id` deduplication automatically.

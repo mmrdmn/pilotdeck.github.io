@@ -19,15 +19,7 @@ const sidebars = {
         'features/router',
         'features/memory',
         'features/always-on',
-        {
-          type: 'category',
-          label: 'Gateway 消息网关',
-          link: { type: 'doc', id: 'features/gateway/index' },
-          items: [
-            'features/gateway/wechat',
-            'features/gateway/feishu',
-          ],
-        },
+        'features/gateway/index',
       ],
     },
     {
@@ -74,15 +66,7 @@ const sidebars = {
         'en/features/router',
         'en/features/memory',
         'en/features/always-on',
-        {
-          type: 'category',
-          label: 'Gateway',
-          link: { type: 'doc', id: 'en/features/gateway/index' },
-          items: [
-            'en/features/gateway/wechat',
-            'en/features/gateway/feishu',
-          ],
-        },
+        'en/features/gateway/index',
       ],
     },
     {

@@ -1,171 +1,210 @@
 ---
 title: "Gateway 消息网关"
-description: "统一的多渠道消息网关，连接 CLI、TUI、Web UI、桌面和飞书"
+description: "在 pilotdeck.yaml 中配置飞书、微信、QQ 等聊天平台"
 icon: "tower-broadcast"
 ---
 
 # Gateway 消息网关
 
-Gateway 是 PilotDeck 的核心通信枢纽。它提供 WebSocket + HTTP 双协议接口，让所有 Channel（CLI、TUI、Web UI、桌面应用、飞书）通过统一的消息协议与 Agent 会话交互。
+PilotDeck 内置 16+ 聊天平台 channel，全部走 `~/.pilotdeck/pilotdeck.yaml` 的 `adapters.<name>` 段开关。本文只列**配 yaml 怎么填、怎么启动**。
 
-## 架构概览
-
-```
-┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
-│  CLI    │  │  TUI    │  │ Web UI  │  │  飞书   │
-│ Channel │  │ Channel │  │ Channel │  │ Channel │
-└────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘
-     │            │            │             │
-     └────────────┴─────┬──────┴─────────────┘
-                        │
-                ┌───────▼───────┐
-                │   Gateway     │
-                │  (WS + HTTP)  │
-                └───────┬───────┘
-                        │
-                ┌───────▼───────┐
-                │ SessionRouter │
-                └───────┬───────┘
-                        │
-           ┌────────────┼────────────┐
-           │            │            │
-     ┌─────▼─────┐ ┌───▼───┐ ┌─────▼─────┐
-     │ Session A │ │ Sess B│ │ Session C │
-     │ (Agent)   │ │(Agent)│ │ (Agent)   │
-     └───────────┘ └───────┘ └───────────┘
-```
-
-## 运行模式
-
-Gateway 支持两种运行模式：
-
-<Tabs>
-  <Tab title="In-Process 模式">
-    Gateway 嵌入在当前进程中运行，适用于 CLI / TUI 单用户场景：
-
-    ```bash
-    # CLI 直接使用（自动创建 in-process gateway）
-    pilotdeck "分析这段代码的性能问题"
-
-    # TUI 模式
-    pilotdeck tui
-    ```
-
-    特点：
-    - 无需单独启动服务
-    - 进程退出后 Gateway 自动销毁
-    - 适合快速单次交互
-  </Tab>
-  <Tab title="Server 模式">
-    Gateway 作为常驻服务运行，多个 Channel 通过 WebSocket 连接：
-
-    ```bash
-    pilotdeck server --port 18789
-    ```
-
-    特点：
-    - 多 Channel 同时连接
-    - 会话持久化
-    - 支持 Always-On 和 Cron 能力
-    - Web UI 和飞书等远端 Channel 必须使用此模式
-  </Tab>
-</Tabs>
-
-## 核心概念
-
-### Session（会话）
-
-Session 是 Agent 的执行上下文，每个 Session 绑定：
-- 一个 `sessionKey`（唯一标识）
-- 一个 WorkSpace 目录 (`projectKey`)
-- 一个 Channel 类型（如 `cli`、`tui`、`web`）
-- 完整的对话历史 (Transcript)
-
-```
-sessionKey 格式: <channel>:project=<path>:s_<uuid>
-示例: web:project=/Users/me/myapp:s_abc123
-```
-
-### Turn（对话轮次）
-
-每次用户输入会触发一个 Turn。Gateway 接收输入后，通过 SessionRouter 分发到对应的 AgentSession，然后以流式事件返回 Agent 的响应。
-
-### 协议事件
-
-Gateway 的 WebSocket 协议定义了以下核心事件类型：
-
-| 事件类型 | 方向 | 说明 |
-|----------|------|------|
-| `submit_turn` | 客户端 → 网关 | 提交用户消息 |
-| `text_delta` | 网关 → 客户端 | Agent 文本流式输出 |
-| `thinking_delta` | 网关 → 客户端 | Agent 思考过程（如适用） |
-| `tool_call_start` | 网关 → 客户端 | 工具调用开始 |
-| `tool_call_end` | 网关 → 客户端 | 工具调用完成 |
-| `turn_complete` | 网关 → 客户端 | 当前轮次结束 |
-| `error` | 网关 → 客户端 | 错误事件 |
-
-### 鉴权
-
-Server 模式下，Gateway 使用 token 文件鉴权：
+启动入口都一样：
 
 ```bash
-# Token 自动生成并保存在：
-~/.pilotdeck/server-token
-
-# WebSocket 连接时通过 hello 帧传递 token
-# HTTP 请求通过 Authorization header 传递
+cd /path/to/PilotDeck
+npm install
+npm run server
 ```
 
-## 支持的 Channel
+---
 
-<CardGroup cols={2}>
-  <Card title="CLI Channel" icon="terminal">
-    命令行单次交互模式，适合脚本化和自动化场景
-  </Card>
-  <Card title="TUI Channel" icon="rectangle-terminal">
-    基于 Ink 的交互式终端 UI，支持实时流式输出
-  </Card>
-  <Card title="Web Channel" icon="browser">
-    基于 React + Vite 的 Web UI，通过 WebSocket 连接 Gateway
-  </Card>
-  <Card title="Feishu Channel" icon="comments">
-    飞书机器人适配器，支持消息收发和会话管理
-  </Card>
-</CardGroup>
+## 飞书（推荐）
 
-## 启动 Gateway Server
+PilotDeck 默认走 **Stream Mode（长连接）**：服务器主动连飞书云 WSS，**不需要公网 URL、不需要 ngrok**。
 
-```bash
-# 默认端口 18789
-pilotdeck server
+### 1. 飞书后台准备
 
-# 自定义端口
-pilotdeck server --port 8080
+在 [飞书开放平台](https://open.feishu.cn/) 创建**企业自建应用**：
 
-# 通过环境变量设置端口
-PILOTDECK_GATEWAY_PORT=8080 pilotdeck server
-```
-
-启动后输出：
-
-```
-PilotDeck server listening: http://127.0.0.1:18789
-WebSocket: ws://127.0.0.1:18789/ws
-Token: ~/.pilotdeck/server-token
-```
-
-## API 概览
-
-Gateway 对外暴露以下主要方法：
-
-| 方法 | 说明 |
+| 步骤 | 关键点 |
 |------|------|
-| `submitTurn` | 提交一轮用户输入，返回流式事件 |
-| `abortTurn` | 中止当前正在进行的 Turn |
-| `newSession` | 创建新会话 |
-| `listSessions` | 列出 WorkSpace 下的所有会话 |
-| `resumeSession` | 恢复一个已有会话 |
-| `closeSession` | 关闭会话并释放资源 |
-| `describeServer` | 获取 Gateway 服务状态信息 |
-| `listProjects` | 列出所有已知 WorkSpace |
-| `describeProject` | 获取单个 WorkSpace 的详情 |
+| 凭证 | 记下 `App ID` (`cli_xxx`) 和 `App Secret` |
+| 事件与回调 → 订阅方式 | 选 **「使用长连接接收事件/回调」**（不要选 Webhook） |
+| 事件配置 | 添加 `im.message.receive_v1` |
+| 权限 | 勾 `im:message`、`im:message:send_as_bot`、`im:chat:readonly` |
+| 版本管理 | **创建版本并发布**，否则机器人收不到消息 |
+
+:::warning
+应用商店应用不支持长连接，必须走 Webhook 模式（见底部）。
+:::
+
+### 2. yaml
+
+```yaml
+adapters:
+  feishu:
+    enabled: true
+    appId: cli_xxxxxxxxxxxx
+    appSecret: xxxxxxxxxxxxxxxxxxxxxxxx
+    defaultSessionLabel: default
+    # domainName: lark    # 国际版改成 lark（默认 feishu）
+```
+
+启动后看到 `feishu: stream mode connected (appId=...)` 即就绪，去飞书 @机器人测试。
+
+---
+
+## 微信（iLink Bot）
+
+需要 **ClawBot 灰度白名单**。微信 channel **默认关闭**，避免无名单的机器误触 QR 登录。
+
+### yaml
+
+```yaml
+adapters:
+  weixin:
+    enabled: true   # 必填，否则不实例化
+```
+
+无需其他凭据：启动后终端会显示 QR 登录链接，用已加灰度的微信号扫码即可。凭证落到 `~/.pilotdeck/weixin-credentials.json`，之后免登录。`/new` 命令开新 session，删凭证文件可强制重登。
+
+---
+
+## QQ 官方机器人
+
+通过 QQ 官方 Bot Gateway WSS 接入，群聊 + 单聊都支持。**目前用环境变量配置**（不在 yaml 里）。
+
+### 1. QQ 开放平台准备
+
+[QQ 开放平台](https://q.qq.com/) → 创建机器人 → 拿到 `AppId` / `AppSecret`，订阅事件：
+
+- `GROUP_AT_MESSAGE_CREATE` —— 群里 @机器人
+- `C2C_MESSAGE_CREATE` —— 私聊机器人
+
+### 2. 启动
+
+```bash
+export QQ_BOT_APPID=102xxxxxxx
+export QQ_BOT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxx
+# 可选：限制只在白名单群响应
+# export QQ_ALLOW_GROUPS=GROUP_OPENID_A,GROUP_OPENID_B
+
+npm run server
+```
+
+启动看到 `qq: authenticated, listening for group messages` 即就绪。
+
+> 沙箱阶段只能在测试群响应；正式上架后才能服务任意群。
+
+---
+
+## 其他平台（一段 yaml 搞定）
+
+Telegram、Discord、Slack、Matrix、Mattermost、Signal、WhatsApp、BlueBubbles、DingTalk、WeCom、Email、SMS、HomeAssistant、ApiServer、Webhook 共 16 个 channel 全部用同一个 schema：
+
+```yaml
+adapters:
+  <name>:
+    enabled: true
+    token: xxx           # 大多数平台用 token
+    apiKey: xxx          # 部分平台
+    webhookUrl: https://...   # 部分平台
+    extra:
+      # 平台专属字段（如 slack 的 appToken、matrix 的 homeserver 等）
+```
+
+具体字段看 [`src/adapters/channel/loadEnabledChannels.ts`](https://github.com/Gucc111/PilotDeck/blob/feat/cleanup/src/adapters/channel/loadEnabledChannels.ts) 里的 loader。常见示例：
+
+<details>
+<summary>Telegram</summary>
+
+```yaml
+adapters:
+  telegram:
+    enabled: true
+    token: 123456:ABC...   # @BotFather 拿到的
+```
+</details>
+
+<details>
+<summary>Discord</summary>
+
+```yaml
+adapters:
+  discord:
+    enabled: true
+    token: NTk3...         # Discord Developer Portal → Bot → Token
+```
+</details>
+
+<details>
+<summary>Slack</summary>
+
+```yaml
+adapters:
+  slack:
+    enabled: true
+    token: xoxb-...        # Bot User OAuth Token
+    extra:
+      appToken: xapp-...   # Socket Mode app-level token
+```
+</details>
+
+<details>
+<summary>钉钉 / Stream Mode</summary>
+
+```yaml
+adapters:
+  dingtalk:
+    enabled: true
+    extra:
+      clientId: dingxxxxxxxx
+      clientSecret: xxxxxxxxxxxxxxxxxxxxxxxx
+```
+</details>
+
+<details>
+<summary>Matrix</summary>
+
+```yaml
+adapters:
+  matrix:
+    enabled: true
+    token: syt_...                 # access token
+    extra:
+      homeserver: https://matrix.org
+      userId: "@bot:matrix.org"
+```
+</details>
+
+每个 channel 实现都在 `src/adapters/channel/<name>/` 下，三件套：`<Name>Channel.ts` + `<Name>SessionMapper.ts` + `<name>-render.ts`。
+
+---
+
+## 通用约定
+
+| 行为 | 说明 |
+|------|------|
+| `/new` | 用户在任何 channel 发 `/new` 会创建新 session；`/new 你好` 会顺带把"你好"作为第一条消息 |
+| Session key | 格式 `<channel>:chat=<id>:general` 或 `<channel>:chat=<id>:s_<uuid>` |
+| 并发保护 | 同一 chat 内一条消息正在跑时，新消息会被跳过（避免乱序回复） |
+| 日志 | 启动日志里每个 channel 会打印 `<channel>: ready` 或 `<channel>: connected`，看不到就是没启用或凭据错 |
+
+---
+
+## Webhook 模式（飞书备选）
+
+如果你的飞书应用是商店应用必须走 webhook：
+
+```yaml
+adapters:
+  feishu:
+    enabled: true
+    connectionMode: webhook
+    appId: cli_xxx
+    appSecret: xxx
+    encryptKey: xxx     # 后台启用了加密就填
+    verifyToken: xxx    # 后台启用了校验就填
+```
+
+把 `https://<your-tunnel>/feishu/webhook` 填到飞书后台「事件订阅」即可。`url_verification`、加密事件解密、event_id 去重 PilotDeck 都自动处理。

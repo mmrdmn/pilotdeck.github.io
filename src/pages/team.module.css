@@ -1,0 +1,223 @@
+/* ── Team members section ── */
+
+.teamSection {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px 0;
+}
+
+.teamHeader {
+  margin-bottom: 48px;
+}
+
+.teamTitle {
+  font-size: 36px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.teamDesc {
+  font-size: 17px;
+  color: #666;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+/* ── Founder (top-level, centered) ── */
+
+.founderGroup {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.groupLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: #3b82f6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 28px;
+  position: relative;
+  display: inline-block;
+}
+
+.groupLabel::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 2px;
+  background: #3b82f6;
+  border-radius: 1px;
+}
+
+/* ── Member grid ── */
+
+.memberGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+}
+
+.coreGroup {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.coreGrid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* ── Member card ── */
+
+.memberCard {
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.memberCard:hover {
+  transform: translateY(-4px);
+}
+
+.avatarWrapper {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 14px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
+}
+
+.avatarPlaceholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
+}
+
+.avatarPlaceholder svg {
+  width: 48px;
+  height: 48px;
+  color: #818cf8;
+}
+
+.memberInfo {
+  text-align: center;
+}
+
+.memberName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.memberRole {
+  display: block;
+  font-size: 0.82rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* ── Divider between team and community ── */
+
+.divider {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.divider hr {
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  margin: 0;
+}
+
+/* ── Responsive ── */
+
+@media screen and (max-width: 996px) {
+  .teamSection {
+    padding: 60px 24px 0;
+  }
+
+  .teamTitle {
+    font-size: 28px;
+  }
+
+  .coreGrid {
+    gap: 28px;
+  }
+
+  .memberCard {
+    width: 130px;
+  }
+
+  .avatarWrapper {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .teamSection {
+    padding: 40px 16px 0;
+  }
+
+  .teamTitle {
+    font-size: 24px;
+  }
+
+  .teamDesc {
+    font-size: 15px;
+  }
+
+  .coreGrid {
+    gap: 20px;
+  }
+
+  .memberCard {
+    width: 110px;
+  }
+
+  .avatarWrapper {
+    width: 80px;
+    height: 80px;
+  }
+
+  .memberName {
+    font-size: 0.95rem;
+  }
+
+  .memberRole {
+    font-size: 0.75rem;
+  }
+
+  .founderGroup,
+  .coreGroup {
+    margin-bottom: 36px;
+  }
+}

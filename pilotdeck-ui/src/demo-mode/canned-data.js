@@ -51,6 +51,12 @@ Full docs and one-line installer: [github.com/OpenBMB/PilotDeck](https://github.
 // its sessions under the default scratchpad section).
 const PROJECTS = [
   {
+    name: 'pilotdeck-demo',
+    displayName: 'PilotDeck Demo',
+    fullPath: '~/pilotdeck/workspaces/pilotdeck-demo',
+    path: '~/pilotdeck/workspaces/pilotdeck-demo',
+  },
+  {
     name: 'general',
     displayName: 'general',
     fullPath: '~/pilotdeck/workspaces/general',
@@ -67,7 +73,7 @@ const PROJECTS = [
 // of the wire shape sent over the /api/projects payload.
 
 const SESSIONS = {
-  general: [
+  'pilotdeck-demo': [
     {
       id: 'demo-session-tutorial-01',
       summary: 'Welcome to PilotDeck',
@@ -119,74 +125,56 @@ Open [github.com/OpenBMB/PilotDeck](https://github.com/OpenBMB/PilotDeck) for th
         ),
       ],
     },
+  ],
+  general: [
     {
-      // A second canned session that shows what a real PilotDeck turn looks
-      // like with tool calls + streamed markdown output. Provides flavor for
-      // visitors who want to see beyond the Q&A walkthrough.
-      id: 'demo-session-tutorial-02',
-      summary: 'Survey the China LLM application market',
-      title: 'Survey the China LLM application market',
-      lastActivity: hoursAgo(3),
-      createdAt: daysAgo(1),
-      messageCount: 7,
+      id: 'demo-session-general-01',
+      summary: 'Welcome to PilotDeck',
+      title: 'Welcome to PilotDeck',
+      lastActivity: minutesAgo(12),
+      createdAt: daysAgo(2),
+      messageCount: 4,
       __messages: [
         msgUser(
-          'demo-session-tutorial-02',
-          hoursAgo(4),
-          'Survey the Chinese LLM application market and turn it into a formal HTML white paper.',
+          'demo-session-general-01',
+          minutesAgo(15),
+          "I'm new here — what makes PilotDeck different from other AI agent harnesses?",
         ),
         msgAssistantText(
-          'demo-session-tutorial-02',
-          hoursAgo(4),
-          `Got it. I'll break this into four passes:
+          'demo-session-general-01',
+          minutesAgo(14),
+          `PilotDeck is built around the **WorkSpace** as the core unit of work, plus three pillars:
 
-1. **Scope** — narrow the landscape to public-facing applications shipped in mainland China during 2024–2026
-2. **Source pull** — fetch coverage from 36Kr, IT Juzi, Tencent News, plus official disclosures from Baichuan / Zhipu / Moonshot / 01.AI
-3. **Synthesis** — segment by vertical (productivity, coding, search, customer ops) and tabulate funding + MAU where disclosed
-4. **Render** — output a single HTML deliverable with embedded styles, ready to print as PDF
+### 1. White-box Memory
+Generation → extraction → storage → retrieval is fully visible. You can pinpoint and edit any memory entry; Dream Mode consolidates in idle windows with one-click rollback.
 
-Starting the source pull now.`,
+### 2. Smart Routing
+Task difficulty is auto-detected. Complex calls hit flagship models (Opus / GPT-4o), simple ones drop to lighter sub-agents (Sonnet / MiniMax-M2.7). On a typical social-media workflow this cuts token spend by ~70%.
+
+### 3. Always-on Background Execution
+After you sign off, the agent keeps discovering candidate tasks, runs long-horizon monitors, and lands deliverables as files on disk with a summary waiting for you.
+
+All of this is wrapped in an MCP-native plugin protocol so external tools and skills plug in via a single \`plugin.json\`.`,
         ),
-        msgToolUse(
-          'demo-session-tutorial-02',
-          hoursAgo(3) + 'a',
-          'tool-01',
-          'WebFetch',
-          { url: 'https://36kr.com/topics/llm-applications-2026', mode: 'summary' },
-        ),
-        msgToolResult(
-          'demo-session-tutorial-02',
-          hoursAgo(3) + 'b',
-          'tool-01',
-          `Fetched 36Kr topic page: 47 articles, 18 unique products, funding totals across Seed–Series C tabulated below.`,
-        ),
-        msgToolUse(
-          'demo-session-tutorial-02',
-          hoursAgo(3) + 'c',
-          'tool-02',
-          'Write',
-          { path: 'whitepaper.html', mode: 'create' },
-        ),
-        msgToolResult(
-          'demo-session-tutorial-02',
-          hoursAgo(3) + 'd',
-          'tool-02',
-          'Wrote whitepaper.html (412 lines, 24KB) — includes 6 sections, 3 tables, embedded CSS for print.',
+        msgUser(
+          'demo-session-general-01',
+          minutesAgo(12),
+          'How do I actually try those out?',
         ),
         msgAssistantText(
-          'demo-session-tutorial-02',
-          hoursAgo(3),
-          `Draft is on disk at \`whitepaper.html\`. The structure:
+          'demo-session-general-01',
+          minutesAgo(11),
+          `This page is a **read-only sandbox** — every panel renders, but nothing reaches a real model. Two ways forward:
 
-- **Executive Summary** — 3-paragraph TL;DR
-- **Section 1** — Foundational Models (closed / open-source split)
-- **Section 2** — Productivity & Office Suites (Kimi K2, Doubao 1.5, etc.)
-- **Section 3** — Coding Assistants
-- **Section 4** — Vertical Agents (legal, healthcare, education)
-- **Section 5** — Funding & Valuation Tables
-- **Section 6** — 2026 Outlook
+- **Stay here** and type anything in the composer below. You'll get a sandbox notice back, streamed token-by-token so you can see what a real V2 chat turn looks like.
+- **Install PilotDeck locally** to get the actual cockpit: live model routing, white-box memory you can edit, Always-on background runs landing files on disk.
 
-Open it in a browser to review. Want me to add a methodology appendix, or push it through the **Always-on** pipeline for a weekly auto-refresh?`,
+\`\`\`bash
+curl -fsSL https://raw.githubusercontent.com/OpenBMB/PilotDeck/main/install.sh | bash
+pilotdeck
+\`\`\`
+
+Open [github.com/OpenBMB/PilotDeck](https://github.com/OpenBMB/PilotDeck) for the full quick-start.`,
         ),
       ],
     },
