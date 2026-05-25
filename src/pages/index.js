@@ -194,8 +194,8 @@ const QUICKSTART = {
     ctaTo: 'https://github.com/OpenBMB/PilotDeck#-installation--quick-start',
     uiTitle: 'Visual WorkSpace Cockpit',
     uiDesc: 'Manage every WorkSpace, inspect white-box memory, and watch multi-agent collaboration in a single browser tab.',
-    uiCta: 'View Details',
-    uiCtaTo: 'http://58.57.119.12:52006/',
+    uiCta: 'Open Demo',
+    uiCtaTo: '/demo/',
   },
   zh: {
     title: '快速开始',
@@ -204,8 +204,8 @@ const QUICKSTART = {
     ctaTo: 'https://github.com/OpenBMB/PilotDeck#-installation--quick-start',
     uiTitle: '可视化 WorkSpace 驾驶舱',
     uiDesc: '在一个浏览器标签里管理所有 WorkSpace、查看白盒记忆、观察多智能体协作。',
-    uiCta: '查看详解',
-    uiCtaTo: 'http://58.57.119.12:52006/',
+    uiCta: '在线试玩',
+    uiCtaTo: '/demo/',
   },
 };
 
@@ -274,12 +274,14 @@ function HeroSection() {
           </p>
 
           <div className={styles.heroButtons}>
-            <Link className={styles.btnPrimary} to="http://58.57.119.12:52006/">
+            {/* Static SPA microsite at static/demo/index.html — use a plain
+                anchor so Docusaurus's link checker doesn't flag it. */}
+            <a className={styles.btnPrimary} href={useBaseUrl('/demo/')}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ marginRight: 6 }}>
                 <path d="M8 5v14l11-7z"></path>
               </svg>
               {t.tryDemo}
-            </Link>
+            </a>
             <Link className={styles.btnSecondary} to="#quick-start">
               {t.quickStart}
             </Link>
@@ -511,9 +513,11 @@ pilotdeck status     # check runtime status`}
         <div className={styles.quickStartContent}>
           <h2 className={styles.quickStartTitle}>{t.uiTitle}</h2>
           <p className={styles.quickStartDesc}>{t.uiDesc}</p>
-          <Link className={styles.btnSecondary} to={t.uiCtaTo}>
+          {/* Static SPA microsite at static/demo/ — plain anchor so the
+              Docusaurus link checker doesn't warn about a missing route. */}
+          <a className={styles.btnSecondary} href={useBaseUrl(t.uiCtaTo)}>
             {t.uiCta}
-          </Link>
+          </a>
         </div>
         <div className={styles.quickStartImageWrapper}>
           <img

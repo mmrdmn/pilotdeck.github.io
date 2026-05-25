@@ -24,8 +24,28 @@ jobs:
           node-version: 22
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm install
+
+      # Cache pilotdeck-ui/node_modules between runs — first install
+      # compiles native modules (better-sqlite3 / bcrypt / node-pty /
+      # sharp) and takes 4-5 minutes; with the cache it drops to ~30s.
+      - name: Cache pilotdeck-ui dependencies
+        id: cache-pilotdeck-ui
+        uses: actions/cache@v4
+        with:
+          path: pilotdeck-ui/node_modules
+          key: ${{ runner.os }}-pilotdeck-ui-${{ hashFiles('pilotdeck-ui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pilotdeck-ui-
+
+      - name: Install pilotdeck-ui dependencies
+        if: steps.cache-pilotdeck-ui.outputs.cache-hit != 'true'
+        run: npm install --no-audit --no-fund
+        working-directory: pilotdeck-ui
+
+      - name: Build V2 demo SPA into static/demo/
+        run: npm run build:demo
 
       - name: Build website
         run: npm run build

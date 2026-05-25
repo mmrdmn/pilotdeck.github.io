@@ -6,6 +6,8 @@
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",
+    "build:demo": "node scripts/build-demo.mjs",
+    "build:all": "npm run build:demo && docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
