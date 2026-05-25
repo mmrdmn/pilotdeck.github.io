@@ -278,20 +278,20 @@ const PARTNERS = {
     title: 'Jointly Developed By',
     desc: 'Open-sourced by Tsinghua THUNLP, ModelBest, OpenBMB and AI9Stars.',
     logos: [
-      { src: 'img/partner/thunlp.svg',    name: 'THUNLP',    href: 'https://nlp.csai.tsinghua.edu.cn/' },
-      { src: 'img/partner/modelbest.svg', name: 'ModelBest', href: 'https://modelbest.cn/' },
-      { src: 'img/partner/openbmb.svg',   name: 'OpenBMB',   href: 'https://www.openbmb.cn/' },
-      { src: 'img/partner/ai9stars.svg',  name: 'AI9Stars',  href: 'https://github.com/AI9Stars' },
+      { src: 'img/partner/thunlp.png',    name: 'THUNLP',    href: 'https://nlp.csai.tsinghua.edu.cn/' },
+      { src: 'img/partner/modelbest.png', name: 'ModelBest', href: 'https://modelbest.cn/' },
+      { src: 'img/partner/openbmb.png',   name: 'OpenBMB',   href: 'https://www.openbmb.cn/' },
+      { src: 'img/partner/ai9stars.png',  name: 'AI9Stars',  href: 'https://github.com/AI9Stars' },
     ],
   },
   zh: {
     title: '联合发起',
     desc: 'PilotDeck 由清华 THUNLP、面壁智能、OpenBMB 与 AI9Stars 联合开发与开源。',
     logos: [
-      { src: 'img/partner/thunlp.svg',    name: 'THUNLP',    href: 'https://nlp.csai.tsinghua.edu.cn/' },
-      { src: 'img/partner/modelbest.svg', name: 'ModelBest', href: 'https://modelbest.cn/' },
-      { src: 'img/partner/openbmb.svg',   name: 'OpenBMB',   href: 'https://www.openbmb.cn/' },
-      { src: 'img/partner/ai9stars.svg',  name: 'AI9Stars',  href: 'https://github.com/AI9Stars' },
+      { src: 'img/partner/thunlp.png',    name: 'THUNLP',    href: 'https://nlp.csai.tsinghua.edu.cn/' },
+      { src: 'img/partner/modelbest.png', name: 'ModelBest', href: 'https://modelbest.cn/' },
+      { src: 'img/partner/openbmb.png',   name: 'OpenBMB',   href: 'https://www.openbmb.cn/' },
+      { src: 'img/partner/ai9stars.png',  name: 'AI9Stars',  href: 'https://github.com/AI9Stars' },
     ],
   },
 };
@@ -618,6 +618,7 @@ function PartnersSection() {
           {t.logos.map((logo, idx) => (
             <a key={idx} href={logo.href} target="_blank" rel="noopener noreferrer" className={styles.partnerLogoLink}>
               <img src={useBaseUrl(logo.src)} alt={logo.name} className={styles.partnerLogo} />
+              <span className={styles.partnerName}>{logo.name}</span>
             </a>
           ))}
         </div>
