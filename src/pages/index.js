@@ -317,7 +317,7 @@ function HeroSection() {
           <h1 className={styles.heroTitle}>
             {isZh ? (
               <>
-                从一个控制台<br />调度所有 Agent
+                从<span>一个控制台</span><br />调度所有 Agent
               </>
             ) : (
               <>
@@ -327,7 +327,7 @@ function HeroSection() {
           </h1>
           <p className={styles.heroSubtitle}>
             {isZh
-              ? '一个座舱。所有 Agent。统一控制。最大影响。'
+              ? '一个驾驶舱 · 所有智能体 · 一目了然 · 掌控全局'
               : 'One cockpit. All agents. Unified control. Maximum impact.'}
           </p>
           <p className={styles.heroDesc}>
