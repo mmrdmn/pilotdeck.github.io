@@ -7,10 +7,10 @@ const config = {
   tagline: 'Task-oriented AI Agent productivity platform — one WorkSpace at a time.',
   favicon: 'img/favicon.png',
 
-  url: 'https://pilotdeck.github.io',
-  baseUrl: '/',
+  url: 'https://mmrdmn.github.io',
+  baseUrl: '/pilotdeck.github.io/',
 
-  organizationName: 'Gucc111',
+  organizationName: 'mmrdmn',
   projectName: 'pilotdeck.github.io',
 
   onBrokenLinks: 'warn',
