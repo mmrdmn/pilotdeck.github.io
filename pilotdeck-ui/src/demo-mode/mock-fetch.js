@@ -24,6 +24,22 @@ function jsonResponse(body, init = {}) {
   });
 }
 
+// Shape mirrored from useRoutingDashboard.ts TokenBucket. Several panels
+// (DashboardV2 in particular) destructure these fields without optional
+// chaining, so the canned payload zero-fills every key.
+function emptyTokenBucket() {
+  return {
+    inputTokens: 0,
+    outputTokens: 0,
+    cacheReadTokens: 0,
+    totalTokens: 0,
+    requestCount: 0,
+    estimatedCost: 0,
+    baselineCost: 0,
+    savedCost: 0,
+  };
+}
+
 // Routes are matched in order; the first matching handler wins.
 const ROUTES = [
   // Auth — `DISABLE_LOCAL_AUTH=true` is set at build time so AuthProvider
@@ -90,6 +106,28 @@ const ROUTES = [
       const name = match ? decodeURIComponent(match[1]) : '';
       return jsonResponse(getProjectSessionsPayload(name));
     },
+  },
+
+  // Smart-routing dashboard (`useRoutingDashboard`) — the Dashboard tab
+  // is blocked from being opened, but useRoutingDashboard may still poll
+  // during mount if a stale localStorage points the user there, and
+  // unmocked it would crash on `data.projects is not iterable`. Return a
+  // fully-shaped empty payload so the panel renders an empty state.
+  {
+    method: 'GET',
+    test: (path) => path === '/api/ccr/dashboard',
+    handle: () =>
+      jsonResponse({
+        projects: [],
+        overall: {
+          total: emptyTokenBucket(),
+          byTier: {},
+          byRole: {},
+          projectCount: 0,
+          sessionCount: 0,
+        },
+        unmatchedSessions: [],
+      }),
   },
 
   // Discovery plans (Always-on tab) — always empty in demo.

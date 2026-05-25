@@ -9,6 +9,17 @@ import './mock-fetch.js';
 import './mock-websocket.js';
 import './demo-block.js';
 
+// The V2 sidebar persists the last-active tool tab in localStorage so a
+// reload reopens where the user left off. In the public demo we want EVERY
+// visit to start on the chat surface — partly so a returning visitor isn't
+// landed on a now-blocked panel (Dashboard / Memory / Always-on / etc.)
+// that would otherwise mount and immediately crash on missing data.
+try {
+  window.localStorage.setItem('activeTab', 'chat');
+} catch {
+  // private mode / disabled storage — fine.
+}
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from '../App.js';
