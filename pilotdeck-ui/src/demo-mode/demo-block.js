@@ -23,9 +23,11 @@ const GITHUB_INSTALL_URL = 'https://github.com/OpenBMB/PilotDeck#-installation--
 const BLOCK_RULES = [
   {
     id: 'settings',
-    // Sidebar gear button + any other surface that calls window.openSettings.
-    // ProjectsState exposes `aria-label="Settings"` on the sidebar footer
-    // button; the AppShell's main chrome reuses the same.
+    // The visible Settings button in the sidebar footer is rewritten in
+    // place to "Back to website" (see transformSettingsButton below), so
+    // this rule only catches programmatic openSettings invocations that
+    // sneak through other paths (slash commands, etc.). The button itself
+    // now navigates to the docs site root, not the Settings dialog.
     test: (el) =>
       el.closest('[aria-label="Settings"], [aria-label*="设置"]') !== null,
     title: 'Settings — Demo Sandbox',
@@ -334,5 +336,83 @@ window.__pilotdeckShowDemoNotice = (ruleId = 'settings') => {
   const modal = ensureModal();
   openModal(modal, rule);
 };
+
+// ─── Settings → "Back to website" transform ───────────────────────────────
+// V2 renders a Settings gear in the sidebar footer; in the demo we want
+// it to instead say "Back to website" and navigate to the docs site root
+// (since the demo SPA is hosted as a sibling page under the same baseUrl).
+// We rewrite the button in place via MutationObserver — no V2 source
+// change, and any future locale rename to "Settings" is still caught.
+
+function computeWebsiteHomeUrl() {
+  const path = window.location.pathname;
+  // Strip the `/demo/...` suffix to land on the docs site root. Handles
+  // both `/pilotdeck.github.io/demo/` and a future custom-domain layout.
+  const demoMatch = path.match(/^(.*?)\/demo(\/|$)/);
+  if (demoMatch) return demoMatch[1] + '/';
+  return '/';
+}
+
+function transformSettingsButton(btn) {
+  if (!btn || btn.dataset.pdDemoBackPatched === '1') return;
+  btn.dataset.pdDemoBackPatched = '1';
+
+  const label = 'Back to website';
+  btn.setAttribute('aria-label', label);
+  btn.setAttribute('title', label);
+
+  // Swap the SettingsIcon SVG for an arrow-left in the same lucide style,
+  // and replace the visible text. We leave the parent classes alone so
+  // the button still looks/aligns identical to the V2 design.
+  btn.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"
+         class="lucide lucide-arrow-left h-4 w-4" aria-hidden="true">
+      <line x1="19" x2="5" y1="12" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    <span>${label}</span>
+  `;
+
+  // Hijack the click in capture phase so V2's onShowSettings handler
+  // never runs. Then navigate to the docs home with a full-page load —
+  // we're leaving the SPA entirely.
+  btn.addEventListener(
+    'click',
+    (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.location.href = computeWebsiteHomeUrl();
+    },
+    true,
+  );
+}
+
+(function installSettingsButtonTransform() {
+  // Patch anything already rendered (rare — usually the observer beats this).
+  document
+    .querySelectorAll('[aria-label="Settings"]')
+    .forEach(transformSettingsButton);
+
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (!(node instanceof Element)) continue;
+        if (node.matches?.('[aria-label="Settings"]')) {
+          transformSettingsButton(node);
+        }
+        node.querySelectorAll?.('[aria-label="Settings"]').forEach(
+          transformSettingsButton,
+        );
+      }
+    }
+  });
+
+  // The body element exists by the time this module runs (we're loaded
+  // from a deferred <script type="module"> in the demo HTML), so observing
+  // it immediately is safe.
+  observer.observe(document.body, { childList: true, subtree: true });
+})();
 
 void GITHUB_REPO_URL; // exported only via the modal's install link for now

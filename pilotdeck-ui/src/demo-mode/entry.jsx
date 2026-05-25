@@ -9,13 +9,24 @@ import './mock-fetch.js';
 import './mock-websocket.js';
 import './demo-block.js';
 
-// The V2 sidebar persists the last-active tool tab in localStorage so a
-// reload reopens where the user left off. In the public demo we want EVERY
-// visit to start on the chat surface — partly so a returning visitor isn't
-// landed on a now-blocked panel (Dashboard / Memory / Always-on / etc.)
-// that would otherwise mount and immediately crash on missing data.
+// Pin the demo's persisted state to a known-good baseline on every boot.
+// Without this:
+//   - activeTab: a returning visitor who clicked Dashboard/Memory/Always-on
+//     before the click-block landed would re-mount that (now-blocked)
+//     panel on reload and crash before our shim could intervene.
+//   - userLanguage: i18next's browser language detector picks ZH/EN
+//     based on the visitor's OS locale. The demo's canned copy is
+//     English-only, so a ZH visitor would see a half-translated UI.
+//   - theme: the V2 ThemeContext falls back to prefers-color-scheme on
+//     first visit. We want every screenshot / share / repeat visit to
+//     look the same in light mode.
 try {
   window.localStorage.setItem('activeTab', 'chat');
+  window.localStorage.setItem('userLanguage', 'en');
+  window.localStorage.setItem('theme', 'light');
+  // Drop the dark-mode class eagerly so we never flash dark before the
+  // ThemeProvider's effect runs on the very first paint.
+  document.documentElement.classList.remove('dark');
 } catch {
   // private mode / disabled storage — fine.
 }
