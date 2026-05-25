@@ -71,25 +71,6 @@ const config = {
           {
             type: 'custom-megaMenu',
             position: 'left',
-            label: 'Features',
-            labelZh: '产品特性',
-            to: '/#features',
-            items: [
-              {
-                title: 'Highlights',
-                titleZh: '核心能力',
-                items: [
-                  { label: 'WorkSpace Isolation', labelZh: 'WorkSpace 隔离', to: '/#feature-workspace' },
-                  { label: 'White-box Memory', labelZh: '白盒记忆', to: '/#feature-memory' },
-                  { label: 'Smart Routing', labelZh: '智能路由', to: '/#feature-router' },
-                  { label: 'Always-on', labelZh: '后台常驻', to: '/#feature-alwayson' },
-                ],
-              },
-            ],
-          },
-          {
-            type: 'custom-megaMenu',
-            position: 'left',
             label: 'Docs',
             labelZh: '文档',
             to: '/docs/introduction',
@@ -129,7 +110,7 @@ const config = {
             position: 'left',
             label: 'Showcase',
             labelZh: '案例广场',
-            to: '/#usecases',
+            href: '/showcase/',
             items: [
               {
                 title: 'Featured',
@@ -154,7 +135,7 @@ const config = {
             type: 'custom-megaMenu',
             position: 'left',
             label: 'Connect',
-            labelZh: '连接',
+            labelZh: '加入我们',
             to: '/connect',
             items: [
               {

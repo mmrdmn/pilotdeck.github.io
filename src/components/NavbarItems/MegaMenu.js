@@ -47,10 +47,11 @@ function MegaMenuLink({ item }) {
   );
 }
 
-export default function MegaMenu({ label, labelZh, items, position, to: triggerTo }) {
+export default function MegaMenu({ label, labelZh, items, position, to: triggerTo, href: triggerHref }) {
   const { lang } = useLanguage();
   const isZh = lang === 'zh';
   const displayLabel = isZh ? (labelZh || label) : label;
+  const resolvedHref = useBaseUrl(triggerHref || '/');
   const localizeDocsPath = (url) => {
     if (!url || !url.startsWith('/docs/')) return url;
 
@@ -108,7 +109,16 @@ export default function MegaMenu({ label, labelZh, items, position, to: triggerT
       onMouseLeave={handleMouseLeave}
       ref={containerRef}
     >
-      {triggerTo ? (
+      {triggerHref ? (
+        <a
+          href={resolvedHref}
+          className={clsx('navbar__link', styles.megaMenuTrigger, {
+            [styles.active]: isOpen,
+          })}
+        >
+          {displayLabel}
+        </a>
+      ) : triggerTo ? (
         <Link
           to={localizedTriggerTo}
           className={clsx('navbar__link', styles.megaMenuTrigger, {
