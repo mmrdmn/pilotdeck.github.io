@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import { useIsZh } from '@site/src/i18n';
 import comingSoonStyles from '@site/src/components/ComingSoon/styles.module.css';
@@ -57,7 +58,7 @@ export default function UseCases() {
             {t.cards.map((c) => {
               const isStaticShowcase = c.href.startsWith('/showcase');
               return isStaticShowcase ? (
-                <a key={c.href} href={c.href} className={comingSoonStyles.btnPrimary}>
+                <a key={c.href} href={useBaseUrl(c.href)} className={comingSoonStyles.btnPrimary}>
                   {c.title}
                 </a>
               ) : (

@@ -435,8 +435,9 @@ function UseCasesSection() {
           // bypass Docusaurus' Link prefetch/validation with a plain anchor.
           const isStaticShowcase = !item.href || item.href.startsWith('/showcase');
           const LinkEl = isStaticShowcase ? 'a' : Link;
+          const rawHref = item.href || '/showcase/';
           const linkProps = isStaticShowcase
-            ? { href: item.href || '/showcase/' }
+            ? { href: useBaseUrl(rawHref) }
             : { to: item.href };
           return (
           <LinkEl key={idx} {...linkProps} className={styles.useCaseCard}>
@@ -464,7 +465,7 @@ function UseCasesSection() {
       </div>
       {t.seeAllHref && (
         <div className={styles.useCasesFooter}>
-          <a href={t.seeAllHref} className={styles.useCasesFooterLink}>
+          <a href={useBaseUrl(t.seeAllHref)} className={styles.useCasesFooterLink}>
             {t.seeAll}
           </a>
         </div>

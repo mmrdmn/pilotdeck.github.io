@@ -12,6 +12,7 @@ const config = {
 
   organizationName: 'mmrdmn',
   projectName: 'pilotdeck.github.io',
+  trailingSlash: false,
 
   onBrokenLinks: 'warn',
   onBrokenAnchors: 'ignore',

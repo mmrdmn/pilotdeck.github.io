@@ -1,8 +1,51 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import clsx from 'clsx';
 import { useLanguage } from '@site/src/context/LanguageContext';
 import styles from './MegaMenu.module.css';
+
+function MegaMenuLink({ item }) {
+  const url = item.to || item.href || '/';
+  const isExternal = /^[a-z]+:\/\//i.test(url);
+  // Static-folder URLs (e.g. /showcase/ microsite) bypass Docusaurus'
+  // router and render as plain anchors with baseUrl prefix.
+  const isStaticShowcase = url.startsWith('/showcase');
+  const baseAdjusted = useBaseUrl(url);
+
+  if (isExternal) {
+    return (
+      <li className={styles.menuItem}>
+        <a
+          href={url}
+          className={styles.menuLink}
+          target={item.target}
+          rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+        >
+          {item.label}
+        </a>
+      </li>
+    );
+  }
+
+  if (isStaticShowcase) {
+    return (
+      <li className={styles.menuItem}>
+        <a href={baseAdjusted} className={styles.menuLink} target={item.target}>
+          {item.label}
+        </a>
+      </li>
+    );
+  }
+
+  return (
+    <li className={styles.menuItem}>
+      <Link to={url} className={styles.menuLink} target={item.target}>
+        {item.label}
+      </Link>
+    </li>
+  );
+}
 
 export default function MegaMenu({ label, labelZh, items, position, to: triggerTo }) {
   const { lang } = useLanguage();
@@ -92,31 +135,9 @@ export default function MegaMenu({ label, labelZh, items, position, to: triggerT
             <div key={idx} className={styles.menuColumn}>
               {column.title && <div className={styles.columnTitle}>{column.title}</div>}
               <ul className={styles.menuList}>
-                {column.items.map((item, itemIdx) => {
-                  const url = item.to || item.href;
-                  // Static-folder URLs (e.g. /showcase/ microsite) bypass
-                  // Docusaurus' router link check and render as plain anchors.
-                  const isRawHref =
-                    !!url && (item.href !== undefined || url.startsWith('/showcase'));
-                  return (
-                    <li key={itemIdx} className={styles.menuItem}>
-                      {isRawHref ? (
-                        <a
-                          href={url}
-                          className={styles.menuLink}
-                          target={item.target}
-                          rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                        >
-                          {item.label}
-                        </a>
-                      ) : (
-                        <Link to={url} className={styles.menuLink} target={item.target}>
-                          {item.label}
-                        </Link>
-                      )}
-                    </li>
-                  );
-                })}
+                {column.items.map((item, itemIdx) => (
+                  <MegaMenuLink key={itemIdx} item={item} />
+                ))}
               </ul>
             </div>
           ))}
