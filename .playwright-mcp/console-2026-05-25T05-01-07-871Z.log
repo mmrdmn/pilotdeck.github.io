@@ -1,7 +1,0 @@
-[      61ms] [ERROR] Error: <svg> attribute height: Expected length, "auto". @ http://localhost:6688/showcase/:665
-[      61ms] [ERROR] Error: <svg> attribute height: Expected length, "auto". @ http://localhost:6688/showcase/:665
-[      61ms] [ERROR] Error: <svg> attribute height: Expected length, "auto". @ http://localhost:6688/showcase/:665
-[      61ms] [ERROR] Error: <svg> attribute height: Expected length, "auto". @ http://localhost:6688/showcase/:665
-[      61ms] [ERROR] Error: <svg> attribute height: Expected length, "auto". @ http://localhost:6688/showcase/:665
-[      61ms] [ERROR] Error: <svg> attribute height: Expected length, "auto". @ http://localhost:6688/showcase/:665
-[     104ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:6688/favicon.ico:0
