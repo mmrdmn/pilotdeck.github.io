@@ -1,0 +1,88 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - img "PilotDeck" [ref=e4] [cursor=pointer]
+    - generic [ref=e5]:
+      - link "📖 Docs" [ref=e6] [cursor=pointer]:
+        - /url: /pages/introduction
+      - generic [ref=e7] [cursor=pointer]:
+        - button "中文" [ref=e8]
+        - button "EN" [ref=e9]
+  - generic [ref=e10]:
+    - generic [ref=e11]:
+      - heading "AI Agent Case Showcase" [level=1] [ref=e12]
+      - paragraph [ref=e13]: Explore full project cases powered by PilotDeck AI Agent
+    - generic [ref=e15]:
+      - generic [ref=e16] [cursor=pointer]:
+        - generic [ref=e17]:
+          - img "Zelda Sky Glide" [ref=e18]
+          - generic [ref=e19]:
+            - generic [ref=e20]: 🔗
+            - text: 🎮 Play Online
+        - generic [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]: Zelda Sky Glide
+            - generic [ref=e24]: Web Game
+          - generic [ref=e25]: A Zelda-inspired web game where you control Link gliding from heights on a wing, freely overlooking the landscape, architecture, and NPCs below.
+      - generic [ref=e26] [cursor=pointer]:
+        - generic [ref=e27]:
+          - img "Multilingual Podcast Push" [ref=e28]
+          - generic [ref=e29]:
+            - generic [ref=e30]: 🔗
+            - text: 📄 Chinese Push
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - generic [ref=e33]: Multilingual Podcast Push
+            - generic [ref=e34]: Multimedia
+          - generic [ref=e35]: Take an English podcast and deliver it to a global audience — one-click generation of push pages in 6 languages.
+      - generic [ref=e36] [cursor=pointer]:
+        - generic [ref=e37]:
+          - img [ref=e39]:
+            - generic [ref=e42]: 🌱 农田
+            - generic [ref=e44]: 🐄 牲畜
+            - generic [ref=e46]: 🏠 房屋
+            - generic [ref=e48]: 💰 商店
+            - generic [ref=e50]: ⚙️ MB Farm 网页农场
+            - generic [ref=e51]: FastAPI + SQLite · 后端项目
+          - generic [ref=e52]:
+            - generic [ref=e53]: 📄
+            - text: Source Code
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: QQ Farm
+            - generic [ref=e57]: Web Game
+          - generic [ref=e58]: A simple web-based QQ Farm game called MB Farm, built with FastAPI + SQLite, featuring social 'steal vegetables' mechanics.
+      - generic [ref=e59] [cursor=pointer]:
+        - generic [ref=e60]:
+          - img "Plane Wars" [ref=e61]
+          - generic [ref=e62]:
+            - generic [ref=e63]: 🔗
+            - text: 🎮 Play Online
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - generic [ref=e66]: Plane Wars
+            - generic [ref=e67]: Web Game
+          - generic [ref=e68]: A classic plane shooter game with multiple enemy types, power-up system, particle effects, and progressive wave difficulty.
+      - generic [ref=e69] [cursor=pointer]:
+        - generic [ref=e70]:
+          - img [ref=e72]:
+            - generic [ref=e82]: 🔍 VR眼镜视角
+          - generic [ref=e83]:
+            - generic [ref=e84]: 🌐
+            - text: 🔍 Play Online
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - generic [ref=e87]: VR Ball Hunt
+            - generic [ref=e88]: Interactive Experience
+          - generic [ref=e89]: A VR-glasses-shaped 3D room ball-hunting game with phone gyroscope view rotation. See final result at https://onehot123.github.io/miam/
+      - generic [ref=e90] [cursor=pointer]:
+        - generic [ref=e91]:
+          - img "Resume Generator" [ref=e92]
+          - generic [ref=e93]:
+            - generic [ref=e94]: 🔗
+            - text: 📥 Download PDF
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - generic [ref=e97]: Resume Generator
+            - generic [ref=e98]: Tool
+          - generic [ref=e99]: A LaTeX personal resume template based on Lei Jun's career experience, supporting both Chinese and English layouts.
+    - contentinfo [ref=e100]: © 2026 PilotDeck — AI-Powered Case Showcase

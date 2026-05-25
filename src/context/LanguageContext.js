@@ -15,6 +15,8 @@ export function LanguageProvider({ children }) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === 'zh' || saved === 'en') {
         setLangState(saved);
+      } else {
+        localStorage.setItem(STORAGE_KEY, 'en');
       }
     } catch (e) {
       // SSR or localStorage not available
