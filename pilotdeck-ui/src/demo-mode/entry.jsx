@@ -7,6 +7,7 @@
 
 import './mock-fetch.js';
 import './mock-websocket.js';
+import './demo-block.js';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
