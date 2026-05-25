@@ -184,8 +184,8 @@ const config = {
                 title: 'Contribute',
                 titleZh: '参与建设',
                 items: [
-                  { label: 'GitHub Issues', labelZh: '提交 Issue', href: 'https://github.com/Gucc111/PilotDeck/issues', target: '_blank' },
-                  { label: 'Pull Requests', labelZh: '提交 PR', href: 'https://github.com/Gucc111/PilotDeck/pulls', target: '_blank' },
+                  { label: 'GitHub Issues', labelZh: '提交 Issue', href: 'https://github.com/OpenBMB/PilotDeck/issues', target: '_blank' },
+                  { label: 'Pull Requests', labelZh: '提交 PR', href: 'https://github.com/OpenBMB/PilotDeck/pulls', target: '_blank' },
                 ],
               },
             ],
@@ -193,8 +193,8 @@ const config = {
           {
             type: 'custom-githubStar',
             position: 'right',
-            repo: 'Gucc111/PilotDeck',
-            href: 'https://github.com/Gucc111/PilotDeck',
+            repo: 'OpenBMB/PilotDeck',
+            href: 'https://github.com/OpenBMB/PilotDeck',
           },
           {
             type: 'custom-languageSwitcher',

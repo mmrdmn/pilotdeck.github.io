@@ -192,7 +192,7 @@ const QUICKSTART = {
     title: 'Quick Start',
     desc: 'One-line install on macOS / Linux. Node.js, dependencies and frontend are taken care of.',
     cta: 'Get Started',
-    ctaTo: 'https://github.com/Gucc111/PilotDeck#-installation--quick-start',
+    ctaTo: 'https://github.com/OpenBMB/PilotDeck#-installation--quick-start',
     uiTitle: 'Visual WorkSpace Cockpit',
     uiDesc: 'Manage every WorkSpace, inspect white-box memory, and watch multi-agent collaboration in a single browser tab.',
     uiCta: 'View Details',
@@ -202,7 +202,7 @@ const QUICKSTART = {
     title: '快速开始',
     desc: '一行命令安装（macOS / Linux）。Node.js、依赖、前端一并搞定。',
     cta: '即刻上手',
-    ctaTo: 'https://github.com/Gucc111/PilotDeck#-installation--quick-start',
+    ctaTo: 'https://github.com/OpenBMB/PilotDeck#-installation--quick-start',
     uiTitle: '可视化 WorkSpace 驾驶舱',
     uiDesc: '在一个浏览器标签里管理所有 WorkSpace、查看白盒记忆、观察多智能体协作。',
     uiCta: '查看详解',
@@ -220,21 +220,21 @@ const COMMUNITY = {
         name: 'Discord',
         desc: 'Real-time chat with the core team and other builders.',
         cta: 'Join Discord',
-        href: 'https://github.com/Gucc111/PilotDeck#-community',
+        href: 'https://github.com/OpenBMB/PilotDeck#-community',
       },
       {
         icon: 'img/community/feishu.svg',
         name: 'Feishu',
         desc: '飞书社区群 — ideal for Chinese-speaking teams.',
         cta: 'Join Feishu',
-        href: 'https://github.com/Gucc111/PilotDeck#-community',
+        href: 'https://github.com/OpenBMB/PilotDeck#-community',
       },
       {
         icon: 'img/community/wechat.svg',
         name: 'WeChat',
         desc: 'Scan to join our WeChat user group.',
         cta: 'Join WeChat',
-        href: 'https://github.com/Gucc111/PilotDeck#-community',
+        href: 'https://github.com/OpenBMB/PilotDeck#-community',
       },
     ],
     contactTitle: 'Prefer email?',
@@ -250,21 +250,21 @@ const COMMUNITY = {
         name: 'Discord',
         desc: '与核心团队、开发者实时交流的英文社区。',
         cta: '加入 Discord',
-        href: 'https://github.com/Gucc111/PilotDeck#-community',
+        href: 'https://github.com/OpenBMB/PilotDeck#-community',
       },
       {
         icon: 'img/community/feishu.svg',
         name: '飞书',
         desc: '中文用户首选 —— 飞书社区群。',
         cta: '加入飞书群',
-        href: 'https://github.com/Gucc111/PilotDeck#-community',
+        href: 'https://github.com/OpenBMB/PilotDeck#-community',
       },
       {
         icon: 'img/community/wechat.svg',
         name: '微信',
         desc: '扫码加入微信用户群。',
         cta: '加入微信群',
-        href: 'https://github.com/Gucc111/PilotDeck#-community',
+        href: 'https://github.com/OpenBMB/PilotDeck#-community',
       },
     ],
     contactTitle: '更喜欢邮件？',
@@ -353,7 +353,7 @@ function HeroSection() {
               </svg>
               {t.docs}
             </Link>
-            <Link className={styles.btnSecondary} to="https://github.com/Gucc111/PilotDeck">
+            <Link className={styles.btnSecondary} to="https://github.com/OpenBMB/PilotDeck">
               <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" style={{ marginRight: 8 }}>
                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
               </svg>
@@ -532,13 +532,13 @@ function QuickStartSection() {
           <CodeBlock language="shell">
 {isZh
   ? `# 一行安装 (macOS / Linux)
-curl -fsSL https://raw.githubusercontent.com/Gucc111/PilotDeck/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/OpenBMB/PilotDeck/main/install.sh | bash
 
 # 启动 PilotDeck
 pilotdeck            # 服务监听 http://localhost:3001
 pilotdeck status     # 查看运行状态`
   : `# One-line install (macOS / Linux)
-curl -fsSL https://raw.githubusercontent.com/Gucc111/PilotDeck/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/OpenBMB/PilotDeck/main/install.sh | bash
 
 # Start PilotDeck
 pilotdeck            # serves at http://localhost:3001

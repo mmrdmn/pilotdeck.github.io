@@ -34,7 +34,7 @@ export default function ComingSoon({ title, titleZh, lead, leadZh, tags = [] }) 
             <Link className={styles.btnPrimary} to="/">
               ← {isZh ? '返回首页' : 'Back to Home'}
             </Link>
-            <Link className={styles.btnSecondary} to="https://github.com/Gucc111/PilotDeck">
+            <Link className={styles.btnSecondary} to="https://github.com/OpenBMB/PilotDeck">
               {isZh ? '查看 GitHub' : 'View on GitHub'}
             </Link>
           </div>
