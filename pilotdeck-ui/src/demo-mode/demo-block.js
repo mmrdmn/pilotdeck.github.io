@@ -42,6 +42,17 @@ const BLOCK_RULES = [
       'WorkSpaces are isolated project containers backed by a real filesystem and memory store. Spinning one up needs the local PilotDeck server.',
   },
   {
+    id: 'new-chat',
+    // Hover-revealed pencil ("MessageSquarePlus") on every project row, and
+    // its twin at the top of the project list. Both share aria-label="New
+    // Chat" in the V2 sidebar.
+    test: (el) =>
+      el.closest('[aria-label*="New Chat" i], [aria-label*="新建对话"]') !== null,
+    title: 'New Conversation — Demo Sandbox',
+    body:
+      'Starting a fresh chat would normally spin up a clean PilotDeck session against a real model. This sandbox only ships the canned tutorial transcript — open the existing session in the sidebar or install PilotDeck locally to start your own.',
+  },
+  {
     id: 'tool-tab',
     // Tab buttons inside the MainAreaV2 tool strip — block everything that
     // isn't the first tab (Chat). MainAreaV2 renders the strip as:

@@ -45,26 +45,15 @@ Full docs and one-line installer: [github.com/OpenBMB/PilotDeck](https://github.
 // WorkSpace / Project list
 // ──────────────────────────────────────────────────────────────────────────
 
-// Shape matches Project from src/types/app.ts. fullPath is purely cosmetic
-// here — it surfaces in the breadcrumb but the backend never resolves it.
+// Shape matches Project from src/types/app.ts. The demo ships exactly one
+// WorkSpace with one canned tutorial session — keeps the sidebar focused
+// and lets every visitor land on the same guided walkthrough.
 const PROJECTS = [
   {
-    name: 'general',
-    displayName: 'general',
-    fullPath: '~/pilotdeck/workspaces/general',
-    path: '~/pilotdeck/workspaces/general',
-  },
-  {
-    name: 'whitepaper-china-llm',
-    displayName: 'Whitepaper · China LLM Market',
-    fullPath: '~/pilotdeck/workspaces/whitepaper-china-llm',
-    path: '~/pilotdeck/workspaces/whitepaper-china-llm',
-  },
-  {
-    name: 'ar-game-ios',
-    displayName: 'iOS AR · Ball Finder',
-    fullPath: '~/pilotdeck/workspaces/ar-game-ios',
-    path: '~/pilotdeck/workspaces/ar-game-ios',
+    name: 'pilotdeck-tutorial',
+    displayName: 'PilotDeck Tutorial',
+    fullPath: '~/pilotdeck/workspaces/pilotdeck-tutorial',
+    path: '~/pilotdeck/workspaces/pilotdeck-tutorial',
   },
 ];
 
@@ -77,9 +66,9 @@ const PROJECTS = [
 // of the wire shape sent over the /api/projects payload.
 
 const SESSIONS = {
-  general: [
+  'pilotdeck-tutorial': [
     {
-      id: 'demo-session-general-01',
+      id: 'demo-session-tutorial-01',
       summary: 'Welcome to PilotDeck',
       title: 'Welcome to PilotDeck',
       lastActivity: minutesAgo(12),
@@ -87,12 +76,12 @@ const SESSIONS = {
       messageCount: 4,
       __messages: [
         msgUser(
-          'demo-session-general-01',
+          'demo-session-tutorial-01',
           minutesAgo(15),
           "I'm new here — what makes PilotDeck different from other AI agent harnesses?",
         ),
         msgAssistantText(
-          'demo-session-general-01',
+          'demo-session-tutorial-01',
           minutesAgo(14),
           `PilotDeck is built around the **WorkSpace** as the core unit of work, plus three pillars:
 
@@ -108,168 +97,24 @@ After you sign off, the agent keeps discovering candidate tasks, runs long-horiz
 All of this is wrapped in an MCP-native plugin protocol so external tools and skills plug in via a single \`plugin.json\`.`,
         ),
         msgUser(
-          'demo-session-general-01',
+          'demo-session-tutorial-01',
           minutesAgo(12),
-          'Show me what a real workspace looks like.',
+          'How do I actually try those out?',
         ),
         msgAssistantText(
-          'demo-session-general-01',
+          'demo-session-tutorial-01',
           minutesAgo(11),
-          `Pick **Whitepaper · China LLM Market** or **iOS AR · Ball Finder** from the sidebar to see two saved sessions with real tool traces and streamed responses.
+          `This page is a **read-only sandbox** — every panel renders, but nothing reaches a real model. Two ways forward:
 
-You can also send anything in the composer below — every message in this demo gets the same sandbox notice back, streamed token-by-token so the chat surface behaves like the real thing.`,
-        ),
-      ],
-    },
-  ],
+- **Stay here** and type anything in the composer below. You'll get a sandbox notice back, streamed token-by-token so you can see what a real V2 chat turn looks like.
+- **Install PilotDeck locally** to get the actual cockpit: live model routing, white-box memory you can edit, Always-on background runs landing files on disk.
 
-  'whitepaper-china-llm': [
-    {
-      id: 'demo-session-whitepaper-01',
-      summary: 'Survey the China LLM application market',
-      title: 'Survey the China LLM application market',
-      lastActivity: hoursAgo(3),
-      createdAt: daysAgo(1),
-      messageCount: 6,
-      __messages: [
-        msgUser(
-          'demo-session-whitepaper-01',
-          hoursAgo(4),
-          'Survey the Chinese LLM application market and turn it into a formal HTML white paper.',
-        ),
-        msgAssistantText(
-          'demo-session-whitepaper-01',
-          hoursAgo(4),
-          `Got it. I'll break this into four passes:
-
-1. **Scope** — narrow the landscape to public-facing applications shipped in mainland China during 2024–2026
-2. **Source pull** — fetch coverage from 36Kr, IT Juzi, Tencent News, plus official disclosures from Baichuan / Zhipu / Moonshot / 01.AI
-3. **Synthesis** — segment by vertical (productivity, coding, search, customer ops) and tabulate funding + MAU where disclosed
-4. **Render** — output a single HTML deliverable with embedded styles, ready to print as PDF
-
-Starting the source pull now.`,
-        ),
-        msgToolUse(
-          'demo-session-whitepaper-01',
-          hoursAgo(3) + '',
-          'tool-01',
-          'WebFetch',
-          { url: 'https://36kr.com/topics/llm-applications-2026', mode: 'summary' },
-        ),
-        msgToolResult(
-          'demo-session-whitepaper-01',
-          hoursAgo(3) + '',
-          'tool-01',
-          `Fetched 36Kr topic page: 47 articles, 18 unique products, funding totals across Seed–Series C tabulated below.`,
-        ),
-        msgToolUse(
-          'demo-session-whitepaper-01',
-          hoursAgo(3),
-          'tool-02',
-          'Write',
-          { path: 'whitepaper.html', mode: 'create' },
-        ),
-        msgToolResult(
-          'demo-session-whitepaper-01',
-          hoursAgo(3),
-          'tool-02',
-          'Wrote whitepaper.html (412 lines, 24KB) — includes 6 sections, 3 tables, embedded CSS for print.',
-        ),
-        msgAssistantText(
-          'demo-session-whitepaper-01',
-          hoursAgo(3),
-          `Draft is on disk at \`whitepaper.html\`. The structure:
-
-- **Executive Summary** — 3-paragraph TL;DR
-- **Section 1** — Foundational Models (closed / open-source split)
-- **Section 2** — Productivity & Office Suites (Kimi K2, Doubao 1.5, etc.)
-- **Section 3** — Coding Assistants
-- **Section 4** — Vertical Agents (legal, healthcare, education)
-- **Section 5** — Funding & Valuation Tables
-- **Section 6** — 2026 Outlook
-
-Open it in a browser to review. Want me to add a methodology appendix, or push it through the **Always-on** pipeline for a weekly auto-refresh?`,
-        ),
-      ],
-    },
-  ],
-
-  'ar-game-ios': [
-    {
-      id: 'demo-session-argame-01',
-      summary: 'Ball Finder iOS AR mini-game scaffold',
-      title: 'Ball Finder iOS AR mini-game scaffold',
-      lastActivity: hoursAgo(20),
-      createdAt: daysAgo(3),
-      messageCount: 5,
-      __messages: [
-        msgUser(
-          'demo-session-argame-01',
-          hoursAgo(20),
-          "Walk me through building an iOS AR mini-game called Ball Finder in Vibe Coding mode.",
-        ),
-        msgAssistantText(
-          'demo-session-argame-01',
-          hoursAgo(20),
-          `Vibe Coding mode it is. The MVP loop:
-
-1. **ARKit world tracking** detects floor + walls
-2. Scatter 5 virtual balls around the player's room
-3. Player walks around physically, taps to "collect" each ball
-4. HUD shows score + a 60-second timer
-5. Win/lose screen with confetti
-
-I'll scaffold a single-target Swift app with one ContentView wiring up RealityKit. Let me drop in the entry point.`,
-        ),
-        msgToolUse(
-          'demo-session-argame-01',
-          hoursAgo(20),
-          'tool-ar-01',
-          'Write',
-          { path: 'BallFinder/ContentView.swift', mode: 'create' },
-        ),
-        msgToolResult(
-          'demo-session-argame-01',
-          hoursAgo(20),
-          'tool-ar-01',
-          'Wrote BallFinder/ContentView.swift (89 lines).',
-        ),
-        msgAssistantText(
-          'demo-session-argame-01',
-          hoursAgo(20),
-          `Here's the core view I just wrote:
-
-\`\`\`swift
-import SwiftUI
-import RealityKit
-import ARKit
-
-struct ContentView: View {
-    @StateObject private var game = BallFinderGame()
-
-    var body: some View {
-        ZStack {
-            ARGameView(game: game)
-                .ignoresSafeArea()
-            HUDOverlay(score: game.score, timeLeft: game.timeLeft)
-        }
-        .onAppear { game.start() }
-    }
-}
-
-final class BallFinderGame: ObservableObject {
-    @Published var score = 0
-    @Published var timeLeft: TimeInterval = 60
-    private var anchors: [AnchorEntity] = []
-
-    func start() {
-        // Spin up a 60-second tick and scatter 5 balls on the
-        // first detected horizontal plane.
-    }
-}
+\`\`\`bash
+curl -fsSL https://raw.githubusercontent.com/OpenBMB/PilotDeck/main/install.sh | bash
+pilotdeck
 \`\`\`
 
-Next step is wiring \`ARGameView\` to ARKit's session and spawning the ball entities. Want me to keep going, or pause for design tweaks?`,
+Open [github.com/OpenBMB/PilotDeck](https://github.com/OpenBMB/PilotDeck) for the full quick-start.`,
         ),
       ],
     },
