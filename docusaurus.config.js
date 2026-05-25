@@ -88,7 +88,6 @@ const config = {
                 title: 'Proof',
                 titleZh: '实证数据',
                 items: [
-                  { label: 'Real-world Numbers', labelZh: '实战数据', to: '/#numbers' },
                   { label: 'Use Cases', labelZh: '应用场景', to: '/use-cases' },
                 ],
               },
