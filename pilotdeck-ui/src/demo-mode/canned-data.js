@@ -118,6 +118,77 @@ Open [github.com/OpenBMB/PilotDeck](https://github.com/OpenBMB/PilotDeck) for th
         ),
       ],
     },
+    {
+      // A second canned session that shows what a real PilotDeck turn looks
+      // like with tool calls + streamed markdown output. Provides flavor for
+      // visitors who want to see beyond the Q&A walkthrough.
+      id: 'demo-session-tutorial-02',
+      summary: 'Survey the China LLM application market',
+      title: 'Survey the China LLM application market',
+      lastActivity: hoursAgo(3),
+      createdAt: daysAgo(1),
+      messageCount: 7,
+      __messages: [
+        msgUser(
+          'demo-session-tutorial-02',
+          hoursAgo(4),
+          'Survey the Chinese LLM application market and turn it into a formal HTML white paper.',
+        ),
+        msgAssistantText(
+          'demo-session-tutorial-02',
+          hoursAgo(4),
+          `Got it. I'll break this into four passes:
+
+1. **Scope** — narrow the landscape to public-facing applications shipped in mainland China during 2024–2026
+2. **Source pull** — fetch coverage from 36Kr, IT Juzi, Tencent News, plus official disclosures from Baichuan / Zhipu / Moonshot / 01.AI
+3. **Synthesis** — segment by vertical (productivity, coding, search, customer ops) and tabulate funding + MAU where disclosed
+4. **Render** — output a single HTML deliverable with embedded styles, ready to print as PDF
+
+Starting the source pull now.`,
+        ),
+        msgToolUse(
+          'demo-session-tutorial-02',
+          hoursAgo(3) + 'a',
+          'tool-01',
+          'WebFetch',
+          { url: 'https://36kr.com/topics/llm-applications-2026', mode: 'summary' },
+        ),
+        msgToolResult(
+          'demo-session-tutorial-02',
+          hoursAgo(3) + 'b',
+          'tool-01',
+          `Fetched 36Kr topic page: 47 articles, 18 unique products, funding totals across Seed–Series C tabulated below.`,
+        ),
+        msgToolUse(
+          'demo-session-tutorial-02',
+          hoursAgo(3) + 'c',
+          'tool-02',
+          'Write',
+          { path: 'whitepaper.html', mode: 'create' },
+        ),
+        msgToolResult(
+          'demo-session-tutorial-02',
+          hoursAgo(3) + 'd',
+          'tool-02',
+          'Wrote whitepaper.html (412 lines, 24KB) — includes 6 sections, 3 tables, embedded CSS for print.',
+        ),
+        msgAssistantText(
+          'demo-session-tutorial-02',
+          hoursAgo(3),
+          `Draft is on disk at \`whitepaper.html\`. The structure:
+
+- **Executive Summary** — 3-paragraph TL;DR
+- **Section 1** — Foundational Models (closed / open-source split)
+- **Section 2** — Productivity & Office Suites (Kimi K2, Doubao 1.5, etc.)
+- **Section 3** — Coding Assistants
+- **Section 4** — Vertical Agents (legal, healthcare, education)
+- **Section 5** — Funding & Valuation Tables
+- **Section 6** — 2026 Outlook
+
+Open it in a browser to review. Want me to add a methodology appendix, or push it through the **Always-on** pipeline for a weekly auto-refresh?`,
+        ),
+      ],
+    },
   ],
 };
 
