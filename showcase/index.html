@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="/pilotdeck.github.io/showcase/">
 <title>PilotDeck - AI Agent Case Showcase</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -19,7 +20,9 @@
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
   background:#ffffff;color:#1f2340;min-height:100vh;overflow-x:hidden;padding-top:60px;
+  visibility:hidden;
 }
+body.i18n-ready{visibility:visible;}
 body.detail-mode{background:#ffffff !important;}
 
 /* --- NAV --- */
@@ -1033,6 +1036,7 @@ function init(){
   // Render
   renderHome();
   router();
+  document.body.classList.add('i18n-ready');
 }
 
 function showPreviewFrame(url){
