@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1.7
 #
 # PilotDeck documentation site — docs + V2 demo SPA, served by nginx.
 #
