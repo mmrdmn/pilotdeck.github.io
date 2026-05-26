@@ -33,12 +33,14 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install --no-audit --no-fund
 
-# pilotdeck-ui dependencies next — the same caching idea, but separate
-# so a docs-only edit doesn't bust the V2 frontend's install layer.
+# pilotdeck-ui dependencies next — same caching idea, but separate so a
+# docs-only edit doesn't bust the V2 frontend's install layer. The
+# scripts/ directory must be present BEFORE `npm install` because
+# pilotdeck-ui/package.json declares a `postinstall` that runs
+# scripts/fix-node-pty.js; without it npm aborts the install.
 COPY pilotdeck-ui/package.json pilotdeck-ui/package-lock.json* ./pilotdeck-ui/
-RUN cd pilotdeck-ui \
- && npm install --no-audit --no-fund \
- && npm rebuild
+COPY pilotdeck-ui/scripts/ ./pilotdeck-ui/scripts/
+RUN cd pilotdeck-ui && npm install --no-audit --no-fund
 
 # Now bring in the rest of the source. .dockerignore should already
 # exclude node_modules, build artifacts, and .git so the COPY is small.
