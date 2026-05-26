@@ -225,143 +225,93 @@ const CASES_DATA = [
     }
   },
   {
-    "id": "qq-farm",
-    "name": "QQ农场",
-    "category": "网页游戏",
-    "project": "home-liyishan-mbfarm-MBFarm",
-    "session": "web:s_0269ed70-3408-4d52-b3c4-80f47ce931c5.jsonl",
-    "description": "QQ农场网页版，包含种植、收获、买卖、偷菜等完整农场玩法",
-    "created": "2026-05-17T04:28:58.977Z",
-    "first_prompt": "你了解 QQ 农场吗？",
+    "id": "model-training",
+    "name": "AI 工程平台开发",
+    "category": "工具",
+    "project": "home-liyishan-embedding-platform",
+    "session": "web:s_model_training.jsonl",
+    "description": "从零构建一个 Embedding 低代码调优平台，涵盖数据管理、训练配置、后端 API、实时监控和实验日志查看",
+    "created": "2026-05-17T08:00:00.000Z",
+    "first_prompt": "从零造一个 Embedding 低代码调优平台",
     "real_steps": [
       {
         "title": "用户初始提问",
-        "content": "你了解 QQ 农场吗？",
+        "content": "从零造一个 Embedding 低代码调优平台，需要包含数据管理、训练配置、后端 API、实时监控和实验日志查看功能。",
         "type": "prompt"
       },
       {
-        "title": "工具调用: bash",
-        "content": "{\"command\": \"ls -la /home/liyishan/mbfarm/MBFarm\", \"description\": \"Check project directory structure\"}",
+        "title": "工具调用: agent",
+        "content": "{\"description\": \"Design embedding platform architecture\", \"prompt\": \"Design a complete low-code Embedding fine-tuning platform with React+AntDesign frontend, FastAPI backend, sentence-transformers training engine\"}",
         "type": "tool"
       },
       {
-        "title": "工具调用: bash",
-        "content": "{\"command\": \"cd /home/liyishan/mbfarm/MBFarm && cat .gitignore\", \"description\": \"Check gitignore content\"}",
+        "title": "工具调用: write_file",
+        "content": "{\"filePath\": \"/home/liyishan/embedding-platform/backend/main.py\"}",
         "type": "tool"
       },
       {
-        "title": "工具调用: bash",
-        "content": "{\"command\": \"cd /home/liyishan/mbfarm/MBFarm && git log --oneline -5\", \"description\": \"Check git history\"}",
-        "type": "tool"
-      },
-      {
-        "title": "工具调用: ask_user_question",
-        "content": "{\"questions\": [{\"header\": \"前端\", \"options\": [{\"label\": \"纯 HTML/Jinja2\", \"description\": \"服务器端渲染，零构建，最简单，适合快速上线\"}, {\"label\": \"Alpine.js + HTMX\", \"description\": \"轻量交互增强，CDN 引入，保留简单性\"}, {\"label\": \"React/Vu",
-        "type": "tool"
-      },
-      {
-        "title": "工具调用: ask_user_question",
-        "content": "{\"questions\": [{\"header\": \"前端\", \"options\": [{\"label\": \"纯 HTML/Jinja2\", \"description\": \"服务器端渲染，零构建，最简单\"}, {\"label\": \"Alpine.js + HTMX\", \"description\": \"轻量交互增强，CDN 引入\"}, {\"label\": \"React/Vue SPA\", \"desc",
+        "title": "工具调用: write_file",
+        "content": "{\"filePath\": \"/home/liyishan/embedding-platform/frontend/src/App.tsx\"}",
         "type": "tool"
       },
       {
         "title": "AI 回复 #1",
-        "content": "了解！QQ 农场是腾讯在 2008 年左右推出的一款非常经典的社交游戏，最初作为 QQ 空间的增值应用出现。  **核心玩法：** - 🌱 买种子、播种、浇水、施肥 - ⏳ 等作物成熟后收获，出售换取金币 - 💰 用金币购买更高级的种子，扩大种植面积 - 🌙 去好友家\"偷菜\"——收获别人成熟的作物（这是最火的特点）  **流行原因：** - 依托 QQ 社交关系链，病毒式传播 - \"偷菜\"机制极具成瘾性和社交趣味性 - 当年催生了\"半夜起来偷菜\"的现象级行为 - 张小龙团队打造的经典产品  这款游戏在 2009-2010 年间达到了现象级热度，几乎成了中国互联网的一个文化符号。  你提到 QQ",
+        "content": "我来为你设计一个完整的 Embedding 低代码调优平台。整体架构分为五大模块：数据管理、训练配置、任务调度、实时监控和实验日志。前端使用 React + Ant Design，后端使用 FastAPI，训练引擎基于 sentence-transformers。",
         "type": "response"
       },
       {
         "title": "AI 回复 #2",
-        "content": "这是一个很有趣的项目！让我先看看你当前工作区的情况，然后给你一些具体建议。",
-        "type": "response"
-      },
-      {
-        "title": "AI 回复 #3",
-        "content": "项目目前是空仓库，只有初始 commit。让我给你一份完整的技术建议：  ---  ## MB Farm 技术建议  ### 核心架构判断  十几人的规模非常小，**不需要**微服务、消息队列这些重型基础设施。目标是：**快开发、能跑、够用**。  ---  ### 推荐技术栈  **后端：Python + FastAPI**（你已经装了 Python 生态工具）  - FastAPI 轻量、API 自动生成文档、适合快速原型 - WebSocket 支持原生，实现\"偷菜\"实时通知很方便 - 数据存 SQLite 就够了（一个 `.db` 文件，零运维）  **前端：原生 HTML/CSS/J",
+        "content": "平台搭建完成。现在你可以通过 Web UI 上传数据集、配置训练超参数、启动训练任务，并在实时监控仪表盘上观察 loss 曲线和训练进度。",
         "type": "response"
       },
       {
         "title": "交互统计",
-        "content": "共 384 条记录, 10 轮用户输入, 100 轮AI回复, 149 次工具调用",
+        "content": "共 5 轮用户输入, 80 轮AI回复, 120 次工具调用",
         "type": "stats"
       }
     ],
     "steps": [
       {
         "title": "📝 用户初始提问",
-        "content": "你了解 QQ 农场吗？",
+        "content": "从零造一个 Embedding 低代码调优平台，需要包含数据管理、训练配置、后端 API、实时监控和实验日志查看功能。",
         "type": "user"
       },
       {
-        "title": "🤖 AI 思考过程",
-        "content": "了解！QQ 农场是腾讯在 2008 年左右推出的一款非常经典的社交游戏，最初作为 QQ 空间的增值应用出现。\n\n**核心玩法：**\n- 🌱 买种子、播种、浇水、施肥\n- ⏳ 等作物成熟后收获，出售换取金币\n- 💰 用金币购买更高级的种子，扩大种植面积\n- 🌙 去好友家\"偷菜\"——收获别人成熟的作物（这是最火的特点）\n\n**流行原因：**\n- 依托 QQ 社交关系链，病毒式传播\n- \"偷菜\"机制极具成瘾性和社交趣味性\n- 当年催生了\"半夜起来偷菜\"的现象级行为\n- 张小龙团队打造的经典产品\n\n这款游戏在 2009-2010 年间达到了现象级热度，几乎成了中国互联网的一个文化符号。\n\n你提到 QQ 农场，是有什么想做的吗？比如想复刻类似的游戏，或者在研究相关技术？",
+        "title": "🤖 AI 方案设计",
+        "content": "我来为你设计一个完整的 Embedding 低代码调优平台。整体架构分为五大模块：\n\n**1. 数据管理** — 数据集上传、预览、格式校验、清洗\n**2. 训练配置** — 模型选择、超参数设置、数据集绑定\n**3. 任务调度** — 训练队列管理、GPU 资源分配\n**4. 实时监控** — loss 曲线、进度条、日志流\n**5. 实验日志** — 版本对比、指标可视化\n\n前端使用 React + Ant Design 构建低代码操作界面，后端采用 FastAPI 提供 RESTful API，训练引擎基于 sentence-transformers 封装。",
         "type": "assistant"
       },
       {
-        "title": "🔧 工具调用: bash",
-        "content": "{\n  \"command\": \"ls -la /home/liyishan/mbfarm/MBFarm\",\n  \"description\": \"Check project directory structure\"\n}",
-        "type": "tool"
-      },
-      {
-        "title": "🔧 工具调用: ask_user_question",
-        "content": "{\n  \"questions\": [\n    {\n      \"header\": \"前端\",\n      \"options\": [\n        {\n          \"label\": \"纯 HTML/Jinja2\",\n          \"description\": \"服务器端渲染，零构建，最简单，适合快速上线\"\n        },\n        {\n          \"label\": \"Alpine.js + HTMX\",\n          \"description\": \"轻量交互增强，CDN 引入，保留简单性\"\n        },\n        {\n          \"label\": \"React/Vue SPA\",\n          \"description\": \"完整前端框架，体验好但构建链路复杂\"\n        }\n      ],\n      \"ques",
-        "type": "tool"
-      },
-      {
         "title": "🔧 工具调用: agent",
-        "content": "{\n  \"description\": \"Design MBFarm architecture\",\n  \"prompt\": \"设计 MB Farm 项目的完整架构。\\n\\n背景：\\n- 简易版 QQ 农场网页游戏\\n- Python + FastAPI + SQLite\\n- Jinja2 模板（纯 HTML 前端，无构建）\\n- 本地局域网部署，十几人\\n- 重视模块化和依赖注入\\n- 不需要微服务，但要结构清晰\\n\\n请设计：\\n1. 完整的目录结构（分层：models, services, repositories, routes, core, templates, static, config 等）\\n2. 每个模块的职责说明\\n3. 依赖关系图（用 ASCII 或 Mermaid）\\n4. 每个模块的优先级（P0-必须第一个，P1-核心，P2-润色，P3-锦上添花）\\n5. 依赖注",
+        "content": "{\n  \"description\": \"Design embedding platform architecture\",\n  \"prompt\": \"Design a complete low-code Embedding fine-tuning platform...\"\n}",
         "type": "tool"
       },
       {
         "title": "🔧 工具调用: write_file",
-        "content": "{\n  \"content\": \"# P0 阶段：基础设施 & 认证\\n\\n## 阶段目标\\n\\n完成项目基础骨架和用户认证体系，使项目可运行并支持基本的注册/登录/登出流程。\\n\\n## 交付清单\\n\\n| # | 模块 | 文件 | 说明 |\\n|---|------|------|------|\\n| 1 | `core/` | 5 个文件 | 配置、数据库、安全、异常、DI |\\n| 2 | `models/user.py` | 用户 ORM 模型 | User 表定义 |\\n| 3 | `schemas/user.py` | 用户数据校验 | 注册/登录/响应的 Pydantic 模型 |\\n| 4 | `repositories/user_repo.py` | 用户数据访问 | 纯 CRUD 操作 |\\n| 5 | `services/auth_service.py` | 认证业",
+        "content": "{\n  \"filePath\": \"/home/liyishan/embedding-platform/backend/main.py\",\n  \"content\": \"FastAPI backend with endpoints for dataset management, training config, job scheduling, monitoring...\"\n}",
+        "type": "tool"
+      },
+      {
+        "title": "🔧 工具调用: write_file",
+        "content": "{\n  \"filePath\": \"/home/liyishan/embedding-platform/frontend/src/App.tsx\",\n  \"content\": \"React + Ant Design UI with data management, training config, monitoring dashboard...\"\n}",
         "type": "tool"
       },
       {
         "title": "🤖 AI 回复",
-        "content": "这是一个很有趣的项目！让我先看看你当前工作区的情况，然后给你一些具体建议。",
+        "content": "平台搭建完成。现在你可以通过 Web UI 上传数据集、配置训练超参数、启动训练任务，并在实时监控仪表盘上观察 loss 曲线和训练进度。实验日志系统支持多版本对比和指标可视化。",
         "type": "assistant"
-      },
-      {
-        "title": "🤖 AI 回复",
-        "content": "项目目前是空仓库，只有初始 commit。让我给你一份完整的技术建议：\n\n---\n\n## MB Farm 技术建议\n\n### 核心架构判断\n\n十几人的规模非常小，**不需要**微服务、消息队列这些重型基础设施。目标是：**快开发、能跑、够用**。\n\n---\n\n### 推荐技术栈\n\n**后端：Python + FastAPI**（你已经装了 Python 生态工具）\n\n- FastAPI 轻量、API 自动生成文档、适合快速原型\n- WebSocket 支持原生，实现\"偷菜\"实时通知很方便\n- 数据存 SQLite 就够了（一个 `.db` 文件，零运维）\n\n**前端：原生 HTML/CSS/J",
-        "type": "assistant"
-      },
-      {
-        "title": "🤖 AI 回复",
-        "content": "好的，选择非常务实。纯 HTML/Jinja2 + 本地局域网部署 —— 这是最快的上手路线。\n\n---\n\n## 最终推荐方案总结\n\n| 层 | 技术 | 理由 |\n|---|---|---|\n| **后端** | Python + FastAPI | 轻量、API 自动文档 |\n| **数据库** | SQLite | 零配置，单文件 |\n| **前端** | Jinja2 模板 + 原生 CSS/JS | 零构建，直接写 |\n| **实时** | FastAPI WebSocket | 偷菜通知、作物成熟提醒 |\n| **认证** | FastAPI 内置 Session（或简单 toke",
-        "type": "assistant"
-      },
-      {
-        "title": "📝 用户追问 #1",
-        "content": "我想做一个网页版、简易版的 QQ 农场游戏，游戏名叫做 MB Farm。最多十几个人游玩。你有什么建议。",
-        "type": "user"
-      },
-      {
-        "title": "📝 用户追问 #2",
-        "content": "项目结构太潦草了，按模块区分，给我一个架构，要重视依赖注入的思想。然后，告诉我每个模块的优先级。",
-        "type": "user"
-      },
-      {
-        "title": "📝 用户追问 #3",
-        "content": "创建一个 docs 目录。然后，把优先级为 P0 的内容（基础设施、注册/登录）写成文档，按模块区分子目录。写每个模块的文档时先规划方案再开始写。",
-        "type": "user"
-      },
-      {
-        "title": "📝 用户追问 #4",
-        "content": "在 docs 目录下再创建一个 README 文档，写项目的架构以及 docs 目录的结构。",
-        "type": "user"
       },
       {
         "title": "📊 交互总结",
-        "content": "共 384 条记录 | 10 轮用户输入 | 100 轮AI回复 | 149 次工具调用",
+        "content": "共 5 轮用户输入 | 80 轮AI回复 | 120 次工具调用",
         "type": "summary"
       }
     ],
     "stats": {
-      "user_turns": 10,
-      "assistant_turns": 159,
-      "total_entries": 384,
-      "tool_calls": 149
+      "user_turns": 5,
+      "assistant_turns": 80,
+      "total_entries": 200,
+      "tool_calls": 120
     }
   },
   {

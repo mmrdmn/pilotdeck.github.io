@@ -783,7 +783,7 @@ function showDetail(caseId){
   const steps = dataItem ? dataItem.steps : (c.steps || []);
 
   const capture = CASES_CAPTURES[c.id]||'';
-  const flowchart = FLOWCHARTS[c.id]||'';
+  const flowchart = currentLang === 'en' ? (FLOWCHARTS_EN[c.id] || FLOWCHARTS[c.id] || '') : (FLOWCHARTS[c.id] || '');
   const badgeCls = badgeMap[c.category]||'';
   const left = document.getElementById('detailLeft');
 
