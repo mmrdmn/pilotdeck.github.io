@@ -11,7 +11,7 @@ PilotDeck 采用分层模块化架构，每个模块职责清晰、接口明确�
 ## 系统全景
 
 <div className="architectureDiagram">
-  <svg viewBox="0 0 960 760" role="img" aria-label="PilotDeck 系统全景架构图">
+  <svg viewBox="0 0 960 820" role="img" aria-label="PilotDeck system architecture overview">
     <defs>
       <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
         <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
@@ -71,8 +71,8 @@ PilotDeck 采用分层模块化架构，每个模块职责清晰、接口明确�
       `}</style>
     </defs>
 
-    <rect x="24" y="24" width="912" height="700" className="layer" rx="18" />
-    <text x="480" y="64" textAnchor="middle" className="label">用户交互层</text>
+    <rect x="24" y="24" width="912" height="784" className="layer" rx="18" />
+    <text x="480" y="64" textAnchor="middle" className="label">User Interaction Layer</text>
 
     <g>
       <rect x="56" y="92" width="136" height="82" className="box" />
@@ -96,66 +96,66 @@ PilotDeck 采用分层模块化架构，每个模块职责清晰、接口明确�
       <text x="772" y="150" textAnchor="middle" className="subtitle">Channel</text>
     </g>
 
-    <path d="M124 174 V214 H480" className="line" />
-    <path d="M286 174 V214 H480" className="line" />
-    <path d="M448 174 V214 H480" className="line" />
-    <path d="M610 174 V214 H480" className="line" />
-    <path d="M772 174 V214 H480" className="line" />
-    <path d="M480 214 V252" className="line" markerEnd="url(#arrow)" />
+    <path d="M124 174 V218 H480" className="line" />
+    <path d="M286 174 V218 H480" className="line" />
+    <path d="M448 174 V218 H480" className="line" />
+    <path d="M610 174 V218 H480" className="line" />
+    <path d="M772 174 V218 H480" className="line" />
+    <path d="M480 218 V258" className="line" markerEnd="url(#arrow)" />
 
     <g>
-      <rect x="374" y="252" width="212" height="82" className="box" />
-      <text x="480" y="286" textAnchor="middle" className="title">Gateway</text>
-      <text x="480" y="312" textAnchor="middle" className="subtitle">WS / HTTP</text>
-      <text x="618" y="302" className="side">消息网关层</text>
+      <rect x="374" y="258" width="212" height="82" className="box" />
+      <text x="480" y="292" textAnchor="middle" className="title">Gateway</text>
+      <text x="480" y="318" textAnchor="middle" className="subtitle">WS / HTTP</text>
+      <text x="744" y="304" textAnchor="middle" className="side">Message Gateway Layer</text>
     </g>
 
-    <path d="M480 334 V382" className="line" markerEnd="url(#arrow)" />
+    <path d="M480 340 V394" className="line" markerEnd="url(#arrow)" />
 
     <g>
-      <rect x="330" y="382" width="300" height="84" className="box" />
-      <text x="480" y="416" textAnchor="middle" className="title">SessionRouter</text>
-      <text x="480" y="442" textAnchor="middle" className="subtitle">创建 / 查找 / 管理</text>
-      <text x="662" y="432" className="side">会话路由层</text>
+      <rect x="330" y="394" width="300" height="84" className="box" />
+      <text x="480" y="428" textAnchor="middle" className="title">SessionRouter</text>
+      <text x="480" y="454" textAnchor="middle" className="subtitle">Create / Find / Manage</text>
+      <text x="744" y="444" textAnchor="middle" className="side">Session Routing Layer</text>
     </g>
 
-    <path d="M480 466 V516" className="line" markerEnd="url(#arrow)" />
+    <path d="M480 478 V538" className="line" markerEnd="url(#arrow)" />
 
     <g>
-      <rect x="310" y="516" width="340" height="142" className="box" />
-      <text x="480" y="548" textAnchor="middle" className="title">AgentSession</text>
-      <rect x="368" y="566" width="224" height="70" className="innerBox" />
-      <text x="480" y="594" textAnchor="middle" className="title">TurnRunner</text>
-      <rect x="416" y="608" width="128" height="42" className="innerBox" />
-      <text x="480" y="636" textAnchor="middle" className="subtitle">AgentLoop</text>
-      <text x="682" y="594" className="side">Agent 执行层</text>
+      <rect x="310" y="538" width="340" height="148" className="box" />
+      <text x="480" y="570" textAnchor="middle" className="title">AgentSession</text>
+      <rect x="368" y="590" width="224" height="72" className="innerBox" />
+      <text x="480" y="618" textAnchor="middle" className="title">TurnRunner</text>
+      <rect x="416" y="634" width="128" height="42" className="innerBox" />
+      <text x="480" y="662" textAnchor="middle" className="subtitle">AgentLoop</text>
+      <text x="744" y="622" textAnchor="middle" className="side">Agent Runtime Layer</text>
     </g>
 
-    <path d="M480 658 V688" className="line" />
-    <path d="M124 688 H836" className="line" />
-    <path d="M124 688 V704" className="line" markerEnd="url(#arrow)" />
-    <path d="M286 688 V704" className="line" markerEnd="url(#arrow)" />
-    <path d="M448 688 V704" className="line" markerEnd="url(#arrow)" />
-    <path d="M610 688 V704" className="line" markerEnd="url(#arrow)" />
-    <path d="M772 688 V704" className="line" markerEnd="url(#arrow)" />
+    <path d="M480 686 V718" className="line" />
+    <path d="M124 718 H836" className="line" />
+    <path d="M124 718 V754" className="line" markerEnd="url(#arrow)" />
+    <path d="M286 718 V754" className="line" markerEnd="url(#arrow)" />
+    <path d="M448 718 V754" className="line" markerEnd="url(#arrow)" />
+    <path d="M610 718 V754" className="line" markerEnd="url(#arrow)" />
+    <path d="M772 718 V754" className="line" markerEnd="url(#arrow)" />
 
     <g>
-      <rect x="58" y="704" width="132" height="46" className="box" />
-      <text x="124" y="733" textAnchor="middle" className="title">Router</text>
+      <rect x="58" y="754" width="132" height="52" className="box" />
+      <text x="124" y="787" textAnchor="middle" className="title">Router</text>
 
-      <rect x="220" y="704" width="132" height="46" className="box" />
-      <text x="286" y="733" textAnchor="middle" className="title">Model</text>
+      <rect x="220" y="754" width="132" height="52" className="box" />
+      <text x="286" y="787" textAnchor="middle" className="title">Model</text>
 
-      <rect x="374" y="704" width="148" height="46" className="box" />
-      <text x="448" y="724" textAnchor="middle" className="title">Context</text>
-      <text x="448" y="744" textAnchor="middle" className="subtitle">Memory</text>
+      <rect x="374" y="754" width="148" height="52" className="box" />
+      <text x="448" y="777" textAnchor="middle" className="title">Context</text>
+      <text x="448" y="798" textAnchor="middle" className="subtitle">Memory</text>
 
-      <rect x="544" y="704" width="132" height="46" className="box" />
-      <text x="610" y="733" textAnchor="middle" className="title">Tool</text>
+      <rect x="544" y="754" width="132" height="52" className="box" />
+      <text x="610" y="787" textAnchor="middle" className="title">Tool</text>
 
-      <rect x="706" y="704" width="132" height="46" className="box" />
-      <text x="772" y="724" textAnchor="middle" className="title">Session</text>
-      <text x="772" y="744" textAnchor="middle" className="subtitle">Store</text>
+      <rect x="706" y="754" width="132" height="52" className="box" />
+      <text x="772" y="777" textAnchor="middle" className="title">Session</text>
+      <text x="772" y="798" textAnchor="middle" className="subtitle">Store</text>
     </g>
   </svg>
 </div>
