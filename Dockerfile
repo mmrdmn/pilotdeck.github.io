@@ -12,11 +12,12 @@
 #
 # Final image is ~30 MB (nginx-alpine + a few MB of static assets).
 
+ARG MIRROR=docker.1ms.run
 ARG NODE_VERSION=22-alpine
 ARG NGINX_VERSION=1.27-alpine
 
 # ─── Stage 1: builder ────────────────────────────────────────────────────
-FROM node:${NODE_VERSION} AS builder
+FROM ${MIRROR}/library/node:${NODE_VERSION} AS builder
 
 # pilotdeck-ui pulls in several native modules (better-sqlite3, bcrypt,
 # node-pty, sharp) for its server runtime. The vite demo build doesn't
@@ -54,7 +55,7 @@ RUN npm run build:demo
 RUN npm run build
 
 # ─── Stage 2: runtime ────────────────────────────────────────────────────
-FROM nginx:${NGINX_VERSION} AS runtime
+FROM ${MIRROR}/library/nginx:${NGINX_VERSION} AS runtime
 
 # Drop nginx's stock site config so ours is the only one active.
 RUN rm -f /etc/nginx/conf.d/default.conf
