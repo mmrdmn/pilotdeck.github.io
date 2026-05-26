@@ -6,167 +6,204 @@ icon: "globe"
 
 # Web Install
 
-PilotDeck provides a one-line install script that checks dependencies, pulls the code, builds the project, and starts the service.
+This page is for first-time users installing the PilotDeck Web version. We recommend the one-line install path first; source-based setup belongs in the development guide.
 
 ## Requirements
 
-<CardGroup cols={3}>
-  <Card title="Operating System" icon="apple">
-    macOS only for now
-  </Card>
-  <Card title="Node.js" icon="node-js">
-    v18 or later
-  </Card>
-  <Card title="Git" icon="git-alt">
-    Available from the command line
-  </Card>
-</CardGroup>
+Before you start, make sure you have:
+
+- macOS/Linux for the one-line install script. Windows is currently supported for developer mode only.
+- A working network connection.
+- An available LLM API key.
+
+<Tip>
+The install script checks Git and Node.js. If a suitable Node.js version is not available, it will try to install Node.js 22 through fnm (Fast Node Manager).
+</Tip>
 
 ## One-Line Install
 
-Open a terminal and run:
+Open a terminal, copy the command below, and press Enter:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Gucc111/PilotDeck/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/OpenBMB/PilotDeck/main/install.sh | bash
 ```
 
-<Tip>
-If Node.js is not installed, the script attempts to install Node.js 22 through fnm (Fast Node Manager).
-</Tip>
+<Warning>
+If the terminal asks for a password, enter your Mac login password and press Enter. Characters are not displayed while typing; this is normal terminal behavior. This is usually needed to create the `/usr/local/bin/pilotdeck` command link.
+</Warning>
 
-The install script will:
-
-<Steps>
-  <Step title="Check the environment">
-    Verify macOS, Node.js version (>=18), and Git availability
-  </Step>
-  <Step title="Clone the repository">
-    Clone PilotDeck into `~/.pilotdeck/app`
-  </Step>
-  <Step title="Install dependencies and build">
-    Install npm dependencies and build the Gateway backend and Web UI frontend
-  </Step>
-  <Step title="Create the CLI command">
-    Link the `pilotdeck` command into `/usr/local/bin` or `~/.local/bin`
-  </Step>
-  <Step title="Start the service">
-    Start PilotDeck so it can be opened from a browser
-  </Step>
-</Steps>
-
-## Manual Install
-
-If you want more control, install manually:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/Gucc111/PilotDeck.git ~/.pilotdeck/app
-cd ~/.pilotdeck/app
-
-# 2. Install dependencies and build the backend
-npm install
-npm run build
-
-# 3. Install and build the Web UI
-cd ui
-npm install
-npm run build
-cd ..
-
-# 4. Start the service
-npm run server
-```
-
-## File Layout
-
-After installation, files are arranged as follows:
-
-```
-~/.pilotdeck/
-├── app/                    # PilotDeck source and build artifacts
-├── pilotdeck.yaml          # Global config file
-├── server-token             # Gateway auth token
-├── memory/                  # Long-term memory data
-├── projects/                # Session records grouped by WorkSpace
-│   └── <project-id>/
-│       └── chats/
-├── plugins/                 # Global plugin directory
-└── skills/                  # Global skill directory
-```
-
-## Configure an API Key
-
-Before starting PilotDeck, configure at least one model provider API key. Edit the config file:
-
-```bash
-# Config file location
-vim ~/.pilotdeck/pilotdeck.yaml
-```
-
-Minimal configuration:
-
-```yaml pilotdeck.yaml
-schemaVersion: 1
-
-agent:
-  model: anthropic-main/claude-sonnet-4-5
-
-model:
-  providers:
-    anthropic-main:
-      protocol: anthropic
-      url: https://api.anthropic.com
-      apiKey: ${ANTHROPIC_API_KEY}
-      models:
-        claude-sonnet-4-5:
-          displayName: Claude Sonnet 4.5
-          capabilities:
-            supportsToolUse: true
-            supportsStreaming: true
-            maxContextTokens: 200000
-            maxOutputTokens: 8192
-```
-
-Then set the environment variable:
-
-```bash
-export ANTHROPIC_API_KEY="your-api-key-here"
-```
-
-<Tip>
-Add the API key to your shell profile, such as `~/.zshrc`, so you do not need to export it every time.
-</Tip>
-
-## Start the Service
-
-```bash
-# Start the Gateway service on the default port 18789
-pilotdeck server
-
-# Or choose a custom port
-pilotdeck server --port 8080
-```
-
-When startup succeeds, you will see:
+The script installs PilotDeck to:
 
 ```text
-PilotDeck server listening: http://127.0.0.1:18789
-WebSocket: ws://127.0.0.1:18789/ws
+~/.pilotdeck/app/
 ```
 
-Open `http://127.0.0.1:18789` in your browser to use the Web UI.
+The config file is located at:
 
-## Use CLI / TUI
+```text
+~/.pilotdeck/pilotdeck.yaml
+```
 
-You can also use PilotDeck directly from the terminal:
+The command-line entry point is:
+
+```text
+pilotdeck
+```
+
+## Configure an LLM Provider
+
+After installation, the browser opens the setup page automatically. If it does not open, visit:
+
+```text
+http://localhost:3001
+```
+
+You will see the `LLM Provider Setup` page. The configuration flow is shown below:
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/web-install/llm-provider-setup.gif" alt="LLM Provider Setup walkthrough" style={{maxWidth: '70%', margin: '1.5em auto', display: 'block'}} />
+
+### Step 1: Choose a Preset
+
+Common provider presets are available at the top of the page:
+
+- Anthropic
+- OpenRouter
+- MiniMax
+- OpenAI
+
+After you click a provider, `API Base URL`, `Model ID`, and `Protocol Type` are filled automatically.
+
+<Tip>
+If your provider is not listed, such as DeepSeek, skip the preset and fill in the fields manually.
+</Tip>
+
+### Step 2: Fill in API Information
+
+| Field | Description | Example |
+| --- | --- | --- |
+| API Base URL | Provider API endpoint | `https://api.deepseek.com/v1` |
+| API Key | Your provider secret key | `sk-xxxxxxxx` |
+| Model ID | Model name or identifier | `deepseek-chat` |
+| Protocol Type | Protocol type | OpenAI-compatible providers usually use `openai-chat` |
+
+### Step 3: Test the Connection
+
+Click `Test Connection`.
+
+- If you see `Connected successfully`, the connection works.
+- If you see a red error, check the API key, network, provider balance, and API base URL first.
+
+### Step 4: Save
+
+After the test passes, click `Save`. The configuration is written to:
+
+```text
+~/.pilotdeck/pilotdeck.yaml
+```
+
+Then the page enters the main interface.
+
+## Verify Installation
+
+After entering the main interface, send a message in the bottom input box. If the AI replies normally, installation and configuration are complete.
+
+## Daily Usage
+
+| Action | Method |
+| --- | --- |
+| Start | Run `pilotdeck` in a terminal |
+| Use | Visit `http://localhost:3001` in the browser |
+| Stop | Press `Ctrl + C` in the terminal running the service |
+| Update | Run the one-line install command again |
+
+Running the install command again updates the code in `~/.pilotdeck/app/` and does not overwrite existing configuration.
+
+## Troubleshooting
+
+### Test Connection Fails
+
+Common causes include an incorrect API key, unreachable network, insufficient provider balance, or a missing `/v1` in the API base URL.
+
+### `pilotdeck: command not found`
+
+The installer may have placed the command in `~/.local/bin/`. Add it to your shell path:
 
 ```bash
-# CLI mode: ask a single question
-pilotdeck "Analyze the structure of the current project"
-
-# TUI mode: interactive terminal UI
-pilotdeck tui
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc
+# Then restart
+pilotdeck
 ```
+
+### Port Conflict
+
+**Example error:**
+
+```text
+[CONFLICT] Port 3001 already in use by PID 12345.
+```
+
+or
+
+```text
+[CONFLICT] Port 18080 (proxy) already in use by PID 76286.
+```
+
+**Reason:** A previous PilotDeck process did not exit completely, or another program is using the same port. PilotDeck uses two ports:
+
+| Port | Purpose |
+|------|---------|
+| 3001 | Main service (Web UI) |
+| 18080 | AI proxy (forwards requests to LLM providers) |
+
+**Solution:**
+
+```bash
+# Force-kill the processes using these ports (recommended)
+kill -9 $(lsof -i :3001 -t) 2>/dev/null
+kill -9 $(lsof -i :18080 -t) 2>/dev/null
+# Then restart
+pilotdeck
+```
+
+or
+
+```bash
+# Start with another main service port
+pilotdeck --port 8080
+# Then visit http://localhost:8080
+```
+
+<Tip>
+After using PilotDeck, press `Ctrl + C` in the terminal to exit cleanly. Avoid force-closing the terminal directly to reduce port conflicts.
+</Tip>
+
+### Browser Does Not Open Automatically
+
+Visit manually:
+
+```text
+http://localhost:3001
+```
+
+## Uninstall
+
+Remove only the app and command links:
+
+```bash
+rm -rf ~/.pilotdeck/app
+rm -f /usr/local/bin/pilotdeck
+rm -f ~/.local/bin/pilotdeck
+```
+
+To remove the configuration as well:
+
+```bash
+rm -f ~/.pilotdeck/pilotdeck.yaml
+```
+
+<Warning>
+Deleting the entire `~/.pilotdeck/` directory may remove configuration, data, and history. Make sure you no longer need them before doing so.
+</Warning>
 
 ## Next Steps
 

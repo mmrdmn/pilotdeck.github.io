@@ -24,7 +24,7 @@ icon: "code-pull-request"
 
 ```bash
 # 克隆仓库
-git clone https://github.com/Gucc111/PilotDeck.git
+git clone https://github.com/OpenBMB/PilotDeck.git
 cd PilotDeck
 
 # 安装依赖（根目录 + ui workspace）
@@ -62,49 +62,14 @@ npm run dev
 # 终端 1: Gateway Server（使用 tsx 热重载）
 npm run server
 
-# 终端 2: Web UI 开发服务器
-cd ui
-npm run client
+# 终端 2: UI Bridge 服务器
+npm --prefix ui run server
+
+# 终端 3: Web UI 开发服务器
+npm --prefix ui run client
 
 # 或使用 concurrently 同时启动
-cd ui
-npm run dev:concurrent
-```
-
-## 项目结构
-
-```
-PilotDeck/
-├── src/                    # Gateway 后端源码（TypeScript）
-│   ├── adapters/           # Channel 适配器
-│   ├── agent/              # Agent 执行引擎
-│   ├── always-on/          # Discovery 主动发现
-│   ├── cli/                # CLI 入口
-│   ├── context/            # 上下文管理（含 Memory）
-│   ├── cron/               # 定时任务
-│   ├── extension/          # 插件/技能扩展
-│   ├── gateway/            # Gateway 消息网关
-│   ├── lifecycle/          # 生命周期管理
-│   ├── mcp/                # MCP 协议集成
-│   ├── model/              # 模型协议抽象
-│   ├── permission/         # 权限系统
-│   ├── pilot/              # 路径和配置加载
-│   ├── router/             # 智能路由
-│   ├── session/            # 会话管理
-│   ├── task/               # 后台任务
-│   ├── tool/               # 工具系统
-│   └── web/                # Web 静态资源
-├── ui/                     # Web UI 前端（React + Vite）
-│   ├── src/                # 前端源码
-│   ├── server/             # UI Bridge 服务器
-│   └── shared/             # 前后端共享类型
-├── apps/
-│   └── desktop/            # Electron 桌面应用
-├── tests/                  # 测试套件
-├── docs/                   # 内部设计文档
-├── scripts/                # 构建和开发脚本
-├── config/                 # 额外配置（MCP 等）
-└── packages/               # 其他内部包
+npm --prefix ui run dev:concurrent
 ```
 
 ## 编码规范
@@ -177,11 +142,11 @@ npm run build
 # 输出到 dist/
 
 # 编译 Web UI
-cd ui && npm run build
+npm --prefix ui run build
 # 输出到 ui/dist/
 
 # 类型检查（不编译）
-cd ui && npm run typecheck
+npm --prefix ui run typecheck
 ```
 
 ## 提交 PR 的检查清单
@@ -199,7 +164,7 @@ cd ui && npm run typecheck
   </Step>
   <Step title="UI 类型检查通过（如涉及）">
     ```bash
-    cd ui && npm run typecheck
+    npm --prefix ui run typecheck
     ```
   </Step>
   <Step title="更新相关文档">

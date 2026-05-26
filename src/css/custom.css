@@ -225,3 +225,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   margin: 1.5em 0;
 }
+
+.pagination-nav {
+  display: none;
+}

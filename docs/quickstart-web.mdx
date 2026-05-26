@@ -4,177 +4,203 @@ description: "通过一键脚本安装 PilotDeck Web 版"
 icon: "globe"
 ---
 
-# Web 安装
+# 网页版安装
 
-PilotDeck 提供一键安装脚本，自动完成依赖检查、代码拉取、编译和启动。
+本页面向第一次使用 PilotDeck 网页版的用户。推荐先走一键安装路径，源码安装后续会放到开发指南中。
 
-## 系统要求
+## 准备工作
 
-<CardGroup cols={3}>
-  <Card title="操作系统" icon="apple">
-    macOS（当前仅支持）
-  </Card>
-  <Card title="Node.js" icon="node-js">
-    v18 或更高版本
-  </Card>
-  <Card title="Git" icon="git-alt">
-    命令行可用即可
-  </Card>
-</CardGroup>
+开始前请确认你有：
+
+- 目前一键安装脚本仅支持 macOS/Linux（Windows 目前仅支持开发者模式）。
+- 可用网络。
+- 一个可用的 LLM API Key。
+
+<Tip>
+安装脚本会检查 Git 和 Node.js。如果没有合适的 Node.js，会尝试通过 fnm (Fast Node Manager) 自动安装 Node.js 22。
+</Tip>
 
 ## 一键安装
 
-打开终端，运行：
+打开终端，复制下面的命令并回车：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Gucc111/PilotDeck/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/OpenBMB/PilotDeck/main/install.sh | bash
 ```
 
-<Tip>
-如果你还没有安装 Node.js，安装脚本会自动通过 fnm (Fast Node Manager) 为你安装 Node.js 22。
-</Tip>
+<Warning>
+如果终端要求输入密码，输入 Mac 开机密码并回车。输入时屏幕不会显示字符，这是终端的正常行为。通常这是为了创建 `/usr/local/bin/pilotdeck` 命令链接。
+</Warning>
 
-安装脚本会自动执行以下步骤：
-
-<Steps>
-  <Step title="环境检查">
-    检测 macOS 系统、Node.js 版本 (≥18)、Git 是否可用
-  </Step>
-  <Step title="拉取代码">
-    将 PilotDeck 仓库克隆到 `~/.pilotdeck/app`
-  </Step>
-  <Step title="安装依赖 & 编译">
-    安装 npm 依赖，编译 Gateway 后端和 Web UI 前端
-  </Step>
-  <Step title="创建 CLI 命令">
-    将 `pilotdeck` 命令链接到 `/usr/local/bin`（或 `~/.local/bin`）
-  </Step>
-  <Step title="启动服务">
-    自动启动 PilotDeck，可通过浏览器访问
-  </Step>
-</Steps>
-
-## 手动安装
-
-如果你需要更多控制，可以手动安装：
-
-```bash
-# 1. 克隆仓库
-git clone https://github.com/Gucc111/PilotDeck.git ~/.pilotdeck/app
-cd ~/.pilotdeck/app
-
-# 2. 安装依赖 & 编译后端
-npm install
-npm run build
-
-# 3. 安装 & 编译 Web UI
-cd ui
-npm install
-npm run build
-cd ..
-
-# 4. 启动服务
-npm run server
-```
-
-## 目录结构
-
-安装完成后的文件布局：
-
-```
-~/.pilotdeck/
-├── app/                    # PilotDeck 源码和编译产物
-├── pilotdeck.yaml          # 全局配置文件
-├── server-token             # Gateway 鉴权 token
-├── memory/                  # 长期记忆数据
-├── projects/                # 按 WorkSpace 分组的会话记录
-│   └── <project-id>/
-│       └── chats/
-├── plugins/                 # 全局插件目录
-└── skills/                  # 全局技能目录
-```
-
-## 配置 API Key
-
-PilotDeck 启动前需要配置至少一个模型 Provider 的 API Key。编辑配置文件：
-
-```bash
-# 配置文件位于 ~/.pilotdeck/pilotdeck.yaml
-vim ~/.pilotdeck/pilotdeck.yaml
-```
-
-最小配置示例：
-
-```yaml pilotdeck.yaml
-schemaVersion: 1
-
-agent:
-  model: anthropic-main/claude-sonnet-4-5
-
-model:
-  providers:
-    anthropic-main:
-      protocol: anthropic
-      url: https://api.anthropic.com
-      apiKey: ${ANTHROPIC_API_KEY}
-      models:
-        claude-sonnet-4-5:
-          displayName: Claude Sonnet 4.5
-          capabilities:
-            supportsToolUse: true
-            supportsStreaming: true
-            maxContextTokens: 200000
-            maxOutputTokens: 8192
-```
-
-然后设置环境变量：
-
-```bash
-export ANTHROPIC_API_KEY="your-api-key-here"
-```
-
-<Tip>
-建议将 API Key 写入 shell profile（如 `~/.zshrc`），避免每次手动设置。
-</Tip>
-
-## 启动服务
-
-```bash
-# 启动 Gateway 服务（默认端口 18789）
-pilotdeck server
-
-# 或指定端口
-pilotdeck server --port 8080
-```
-
-启动成功后你会看到：
+脚本会安装到：
 
 ```text
-PilotDeck server listening: http://127.0.0.1:18789
-WebSocket: ws://127.0.0.1:18789/ws
+~/.pilotdeck/app/
 ```
 
-打开浏览器访问 `http://127.0.0.1:18789` 即可使用 Web UI。
+配置文件位置：
 
-## 使用 CLI / TUI
+```text
+~/.pilotdeck/pilotdeck.yaml
+```
 
-除了 Web UI，你还可以直接在终端中使用：
+命令行入口：
+
+```text
+pilotdeck
+```
+
+## 配置 LLM 服务商
+
+安装完成后，浏览器会打开配置页面。如果没有自动打开，手动访问：
+
+```text
+http://localhost:3001
+```
+
+你会看到 `LLM Provider Setup` 页面。配置流程如下：
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/web-install/llm-provider-setup.gif" alt="LLM Provider Setup 操作演示" style={{maxWidth: '70%', margin: '1.5em auto', display: 'block'}} />
+
+### 第一步：选择预设
+
+页面上方提供常见服务商预设：
+
+- Anthropic
+- OpenRouter
+- MiniMax
+- OpenAI
+
+点击对应服务商后，`API Base URL`、`Model ID` 和 `Protocol Type` 会自动填入。
+
+<Tip>
+如果你的服务商不在预设里，例如 DeepSeek，可以跳过预设，手动填写下面几个字段。
+</Tip>
+
+### 第二步：填写 API 信息
+
+| 字段 | 说明 | 示例 |
+| --- | --- | --- |
+| API Base URL | 服务商 API 地址 | `https://api.deepseek.com/v1` |
+| API Key | 你的服务商密钥 | `sk-xxxxxxxx` |
+| Model ID | 模型名称或标识符 | `deepseek-chat` |
+| Protocol Type | 协议类型 | OpenAI 兼容服务通常选择 `openai-chat` |
+
+### 第三步：测试连接
+
+点击 `Test Connection`。
+
+- 如果出现 `Connected successfully`，说明连接成功。
+- 如果出现红色错误，优先检查 API Key、网络、服务商余额和 API Base URL。
+
+### 第四步：保存
+
+测试通过后点击 `Save`。配置会写入：
+
+```text
+~/.pilotdeck/pilotdeck.yaml
+```
+
+之后页面会进入主界面。
+
+## 验证安装成功
+
+进入主界面后，在底部输入框发送一条消息。如果 AI 正常回复，说明安装和配置已经完成。
+
+## 日常使用
+
+| 操作 | 方法 |
+| --- | --- |
+| 启动 | 在终端输入 `pilotdeck` |
+| 使用 | 浏览器访问 `http://localhost:3001` |
+| 关闭 | 在运行服务的终端按 `Ctrl + C` |
+| 更新 | 重新运行一键安装命令 |
+
+重新运行安装命令会更新 `~/.pilotdeck/app/` 中的代码，不会覆盖已有配置。
+
+## 常见问题
+
+### Test Connection 失败
+
+常见原因包括 API Key 错误、网络不可达、服务商余额不足、API Base URL 缺少 `/v1`。
+
+### 输入 pilotdeck 提示 command not found
+
+安装时可能将命令放到了 `~/.local/bin/`。将路径加入 shell 配置：
 
 ```bash
-# CLI 模式：直接提问
-pilotdeck "帮我分析一下当前项目的代码结构"
-
-# TUI 模式：交互式终端界面
-pilotdeck tui
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc
+# 然后重新启动
+pilotdeck
 ```
 
-## 下一步
+### 端口冲突
 
-<CardGroup cols={2}>
-  <Card title="了解 Gateway" icon="tower-broadcast" href="/docs/features/gateway">
-    理解消息网关的工作原理
-  </Card>
-  <Card title="配置路由" icon="route" href="/docs/features/router">
-    设置模型路由以节省费用
-  </Card>
-</CardGroup>
+**错误信息示例：**
+
+```text
+[CONFLICT] Port 3001 already in use by PID 12345.
+```
+
+或
+
+```text
+[CONFLICT] Port 18080 (proxy) already in use by PID 76286.
+```
+
+**原因**：之前的 PilotDeck 没有完全退出，或者有其他程序占用了同一端口。PilotDeck 使用两个端口：
+
+| 端口 | 用途 |
+|------|------|
+| 3001 | 主服务（Web 界面） |
+| 18080 | AI 代理（转发请求到 LLM 服务商） |
+
+**解决方法：**
+
+```bash
+# 强制终止端口的进程（推荐）
+kill -9 $(lsof -i :3001 -t) 2>/dev/null
+kill -9 $(lsof -i :18080 -t) 2>/dev/null
+# 然后重新启动
+pilotdeck
+```
+
+或
+
+```bash
+# 用其他端口启动（只能改主服务端口）
+pilotdeck --port 8080
+# 然后浏览器访问 http://localhost:8080
+```
+
+<Tip>
+每次用完 PilotDeck 后，在终端按 `Ctrl + C` 正常退出，不要直接强制关闭终端，可以避免端口冲突。
+</Tip>
+
+### 浏览器没有自动打开
+
+手动访问：
+
+```text
+http://localhost:3001
+```
+
+## 卸载
+
+只删除程序和命令链接：
+
+```bash
+rm -rf ~/.pilotdeck/app
+rm -f /usr/local/bin/pilotdeck
+rm -f ~/.local/bin/pilotdeck
+```
+
+如果也要删除配置：
+
+```bash
+rm -f ~/.pilotdeck/pilotdeck.yaml
+```
+
+<Warning>
+如果删除整个 `~/.pilotdeck/` 目录，会清除配置、数据和历史记录。执行前请确认你不再需要这些数据。
+</Warning>

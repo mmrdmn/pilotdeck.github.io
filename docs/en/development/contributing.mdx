@@ -23,7 +23,7 @@ Welcome to PilotDeck development. This guide covers local setup, workflow, and p
 ### Clone and Initialize
 
 ```bash
-git clone https://github.com/Gucc111/PilotDeck.git
+git clone https://github.com/OpenBMB/PilotDeck.git
 cd PilotDeck
 
 npm install
@@ -52,45 +52,14 @@ You can also start components separately:
 # Terminal 1: Gateway Server with tsx hot reload
 npm run server
 
-# Terminal 2: Web UI dev server
-cd ui
-npm run client
+# Terminal 2: UI Bridge server
+npm --prefix ui run server
+
+# Terminal 3: Web UI dev server
+npm --prefix ui run client
 
 # Or use concurrently
-cd ui
-npm run dev:concurrent
-```
-
-## Project Structure
-
-```
-PilotDeck/
-├── src/                    # Gateway backend source (TypeScript)
-│   ├── adapters/           # Channel adapters
-│   ├── agent/              # Agent execution engine
-│   ├── always-on/          # Discovery runtime
-│   ├── cli/                # CLI entry
-│   ├── context/            # Context management, including Memory
-│   ├── cron/               # Scheduled tasks
-│   ├── extension/          # Plugins and skills
-│   ├── gateway/            # Gateway
-│   ├── lifecycle/          # Lifecycle management
-│   ├── mcp/                # MCP integration
-│   ├── model/              # Model protocol abstraction
-│   ├── permission/         # Permission system
-│   ├── pilot/              # Paths and config loading
-│   ├── router/             # Intelligent routing
-│   ├── session/            # Session management
-│   ├── task/               # Background tasks
-│   ├── tool/               # Tool system
-│   └── web/                # Web static resources
-├── ui/                     # Web UI frontend
-├── apps/desktop/           # Electron desktop app
-├── tests/                  # Test suite
-├── docs/                   # Internal design docs
-├── scripts/                # Build and development scripts
-├── config/                 # Additional config
-└── packages/               # Internal packages
+npm --prefix ui run dev:concurrent
 ```
 
 ## Coding Standards
@@ -154,8 +123,8 @@ test(router): add TokenSaver decision unit tests
 
 ```bash
 npm run build
-cd ui && npm run build
-cd ui && npm run typecheck
+npm --prefix ui run build
+npm --prefix ui run typecheck
 ```
 
 ## PR Checklist
@@ -173,7 +142,7 @@ cd ui && npm run typecheck
   </Step>
   <Step title="UI typecheck passes when relevant">
     ```bash
-    cd ui && npm run typecheck
+    npm --prefix ui run typecheck
     ```
   </Step>
   <Step title="Docs are updated">

@@ -1,7 +1,81 @@
 ---
 title: "Quick Start"
-description: "Quick Start documentation placeholder"
+description: "PilotDeck Getting Started Guide"
 icon: "rocket"
 ---
 
 # Quick Start
+
+## Basic Interface Overview
+
+After entering PilotDeck, you'll see entries for Projects, Sessions, Models, Memory, Skills, and more. The overall interaction revolves around WorkSpaces: each project has its own independent context, making it easy to work on different tasks in parallel.
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-01.png" alt="PilotDeck Basic Interface Overview" />
+
+## Workspace Projects and Plan Mode
+
+WorkSpace is PilotDeck's core organizational unit. You can place each real project in its own WorkSpace, keeping files, memory, skills, and session history isolated.
+
+Plan Mode is suited for complex tasks. The Agent will first break down your goal into a plan, then execute step by step. This avoids jumping straight into modifications, and lets you confirm direction at key checkpoints.
+
+<video className="quickstartImage" controls muted playsInline>
+  <source src="/pilotdeck.github.io/img/docs/quickstart/en/workspace-plan.mp4" type="video/mp4" />
+</video>
+
+## Always-On
+
+Always-On handles tasks that need long-running or scheduled execution, such as periodic checks, continuous tracking, and routine report generation.
+
+- You can create cron job scheduled tasks.
+- The Agent may also autonomously discover follow-up to-dos based on context.
+- There are also exploration tasks and randomly triggered Easter eggs.
+
+Input:
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-03.png" alt="Always-On Input" />
+
+Then:
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-04.png" alt="Always-On Result" />
+
+## Memory
+
+Memory periodically captures long-term context, such as user preferences, project background, common paths, and key decisions.
+
+Unlike black-box memory, PilotDeck emphasizes visibility, searchability, and editability. You can view memory sources and correct inaccurate records as needed.
+
+<video className="quickstartImage" controls muted playsInline>
+  <source src="/pilotdeck.github.io/img/docs/quickstart/en/memory-demo.mp4" type="video/mp4" />
+</video>
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-05.png" alt="Memory Interface" />
+
+## Cost-Efficient Routing
+
+Routing selects the appropriate model based on task difficulty. Simple tasks can use lightweight models, while complex tasks switch to more powerful ones, reducing overall cost.
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-06.png" alt="Cost-Efficient Routing" />
+
+## Skills
+
+Skills are PilotDeck's extensibility mechanism. You can package common workflows, tool calls, platform operations, or project conventions as skills, letting the Agent invoke them automatically in appropriate scenarios.
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-07.png" alt="Skills" />
+
+## Settings
+
+The Settings page lets you manage models, routing, and other system options.
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-08.png" alt="Settings Page" />
+
+### Set the Default Model
+
+The default model determines which model is used for conversations and task execution. You can choose the right Provider and model based on quality, speed, and cost.
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-09.png" alt="Set Default Model" />
+
+### Configure Cost-Saving Routing
+
+The goal of cost-saving routing is to let the system automatically choose models based on task complexity, and calculate costs using a unified pricing table. Once configured, you can clearly see which models cost more and whether routing is actually saving money.
+
+<img className="quickstartImage" src="/pilotdeck.github.io/img/docs/quickstart/en/quickstart-en-10.png" alt="Configure Cost-Saving Routing" />

@@ -11,7 +11,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-TBD-blue.svg?style=flat-square" alt="License"/></a>
   <a href="https://modelcontextprotocol.io/"><img src="https://img.shields.io/badge/MCP-Native-6366F1?style=flat-square" alt="MCP Native"/></a>
   <a href="#-desktop-app-apple-silicon"><img src="https://img.shields.io/badge/macOS-Desktop_App-000000?style=flat-square&logo=apple&logoColor=white" alt="Desktop App"/></a>
-  <a href="https://github.com/Gucc111/PilotDeck/stargazers"><img src="https://img.shields.io/github/stars/Gucc111/PilotDeck?style=flat-square" alt="Stars"/></a>
+  <a href="https://github.com/OpenBMB/PilotDeck/stargazers"><img src="https://img.shields.io/github/stars/OpenBMB/PilotDeck?style=flat-square" alt="Stars"/></a>
   <br/>
   <a href="#-community"><img src="https://img.shields.io/badge/Discord-Join_Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord"/></a>
   &nbsp;
@@ -298,7 +298,7 @@ We provide a one-line installer for macOS / Linux, plus a source-based workflow 
 ### Option A: One-line install (recommended, macOS / Linux)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Gucc111/PilotDeck/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/OpenBMB/PilotDeck/main/install.sh | bash
 ```
 
 The script auto-installs Node.js 22, clones the repo, installs dependencies, and builds the frontend. Once it finishes:
@@ -313,7 +313,7 @@ pilotdeck status     # check runtime status
 **1. Clone and install dependencies**
 
 ```bash
-git clone https://github.com/Gucc111/PilotDeck.git
+git clone https://github.com/OpenBMB/PilotDeck.git
 cd PilotDeck
 
 npm install              # root deps (Gateway runtime)
@@ -387,7 +387,7 @@ cd ui && npx vitest run
 
 ## 💬 Community
 
-- For bugs and feature requests, please open a [GitHub Issue](https://github.com/Gucc111/PilotDeck/issues).
+- For bugs and feature requests, please open a [GitHub Issue](https://github.com/OpenBMB/PilotDeck/issues).
 - For commercial collaboration, enterprise support, or open-source license discussions, please reach out via email: `team@pilotdeck.ai` <!-- TODO: replace with real contact email -->.
 - Join our community channels:
 
@@ -421,7 +421,7 @@ If PilotDeck has been helpful in your work or research, please consider giving u
   author = {THUNLP and ModelBest and OpenBMB and AI9stars},
   year   = {2026},
   note   = {Live demo: http://58.57.119.12:52006/},
-  url    = {https://github.com/Gucc111/PilotDeck}
+  url    = {https://github.com/OpenBMB/PilotDeck}
 }
 ```
 
