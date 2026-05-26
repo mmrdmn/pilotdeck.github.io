@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.9.2">
 <title data-rh="true">Router 省钱路由 | PilotDeck</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://mmrdmn.github.io/pilotdeck.github.io/img/og-card.png"><meta data-rh="true" name="twitter:image" content="https://mmrdmn.github.io/pilotdeck.github.io/img/og-card.png"><meta data-rh="true" property="og:url" content="https://mmrdmn.github.io/pilotdeck.github.io/docs/features/router"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Router 省钱路由 | PilotDeck"><meta data-rh="true" name="description" content="智能模型路由，通过 TokenSaver 和 Fallback 降低成本、提高可用性"><meta data-rh="true" property="og:description" content="智能模型路由，通过 TokenSaver 和 Fallback 降低成本、提高可用性"><link data-rh="true" rel="icon" href="/pilotdeck.github.io/img/favicon.png"><link data-rh="true" rel="canonical" href="https://mmrdmn.github.io/pilotdeck.github.io/docs/features/router"><link data-rh="true" rel="alternate" href="https://mmrdmn.github.io/pilotdeck.github.io/docs/features/router" hreflang="en"><link data-rh="true" rel="alternate" href="https://mmrdmn.github.io/pilotdeck.github.io/docs/features/router" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Router 省钱路由","item":"https://mmrdmn.github.io/pilotdeck.github.io/docs/features/router"}]}</script><link rel="stylesheet" href="/pilotdeck.github.io/assets/css/styles.680c79d6.css">
-<script src="/pilotdeck.github.io/assets/js/runtime~main.ace053cb.js" defer="defer"></script>
+<script src="/pilotdeck.github.io/assets/js/runtime~main.387f43b1.js" defer="defer"></script>
 <script src="/pilotdeck.github.io/assets/js/main.566e0024.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -17,7 +17,64 @@
 <div class="cardGroup_Dd4H" data-cols="2"><div class="card_rN0d"><div class="cardInner_M82g"><div class="cardHead_oS_Z"><span class="cardIcon_yAJp"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 6h-1V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v1a4 4 0 0 0-4 4v3a4 4 0 0 0 4 4v2h3v-2h6v2h3v-2a4 4 0 0 0 4-4v-3a4 4 0 0 0-2-3.5z M16 11h.01"></path></svg></span><span class="cardTitle_r9D7">TokenSaver 智能降档</span></div><div class="cardBody_zAnJ"><p>分析用户输入的复杂度，自动选择匹配的模型档位，简单任务用便宜模型</p></div></div></div><div class="card_rN0d"><div class="cardInner_M82g"><div class="cardHead_oS_Z"><span class="cardIcon_yAJp"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 4 5v7c0 5 4 8 8 10 4-2 8-5 8-10V5z M12 2v20"></path></svg></span><span class="cardTitle_r9D7">Fallback 容错链</span></div><div class="cardBody_zAnJ"><p>主 Provider 不可用时，自动切换到备用 Provider，用户无感知</p></div></div></div><div class="card_rN0d"><div class="cardInner_M82g"><div class="cardHead_oS_Z"><span class="cardIcon_yAJp"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v18m0-12a3 3 0 1 0 6 0V8a3 3 0 0 1 3-3M18 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path></svg></span><span class="cardTitle_r9D7">Scenario 场景路由</span></div><div class="cardBody_zAnJ"><p>根据 Agent 类型（主 Agent / 子 Agent）应用不同的路由策略</p></div></div></div><div class="card_rN0d"><div class="cardInner_M82g"><div class="cardHead_oS_Z"><span class="cardIcon_yAJp"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3h4v3a2 2 0 1 0 4 0V3h3v4h-3a2 2 0 1 0 0 4h3v7H10v-3a2 2 0 1 1-4 0v3H3V11h3a2 2 0 1 1 0-4H3V3h3"></path></svg></span><span class="cardTitle_r9D7">Custom Router 扩展</span></div><div class="cardBody_zAnJ"><p>支持自定义路由插件，实现你自己的路由逻辑</p></div></div></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="路由决策流程">路由决策流程<a href="#路由决策流程" class="hash-link" aria-label="Direct link to 路由决策流程" title="Direct link to 路由决策流程" translate="no">​</a></h2>
 <p>Router 的每次路由决策经过以下阶段：</p>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">用户请求</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    ▼</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">┌─────────────────────────┐</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">│  1. Custom Router 检查  │ ← 如果有自定义路由插件</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">└───────────┬─────────────┘</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">            │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">            ▼</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">┌─────────────────────────┐</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">│  2. Scenario 场景判定   │ ← 根据 explicit/default/subagent 决定</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">└───────────┬─────────────┘</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">            │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">            ▼</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">┌─────────────────────────┐</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">│  3. TokenSaver 降档判定 │ ← 分析复杂度，选择合适的模型档位</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">└───────────┬─────────────┘</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">            │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">            ▼</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">┌─────────────────────────┐</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">│  4. Session Sticky      │ ← 同一会话保持模型一致性</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">└───────────┬─────────────┘</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">            │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">            ▼</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">     RouterDecision</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  { provider, model, tier }</span><br></span></code></pre></div></div>
+<div class="routerDecisionDiagram"><svg viewBox="0 0 960 620" role="img" aria-label="PilotDeck router decision flow"><defs><marker id="routerArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"></path></marker><style>
+      .routerDecisionDiagram svg {
+        width: 100%;
+        height: auto;
+        display: block;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+      }
+      .routerDecisionDiagram text {
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        fill: #1e293b;
+      }
+      .routerDecisionDiagram .panel {
+        fill: #eaf2ff;
+        stroke: #d5e4f7;
+      }
+      .routerDecisionDiagram .box {
+        fill: #ffffff;
+        stroke: #94a3b8;
+        stroke-width: 2;
+        rx: 14;
+      }
+      .routerDecisionDiagram .decision {
+        fill: #fff7ed;
+        stroke: #fdba74;
+        stroke-width: 2;
+        rx: 14;
+      }
+      .routerDecisionDiagram .output {
+        fill: #ecfdf5;
+        stroke: #86efac;
+        stroke-width: 2;
+        rx: 14;
+      }
+      .routerDecisionDiagram .line {
+        stroke: #64748b;
+        stroke-width: 2;
+        fill: none;
+      }
+      .routerDecisionDiagram .title {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .routerDecisionDiagram .subtitle {
+        fill: #64748b;
+        font-size: 15px;
+      }
+      .routerDecisionDiagram .note {
+        fill: #475569;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .routerDecisionDiagram .small {
+        fill: #64748b;
+        font-size: 14px;
+      }
+    </style></defs><rect x="24" y="24" width="912" height="572" class="panel" rx="18"></rect><g><rect x="324" y="54" width="312" height="58" class="box"></rect><text x="480" y="90" text-anchor="middle" class="title">User Request</text></g><path d="M480 112 V144" class="line" marker-end="url(#routerArrow)"></path><g><rect x="286" y="144" width="388" height="72" class="box"></rect><text x="480" y="175" text-anchor="middle" class="title">1. Custom Router</text><text x="480" y="198" text-anchor="middle" class="subtitle">optional plugin override</text><text x="704" y="186" class="note">custom provider/model wins</text></g><path d="M480 216 V248" class="line" marker-end="url(#routerArrow)"></path><g><rect x="286" y="248" width="388" height="72" class="box"></rect><text x="480" y="279" text-anchor="middle" class="title">2. Scenario Decision</text><text x="480" y="302" text-anchor="middle" class="subtitle">explicit / default / subagent</text><text x="704" y="290" class="note">explicit route skips tiering</text></g><path d="M480 320 V352" class="line" marker-end="url(#routerArrow)"></path><g><rect x="286" y="352" width="388" height="92" class="decision"></rect><text x="480" y="382" text-anchor="middle" class="title">3. TokenSaver Gate</text><text x="480" y="405" text-anchor="middle" class="subtitle">enabled, non-explicit, no custom override</text><text x="480" y="426" text-anchor="middle" class="small">reuse sticky tier first; otherwise judge complexity</text><text x="704" y="406" class="note">selects provider / model / tier</text></g><path d="M480 444 V476" class="line" marker-end="url(#routerArrow)"></path><g><rect x="286" y="476" width="388" height="72" class="output"></rect><text x="480" y="506" text-anchor="middle" class="title">RouterDecision</text><text x="480" y="530" text-anchor="middle" class="subtitle">{ provider, model, tier, scenarioType }</text></g></svg></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="tokensaver-智能降档">TokenSaver 智能降档<a href="#tokensaver-智能降档" class="hash-link" aria-label="Direct link to TokenSaver 智能降档" title="Direct link to TokenSaver 智能降档" translate="no">​</a></h2>
 <p>TokenSaver 是 Router 最核心的省钱能力。它通过分析用户消息的复杂度，将请求分配到不同的模型档位 (Tier)。</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="工作原理">工作原理<a href="#工作原理" class="hash-link" aria-label="Direct link to 工作原理" title="Direct link to 工作原理" translate="no">​</a></h3>

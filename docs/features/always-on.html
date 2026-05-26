@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.9.2">
 <title data-rh="true">Always On 后台常驻 | PilotDeck</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://mmrdmn.github.io/pilotdeck.github.io/img/og-card.png"><meta data-rh="true" name="twitter:image" content="https://mmrdmn.github.io/pilotdeck.github.io/img/og-card.png"><meta data-rh="true" property="og:url" content="https://mmrdmn.github.io/pilotdeck.github.io/docs/features/always-on"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Always On 后台常驻 | PilotDeck"><meta data-rh="true" name="description" content="Discovery 主动发现和 Cron 定时任务让 Agent 持续工作"><meta data-rh="true" property="og:description" content="Discovery 主动发现和 Cron 定时任务让 Agent 持续工作"><link data-rh="true" rel="icon" href="/pilotdeck.github.io/img/favicon.png"><link data-rh="true" rel="canonical" href="https://mmrdmn.github.io/pilotdeck.github.io/docs/features/always-on"><link data-rh="true" rel="alternate" href="https://mmrdmn.github.io/pilotdeck.github.io/docs/features/always-on" hreflang="en"><link data-rh="true" rel="alternate" href="https://mmrdmn.github.io/pilotdeck.github.io/docs/features/always-on" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Always On 后台常驻","item":"https://mmrdmn.github.io/pilotdeck.github.io/docs/features/always-on"}]}</script><link rel="stylesheet" href="/pilotdeck.github.io/assets/css/styles.680c79d6.css">
-<script src="/pilotdeck.github.io/assets/js/runtime~main.ace053cb.js" defer="defer"></script>
+<script src="/pilotdeck.github.io/assets/js/runtime~main.387f43b1.js" defer="defer"></script>
 <script src="/pilotdeck.github.io/assets/js/main.566e0024.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -20,7 +20,70 @@
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="discovery-主动发现">Discovery 主动发现<a href="#discovery-主动发现" class="hash-link" aria-label="Direct link to Discovery 主动发现" title="Direct link to Discovery 主动发现" translate="no">​</a></h2>
 <p>Discovery 是 Always On 的核心能力。当 WorkSpace 空闲且满足触发条件时，Agent 会主动分析 WorkSpace，生成 Discovery Plan 和 Report。</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="工作流程">工作流程<a href="#工作流程" class="hash-link" aria-label="Direct link to 工作流程" title="Direct link to 工作流程" translate="no">​</a></h3>
-<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">   ┌─────────────────┐</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   │  Discovery Gate  │ ← 检查触发条件</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   │  (冷却/预算/忙碌) │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   └───────┬─────────┘</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">           │ 通过</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">           ▼</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   ┌─────────────────┐</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   │ Discovery Plan   │ ← Agent 生成工作计划</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   │ (Markdown 格式)  │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   └───────┬─────────┘</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">           │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">           ▼</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   ┌─────────────────┐</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   │ Execution        │ ← 在独立工作区执行</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   │ (隔离环境)       │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   └───────┬─────────┘</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">           │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">           ▼</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   ┌─────────────────┐</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   │ Discovery Report │ ← 生成发现报告</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   │ (Markdown 格式)  │</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   └─────────────────┘</span><br></span></code></pre></div></div>
+<div class="alwaysOnFlowDiagram"><svg viewBox="0 0 960 560" role="img" aria-label="PilotDeck Always On Discovery workflow"><defs><marker id="alwaysOnArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"></path></marker><style>
+      .alwaysOnFlowDiagram svg {
+        width: 100%;
+        height: auto;
+        display: block;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+      }
+      .alwaysOnFlowDiagram text {
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        fill: #1e293b;
+      }
+      .alwaysOnFlowDiagram .panel {
+        fill: #eaf2ff;
+        stroke: #d5e4f7;
+      }
+      .alwaysOnFlowDiagram .gate {
+        fill: #fff7ed;
+        stroke: #fdba74;
+        stroke-width: 2;
+        rx: 16;
+      }
+      .alwaysOnFlowDiagram .plan {
+        fill: #eff6ff;
+        stroke: #93c5fd;
+        stroke-width: 2;
+        rx: 16;
+      }
+      .alwaysOnFlowDiagram .execution {
+        fill: #f8fafc;
+        stroke: #94a3b8;
+        stroke-width: 2;
+        rx: 16;
+      }
+      .alwaysOnFlowDiagram .report {
+        fill: #ecfdf5;
+        stroke: #86efac;
+        stroke-width: 2;
+        rx: 16;
+      }
+      .alwaysOnFlowDiagram .line {
+        stroke: #64748b;
+        stroke-width: 2;
+        fill: none;
+      }
+      .alwaysOnFlowDiagram .title {
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .alwaysOnFlowDiagram .subtitle {
+        fill: #64748b;
+        font-size: 15px;
+      }
+      .alwaysOnFlowDiagram .note {
+        fill: #475569;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .alwaysOnFlowDiagram .small {
+        fill: #64748b;
+        font-size: 14px;
+      }
+    </style></defs><rect x="24" y="24" width="912" height="512" class="panel" rx="18"></rect><g><rect x="80" y="72" width="236" height="86" class="gate"></rect><text x="198" y="106" text-anchor="middle" class="title">Discovery Gate</text><text x="198" y="130" text-anchor="middle" class="subtitle">cooldown / budget / busy</text><text x="198" y="150" text-anchor="middle" class="small">enabled and in schedule</text></g><path d="M316 115 H384" class="line" marker-end="url(#alwaysOnArrow)"></path><text x="350" y="100" text-anchor="middle" class="note">pass</text><g><rect x="384" y="72" width="236" height="86" class="plan"></rect><text x="502" y="106" text-anchor="middle" class="title">Discovery Plan</text><text x="502" y="130" text-anchor="middle" class="subtitle">agent drafts work plan</text><text x="502" y="150" text-anchor="middle" class="small">Markdown artifact</text></g><path d="M502 158 V226" class="line" marker-end="url(#alwaysOnArrow)"></path><g><rect x="384" y="226" width="236" height="92" class="execution"></rect><text x="502" y="262" text-anchor="middle" class="title">Execution</text><text x="502" y="287" text-anchor="middle" class="subtitle">run in isolated workspace</text><text x="502" y="308" text-anchor="middle" class="small">git worktree or snapshot copy</text></g><path d="M502 318 V386" class="line" marker-end="url(#alwaysOnArrow)"></path><g><rect x="384" y="386" width="236" height="86" class="report"></rect><text x="502" y="420" text-anchor="middle" class="title">Discovery Report</text><text x="502" y="444" text-anchor="middle" class="subtitle">summarize findings</text><text x="502" y="464" text-anchor="middle" class="small">Markdown artifact</text></g><g><rect x="690" y="226" width="178" height="92" class="execution"></rect><text x="779" y="260" text-anchor="middle" class="note">Artifacts</text><text x="779" y="284" text-anchor="middle" class="subtitle">plan, report, logs</text><text x="779" y="304" text-anchor="middle" class="small">always-on state</text></g><path d="M620 272 H690" class="line" marker-end="url(#alwaysOnArrow)"></path></svg></div>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="触发条件gate">触发条件（Gate）<a href="#触发条件gate" class="hash-link" aria-label="Direct link to 触发条件（Gate）" title="Direct link to 触发条件（Gate）" translate="no">​</a></h3>
 <p>Discovery 不会随意触发，需要通过以下 Gate 检查：</p>
 <table><thead><tr><th>Gate</th><th>说明</th></tr></thead><tbody><tr><td><strong>Cooldown</strong></td><td>距离上次 Discovery 需经过冷却时间</td></tr><tr><td><strong>Budget</strong></td><td>当天的 Discovery 次数未超过预算限制</td></tr><tr><td><strong>Busy</strong></td><td>当前 WorkSpace 没有活跃的用户会话</td></tr><tr><td><strong>Enabled</strong></td><td>配置中已启用 Always On</td></tr><tr><td><strong>Schedule</strong></td><td>在配置的允许时间窗口内</td></tr></tbody></table>
