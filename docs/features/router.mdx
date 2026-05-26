@@ -29,33 +29,117 @@ Router 是 PilotDeck 的智能模型路由引擎。它根据任务复杂度自�
 
 Router 的每次路由决策经过以下阶段：
 
-```
-用户请求
-    │
-    ▼
-┌─────────────────────────┐
-│  1. Custom Router 检查  │ ← 如果有自定义路由插件
-└───────────┬─────────────┘
-            │
-            ▼
-┌─────────────────────────┐
-│  2. Scenario 场景判定   │ ← 根据 explicit/default/subagent 决定
-└───────────┬─────────────┘
-            │
-            ▼
-┌─────────────────────────┐
-│  3. TokenSaver 降档判定 │ ← 分析复杂度，选择合适的模型档位
-└───────────┬─────────────┘
-            │
-            ▼
-┌─────────────────────────┐
-│  4. Session Sticky      │ ← 同一会话保持模型一致性
-└───────────┬─────────────┘
-            │
-            ▼
-     RouterDecision
-  { provider, model, tier }
-```
+<div className="routerDecisionDiagram">
+  <svg viewBox="0 0 960 620" role="img" aria-label="PilotDeck router decision flow">
+    <defs>
+      <marker id="routerArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+      </marker>
+      <style>{`
+        .routerDecisionDiagram svg {
+          width: 100%;
+          height: auto;
+          display: block;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+        }
+        .routerDecisionDiagram text {
+          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          fill: #1e293b;
+        }
+        .routerDecisionDiagram .panel {
+          fill: #eaf2ff;
+          stroke: #d5e4f7;
+        }
+        .routerDecisionDiagram .box {
+          fill: #ffffff;
+          stroke: #94a3b8;
+          stroke-width: 2;
+          rx: 14;
+        }
+        .routerDecisionDiagram .decision {
+          fill: #fff7ed;
+          stroke: #fdba74;
+          stroke-width: 2;
+          rx: 14;
+        }
+        .routerDecisionDiagram .output {
+          fill: #ecfdf5;
+          stroke: #86efac;
+          stroke-width: 2;
+          rx: 14;
+        }
+        .routerDecisionDiagram .line {
+          stroke: #64748b;
+          stroke-width: 2;
+          fill: none;
+        }
+        .routerDecisionDiagram .title {
+          font-size: 20px;
+          font-weight: 700;
+        }
+        .routerDecisionDiagram .subtitle {
+          fill: #64748b;
+          font-size: 15px;
+        }
+        .routerDecisionDiagram .note {
+          fill: #475569;
+          font-size: 16px;
+          font-weight: 600;
+        }
+        .routerDecisionDiagram .small {
+          fill: #64748b;
+          font-size: 14px;
+        }
+      `}</style>
+    </defs>
+
+    <rect x="24" y="24" width="912" height="572" className="panel" rx="18" />
+
+    <g>
+      <rect x="324" y="54" width="312" height="58" className="box" />
+      <text x="480" y="90" textAnchor="middle" className="title">User Request</text>
+    </g>
+
+    <path d="M480 112 V144" className="line" markerEnd="url(#routerArrow)" />
+
+    <g>
+      <rect x="286" y="144" width="388" height="72" className="box" />
+      <text x="480" y="175" textAnchor="middle" className="title">1. Custom Router</text>
+      <text x="480" y="198" textAnchor="middle" className="subtitle">optional plugin override</text>
+      <text x="704" y="186" className="note">custom provider/model wins</text>
+    </g>
+
+    <path d="M480 216 V248" className="line" markerEnd="url(#routerArrow)" />
+
+    <g>
+      <rect x="286" y="248" width="388" height="72" className="box" />
+      <text x="480" y="279" textAnchor="middle" className="title">2. Scenario Decision</text>
+      <text x="480" y="302" textAnchor="middle" className="subtitle">explicit / default / subagent</text>
+      <text x="704" y="290" className="note">explicit route skips tiering</text>
+    </g>
+
+    <path d="M480 320 V352" className="line" markerEnd="url(#routerArrow)" />
+
+    <g>
+      <rect x="286" y="352" width="388" height="92" className="decision" />
+      <text x="480" y="382" textAnchor="middle" className="title">3. TokenSaver Gate</text>
+      <text x="480" y="405" textAnchor="middle" className="subtitle">enabled, non-explicit, no custom override</text>
+      <text x="480" y="426" textAnchor="middle" className="small">reuse sticky tier first; otherwise judge complexity</text>
+      <text x="704" y="406" className="note">selects provider / model / tier</text>
+    </g>
+
+    <path d="M480 444 V476" className="line" markerEnd="url(#routerArrow)" />
+
+    <g>
+      <rect x="286" y="476" width="388" height="72" className="output" />
+      <text x="480" y="506" textAnchor="middle" className="title">RouterDecision</text>
+      <text x="480" y="530" textAnchor="middle" className="subtitle">{`{ provider, model, tier, scenarioType }`}</text>
+    </g>
+
+  </svg>
+</div>
 
 ## TokenSaver 智能降档
 
