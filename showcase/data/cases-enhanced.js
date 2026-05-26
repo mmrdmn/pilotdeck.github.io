@@ -115,7 +115,14 @@ const CASES = [
     descriptionEn: "Build a low-code Embedding model fine-tuning platform from scratch, covering data management, training configuration, backend API, real-time monitoring, and experiment log viewing.",
     stats: { user_turns: 5, assistant_turns: 80, tool_calls: 120 },
     thumbnail: "assets/zh/modeltraining_zh.gif",
-    preview: null,
+    thumbnailEn: "assets/en/modeltraining_en.gif",
+    preview: {
+      file: "assets/zh/modeltraining_zh.gif",
+      fileEn: "assets/en/modeltraining_en.gif",
+      type: "image",
+      label: "🎬 查看演示",
+      labelEn: "🎬 View Demo"
+    },
     highlighted_steps: [
       {
         type: "user",

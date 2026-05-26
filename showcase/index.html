@@ -700,8 +700,10 @@ function renderHome(){
     let previewHtml = '';
     if (hasPreview) {
       const p = c.preview;
-      const iframeUrl = getPreviewUrl(p.project, p.file);
-      const thumbUrl = c.thumbnail ? getPreviewUrl(p.project, c.thumbnail) : null;
+      const previewFile = (currentLang === 'en' && p.fileEn) ? p.fileEn : p.file;
+      const iframeUrl = getPreviewUrl(p.project, previewFile);
+      const thumbSrc = (currentLang === 'en' && c.thumbnailEn) ? c.thumbnailEn : c.thumbnail;
+      const thumbUrl = thumbSrc ? getPreviewUrl(p.project, thumbSrc) : null;
       if (thumbUrl) {
         previewHtml = `
         <div class="card-preview">
@@ -796,9 +798,14 @@ function showDetail(caseId){
   let heroSrc = null;
   if (c.preview && !c.preview.externalUrl && c.preview.file && (c.preview.type === 'html' || !c.preview.type)) {
     heroSrc = getPreviewUrl(c.preview.project, c.preview.file);
-    heroHtml = `<iframe src="" sandbox="allow-scripts allow-popups allow-forms " loading="eager"></iframe>`;
+    heroHtml = `<iframe src="" sandbox="allow-scripts allow-popups allow-forms allow-same-origin" loading="eager"></iframe>`;
+  } else if (c.preview && c.preview.type === 'image' && c.preview.file) {
+    const imgFile = (currentLang === 'en' && c.preview.fileEn) ? c.preview.fileEn : c.preview.file;
+    const imgUrl = getPreviewUrl(c.preview.project, imgFile);
+    heroHtml = `<img src="${imgUrl}" alt="${escapeHtml(name)}" style="width:100%;height:100%;object-fit:cover;">`;
   } else if (c.thumbnail) {
-    const thumbUrl = getPreviewUrl(c.preview.project, c.thumbnail);
+    const thumbSrc = (currentLang === 'en' && c.thumbnailEn) ? c.thumbnailEn : c.thumbnail;
+    const thumbUrl = getPreviewUrl(c.preview && c.preview.project, thumbSrc);
     heroHtml = `<img src="${thumbUrl}" alt="${escapeHtml(name)}" style="width:100%;height:100%;object-fit:cover;">`;
   } else if (c.preview && c.preview.externalUrl) {
     heroHtml = `<img src="" style="width:100%;height:100%;object-fit:cover;display:none;">`;
@@ -806,9 +813,13 @@ function showDetail(caseId){
 
   let actionsHtml = '';
   if(c.preview){
-    if(!c.preview.externalUrl){
+    if(!c.preview.externalUrl && c.preview.type !== 'image' && c.preview.type !== 'pdf'){
       const btnUrl = getPreviewUrl(c.preview.project, c.preview.file);
       actionsHtml += `<button class="btn-preview" onclick="updateHeroIframe('${btnUrl}')">${escapeHtml(label || '')}</button>`;
+    }
+    if(c.preview.type === 'pdf'){
+      const pdfUrl = getPreviewUrl(c.preview.project, c.preview.file);
+      actionsHtml += `<button class="btn-preview" onclick="window.open('${pdfUrl}','_blank')">${escapeHtml(label || '')}</button>`;
     }
     if(c.preview.variants && c.preview.variants.length>0){
       const cidx = CASES.indexOf(c);
