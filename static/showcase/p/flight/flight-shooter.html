@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>飞机大战</title>
+<title>Plane Wars</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#000;display:flex;justify-content:center;align-items:center;height:100vh;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif}
@@ -407,17 +407,17 @@ function drawStartScreen(){
   // Title
   ctx.save();
   ctx.font='bold 56px Arial';ctx.textAlign='center';
-  ctx.fillStyle='#4488ff';ctx.fillText('飞机大战',240,200);
+  ctx.fillStyle='#4488ff';ctx.fillText('Plane Wars',240,200);
   ctx.font='bold 20px Arial';ctx.fillStyle='#88bbff';ctx.fillText('Airplane Shooter',240,235);
   ctx.font='18px Arial';ctx.fillStyle='#ffffff';
-  const instructions=['🖱️ 鼠标控制飞机移动',
-    '💥 自动射击',
+  const instructions=['🖱️ Move plane with mouse',
+    '💥 Auto-fire',
     '',
-    '🔥 攻速增强  📦 多发子弹',
-    '🛡️ 护盾保护  💣 全屏炸弹',
-    '⭐ 伤害提升  ❤️ 生命恢复',
+    '🔥 Fire Rate  📦 Multi-shot',
+    '🛡️ Shield  💣 Screen Bomb',
+    '⭐ Damage Up  ❤️ Health',
     '',
-    '⚠️ 点击开始游戏'];
+    '⚠️ Click to Start'];
   instructions.forEach((t,i)=>{ctx.fillText(t,240,300+i*32);});
   ctx.restore();
 }
@@ -425,16 +425,16 @@ function drawStartScreen(){
 function drawHUD(){
   ctx.save();
   ctx.font='bold 16px Arial';ctx.textAlign='left';
-  ctx.fillStyle='#ffffff';ctx.fillText(`分数: ${score}`,10,25);
+  ctx.fillStyle='#ffffff';ctx.fillText(`Score: ${score}`,10,25);
   ctx.fillStyle='#ff4488';ctx.fillText(`❤️ ${lives}`,10,48);
   ctx.textAlign='right';
   ctx.fillStyle='#ffdd00';ctx.fillText(`Wave ${wave}`,470,25);
 
   // Power-up indicators
   let iy=70;ctx.textAlign='left';ctx.font='13px Arial';
-  ctx.fillStyle='#ff8800';ctx.fillText(`🔥火x${fireRateLvl}`,10,iy);iy+=18;
-  ctx.fillStyle='#4488ff';ctx.fillText(`📦弹x${bulletSpreadLvl}`,10,iy);iy+=18;
-  ctx.fillStyle='#ffdd00';ctx.fillText(`⭐伤x${damageLvl}`,10,iy);iy+=18;
+  ctx.fillStyle='#ff8800';ctx.fillText(`🔥Fire x${fireRateLvl}`,10,iy);iy+=18;
+  ctx.fillStyle='#4488ff';ctx.fillText(`📦Shot x${bulletSpreadLvl}`,10,iy);iy+=18;
+  ctx.fillStyle='#ffdd00';ctx.fillText(`⭐Dmg x${damageLvl}`,10,iy);iy+=18;
   if(shieldTimer>0){ctx.fillStyle='#00ccff';ctx.fillText(`🛡️${Math.ceil(shieldTimer/60)}s`,10,iy);iy+=18;}
 
   ctx.restore();
@@ -443,10 +443,10 @@ function drawHUD(){
 function drawGameOver(){
   ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,480,720);
   ctx.save();ctx.textAlign='center';
-  ctx.font='bold 48px Arial';ctx.fillStyle='#ff4444';ctx.fillText('游戏结束',240,300);
-  ctx.font='bold 28px Arial';ctx.fillStyle='#ffffff';ctx.fillText(`最终分数: ${score}`,240,350);
-  ctx.font='20px Arial';ctx.fillStyle='#aaaaff';ctx.fillText(`到达 Wave ${wave}`,240,385);
-  ctx.font='18px Arial';ctx.fillStyle='#ffffff';ctx.fillText('点击重新开始',240,440);
+  ctx.font='bold 48px Arial';ctx.fillStyle='#ff4444';ctx.fillText('Game Over',240,300);
+  ctx.font='bold 28px Arial';ctx.fillStyle='#ffffff';ctx.fillText(`Final Score: ${score}`,240,350);
+  ctx.font='20px Arial';ctx.fillStyle='#aaaaff';ctx.fillText(`Reached Wave ${wave}`,240,385);
+  ctx.font='18px Arial';ctx.fillStyle='#ffffff';ctx.fillText('Click to Restart',240,440);
   ctx.restore();
 }
 
