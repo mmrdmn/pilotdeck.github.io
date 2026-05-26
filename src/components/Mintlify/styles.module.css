@@ -189,13 +189,13 @@
 /* ===== Frame ===== */
 .frame {
   margin: 1.5em 0;
-  border: 1px solid #ececec;
-  border-radius: 14px;
-  overflow: hidden;
-  background: #fafafa;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
 }
 .frameBody {
-  padding: 6px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
