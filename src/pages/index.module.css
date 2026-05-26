@@ -130,6 +130,17 @@
   color: #111827 !important;
 }
 
+.versionBadge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  background: rgba(17, 24, 39, 0.08);
+  border-radius: 4px;
+  color: #374151;
+}
+
 .btnSecondary {
   display: inline-flex;
   align-items: center;

@@ -22,6 +22,9 @@ const HERO = {
     quickStart: 'Quick Start',
     docs: 'Docs',
     github: 'GitHub',
+    downloadMac: 'Download for macOS',
+    downloadWin: 'Download for Windows',
+    allDownloads: 'All platforms',
   },
   zh: {
     versionTag: '0.1 公测',
@@ -32,6 +35,9 @@ const HERO = {
     quickStart: '快速开始',
     docs: '教程文档',
     github: 'GitHub',
+    downloadMac: '下载 macOS 桌面版',
+    downloadWin: '下载 Windows 桌面版',
+    allDownloads: '所有平台',
   },
 };
 
@@ -234,12 +240,70 @@ const PARTNERS = {
 };
 
 // ============================================================
+// HOOKS
+// ============================================================
+
+const GITHUB_RELEASES_API = 'https://api.github.com/repos/OpenBMB/PilotDeck/releases/latest';
+const RELEASES_FALLBACK = 'https://github.com/OpenBMB/PilotDeck/releases/latest';
+
+function detectOS() {
+  if (typeof navigator === 'undefined') return 'mac';
+  const ua = navigator.userAgent || '';
+  if (/Windows/.test(ua)) return 'win';
+  return 'mac';
+}
+
+function useLatestRelease() {
+  const [release, setRelease] = React.useState(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch(GITHUB_RELEASES_API)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled || !data.assets) return;
+        const macDmg = data.assets.find((a) => a.name.endsWith('arm64.dmg'));
+        const winX64 = data.assets.find((a) => a.name.endsWith('win-x64.exe'));
+        const winArm64 = data.assets.find((a) => a.name.endsWith('win-arm64.exe'));
+        setRelease({
+          version: data.tag_name,
+          macUrl: macDmg ? macDmg.browser_download_url : null,
+          winUrl: winX64 ? winX64.browser_download_url : null,
+          winArm64Url: winArm64 ? winArm64.browser_download_url : null,
+          htmlUrl: data.html_url,
+        });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  return release;
+}
+
+// ============================================================
 // SECTIONS
 // ============================================================
 
 function HeroSection() {
   const isZh = useIsZh();
   const t = isZh ? HERO.zh : HERO.en;
+  const release = useLatestRelease();
+  const [os, setOs] = React.useState('mac');
+
+  React.useEffect(() => {
+    setOs(detectOS());
+  }, []);
+
+  const primaryUrl = os === 'win'
+    ? (release?.winUrl || RELEASES_FALLBACK)
+    : (release?.macUrl || RELEASES_FALLBACK);
+  const primaryLabel = os === 'win' ? t.downloadWin : t.downloadMac;
+
+  const secondaryUrl = os === 'win'
+    ? (release?.macUrl || RELEASES_FALLBACK)
+    : (release?.winUrl || RELEASES_FALLBACK);
+  const secondaryLabel = os === 'win' ? t.downloadMac : t.downloadWin;
+
   return (
     <header className={styles.heroSection}>
       <img
@@ -274,9 +338,38 @@ function HeroSection() {
           </p>
 
           <div className={styles.heroButtons}>
+            <a
+              className={styles.btnPrimary}
+              href={primaryUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              {primaryLabel}
+              {release?.version && (
+                <span className={styles.versionBadge}>{release.version}</span>
+              )}
+            </a>
+            <a
+              className={styles.btnSecondary}
+              href={secondaryUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              {secondaryLabel}
+            </a>
             {/* Static SPA microsite at static/demo/index.html — use a plain
                 anchor so Docusaurus's link checker doesn't flag it. */}
-            <a className={styles.btnPrimary} href={useBaseUrl('/demo/')}>
+            <a className={styles.btnSecondary} href={useBaseUrl('/demo/')}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style={{ marginRight: 6 }}>
                 <path d="M8 5v14l11-7z"></path>
               </svg>
