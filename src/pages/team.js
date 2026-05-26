@@ -33,7 +33,7 @@ const CORE_TEAM = {
       [
         { name: 'Sen Mei', role: 'TsinghuaNLP', avatar: 'img/team/梅森.jpg' },
         { name: 'Haidong Xin', role: 'TsinghuaNLP', avatar: 'img/team/辛海东.jpg' },
-        { name: 'Daqi Zheng', role: 'OpenBMB', avatar: 'img/team/郑达奇.jpg' },
+        { name: 'Daqi Zheng', role: 'OpenBMB', avatar: 'img/team/郑达奇.jpg', avatarStyle: { objectPosition: 'center 20%' } },
         { name: 'Yanting Chen', role: 'RUC', avatar: 'img/team/陈燕婷.jpg' },
       ],
     ],
@@ -50,7 +50,7 @@ const CORE_TEAM = {
       [
         { name: '梅森', role: 'TsinghuaNLP', avatar: 'img/team/梅森.jpg' },
         { name: '辛海东', role: 'TsinghuaNLP', avatar: 'img/team/辛海东.jpg' },
-        { name: '郑达奇', role: 'OpenBMB', avatar: 'img/team/郑达奇.jpg' },
+        { name: '郑达奇', role: 'OpenBMB', avatar: 'img/team/郑达奇.jpg', avatarStyle: { objectPosition: 'center 20%' } },
         { name: '陈燕婷', role: 'RUC', avatar: 'img/team/陈燕婷.jpg' },
       ],
     ],
@@ -116,7 +116,12 @@ function MemberCard({ member }) {
     <div className={styles.memberCard}>
       <div className={styles.avatarWrapper}>
         {member.avatar ? (
-          <img src={useBaseUrl(member.avatar)} alt={member.name} className={styles.avatar} />
+          <img
+            src={useBaseUrl(member.avatar)}
+            alt={member.name}
+            className={styles.avatar}
+            style={member.avatarStyle}
+          />
         ) : (
           <PlaceholderAvatar />
         )}

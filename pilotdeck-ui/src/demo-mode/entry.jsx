@@ -67,6 +67,18 @@ if (demoIndex >= 0) {
   window.__ROUTER_BASENAME__ = '';
 }
 
+// Auto-open the first session so the demo lands on a real chat transcript
+// instead of a blank "select a session" state. Only fires when there's no
+// deep-link already in the URL (i.e. visitor hit the bare /demo/ root).
+{
+  const base = window.__ROUTER_BASENAME__ || '';
+  const routerPath = pathname.slice(base.length) || '/';
+  if (routerPath === '/' || routerPath === '') {
+    const target = `${base}/p/pilotdeck-demo/c/demo-session-tutorial-01`;
+    window.history.replaceState(null, '', target);
+  }
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
