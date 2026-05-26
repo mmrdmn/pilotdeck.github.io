@@ -73,8 +73,8 @@ const FEATURES = {
   ],
   zh: [
     {
-      tag: '工作舱 WorkSpace',
-      title: '工作舱级隔离与积累',
+      tag: '项目空间',
+      title: '项目空间级隔离与积累',
       desc: '每个项目独立的文件系统、记忆与技能。多项目并行不再互相干扰，检索范围有界，技能随任务自然沉淀——彻底告别全局上下文污染。',
       image: 'img/feature/workspace-preview.png',
       cta: '了解更多',
