@@ -106,51 +106,44 @@ const CASES = [
     ]
   },
   {
-    id: "qq-farm",
-    name: "QQ农场",
-    nameEn: "QQ Farm",
-    category: "网页游戏",
-    categoryEn: "Web Game",
-    description: "网页版简易 QQ 农场游戏 MB Farm，FastAPI + SQLite 架构，支持社交偷菜",
-    descriptionEn: "A simple web-based QQ Farm game called MB Farm, built with FastAPI + SQLite, featuring social 'steal vegetables' mechanics.",
-    stats: { user_turns: 10, assistant_turns: 159, tool_calls: 149 },
-    thumbnail: null,
+    id: "model-training",
+    name: "AI 工程平台开发",
+    nameEn: "AI Engineering Platform",
+    category: "工具",
+    categoryEn: "Tool",
+    description: "从零构建一个 Embedding 低代码调优平台，涵盖数据管理、训练配置、后端 API、实时监控和实验日志查看",
+    descriptionEn: "Build a low-code Embedding model fine-tuning platform from scratch, covering data management, training configuration, backend API, real-time monitoring, and experiment log viewing.",
+    stats: { user_turns: 5, assistant_turns: 80, tool_calls: 120 },
+    thumbnail: "assets/zh/modeltraining_zh.gif",
     preview: null,
     highlighted_steps: [
       {
         type: "user",
         title: "📝 用户初始要求",
         titleEn: "📝 User's Initial Request",
-        content: "你了解 QQ 农场吗？我想做一个网页版、简易版的 QQ 农场游戏，游戏名叫做 MB Farm。最多十几个人游玩。你有什么建议。",
-        contentEn: "Are you familiar with QQ Farm? I want to make a web-based, simplified version of QQ Farm called MB Farm. For at most a dozen players. What suggestions do you have?"
+        content: "从零造一个 Embedding 低代码调优平台，需要包含数据管理、训练配置、后端 API、实时监控和实验日志查看功能。",
+        contentEn: "Build a low-code Embedding fine-tuning platform from scratch, including data management, training configuration, backend API, real-time monitoring, and experiment log viewing."
       },
       {
         type: "assistant",
-        title: "🤖 架构设计",
-        titleEn: "🤖 Architecture Design",
-        content: "十几人的规模非常小，不需要微服务、消息队列这些重型基础设施。目标是：快开发、能跑、够用。推荐方案：后端 Python + FastAPI（轻量、API 自动文档），数据库 SQLite（零配置，单文件），前端 Jinja2 模板 + 原生 CSS/JS（零构建，直接写），实时 FastAPI WebSocket（偷菜通知、作物成熟提醒），认证 FastAPI 内置 Session。",
-        contentEn: "A dozen players is very small — no need for heavy infrastructure like microservices or message queues. The goal is: fast development, runnable, sufficient. Recommended approach: Python backend + FastAPI (lightweight, auto API docs), SQLite database (zero config, single file), Jinja2 templates + vanilla CSS/JS frontend (zero build, write directly), real-time FastAPI WebSocket (steal notifications, crop maturity alerts), auth via FastAPI built-in Sessions."
-      },
-      {
-        type: "user",
-        title: "💡 亮点：模块化架构",
-        titleEn: "💡 Highlight: Modular Architecture",
-        content: "用户要求项目结构太潦草了，按模块区分，要重视依赖注入的思想，还要给出每个模块的优先级。AI 随后使用 agent 子任务设计了完整架构：models/services/repositories/routes/core/templates/static 分层结构。",
-        contentEn: "The user felt the project structure was too messy and requested module-based separation with emphasis on dependency injection and priority levels for each module. AI then used an agent subtask to design the complete architecture: a layered structure of models/services/repositories/routes/core/templates/static."
+        title: "🤖 方案设计",
+        titleEn: "🤖 Design Proposal",
+        content: "AI Agent 规划了完整的平台架构：前端使用 React + Ant Design 构建低代码操作界面，后端采用 FastAPI 提供 RESTful API，训练引擎基于 sentence-transformers 封装，支持数据集上传、超参数配置、训练任务调度、实时 loss 曲线监控和实验版本对比。",
+        contentEn: "AI Agent designed the complete platform architecture: React + Ant Design frontend for the low-code UI, FastAPI backend providing RESTful APIs, training engine wrapped around sentence-transformers, supporting dataset upload, hyperparameter configuration, training job scheduling, real-time loss curve monitoring, and experiment version comparison."
       },
       {
         type: "tool",
-        title: "📋 文档驱动开发",
-        titleEn: "📋 Document-Driven Development",
-        content: "创建 docs 目录，把优先级为 P0 的内容（基础设施、注册/登录）写成文档，按模块区分子目录。每个模块的文档先规划方案再开始写。随后创建项目 README，记录架构和 docs 目录结构。",
-        contentEn: "Created a docs directory, wrote documentation for P0-priority items (infrastructure, registration/login) organized in module-based subdirectories. Each module's document was planned before implementation. Then created the project README documenting the architecture and docs directory structure."
+        title: "🔧 全栈构建",
+        titleEn: "🔧 Full-Stack Build",
+        content: "AI 自主完成前后端开发：创建数据管理模块（上传/预览/清洗）、训练配置面板（模型选择/超参数/数据集绑定）、任务调度器（队列管理/GPU 分配）、实时监控仪表盘（loss 曲线/进度条/日志流）、实验日志系统（版本对比/指标可视化）。",
+        contentEn: "AI autonomously completed full-stack development: data management module (upload/preview/cleaning), training configuration panel (model selection/hyperparameters/dataset binding), job scheduler (queue management/GPU allocation), real-time monitoring dashboard (loss curves/progress bars/log streaming), and experiment logging system (version comparison/metric visualization)."
       },
       {
         type: "summary",
         title: "📊 交付成果",
         titleEn: "📊 Deliverables",
-        content: "共 384 条记录 | 10 轮用户输入 | 100 轮AI回复 | 149 次工具调用。最终交付：完整的 MB Farm 架构设计文档，包含分层架构、依赖注入体系、P0-P3 优先级规划。项目采用 FastAPI + SQLite + Jinja2，支持 WebSocket 实时偷菜通知。",
-        contentEn: "384 records total | 10 user turns | 100 AI replies | 149 tool calls. Final delivery: complete MB Farm architecture design documentation, including layered architecture, dependency injection system, and P0-P3 priority planning. The project uses FastAPI + SQLite + Jinja2, supporting WebSocket real-time steal notifications."
+        content: "最终交付：完整的 Embedding 低代码调优平台，包含数据管理、训练配置、任务调度、实时监控、实验日志五大模块，支持从数据上传到模型产出的全流程自动化。",
+        contentEn: "Final delivery: a complete low-code Embedding fine-tuning platform with five major modules — data management, training configuration, job scheduling, real-time monitoring, and experiment logging — supporting full-pipeline automation from data upload to model output."
       }
     ]
   },
