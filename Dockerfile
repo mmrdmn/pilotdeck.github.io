@@ -30,7 +30,7 @@ WORKDIR /app
 
 # Copy and install root dependencies first — these change less often,
 # so the layer is reused on most rebuilds.
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 RUN npm install --no-audit --no-fund
 
 # pilotdeck-ui dependencies next — same caching idea, but separate so a
@@ -38,9 +38,11 @@ RUN npm install --no-audit --no-fund
 # scripts/ directory must be present BEFORE `npm install` because
 # pilotdeck-ui/package.json declares a `postinstall` that runs
 # scripts/fix-node-pty.js; without it npm aborts the install.
-COPY pilotdeck-ui/package.json pilotdeck-ui/package-lock.json* ./pilotdeck-ui/
+COPY pilotdeck-ui/package.json pilotdeck-ui/package-lock.json ./pilotdeck-ui/
 COPY pilotdeck-ui/scripts/ ./pilotdeck-ui/scripts/
-RUN cd pilotdeck-ui && npm install --no-audit --no-fund
+WORKDIR /app/pilotdeck-ui
+RUN npm install --no-audit --no-fund
+WORKDIR /app
 
 # Now bring in the rest of the source. .dockerignore should already
 # exclude node_modules, build artifacts, and .git so the COPY is small.
