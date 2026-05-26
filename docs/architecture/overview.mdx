@@ -10,42 +10,155 @@ PilotDeck 采用分层模块化架构，每个模块职责清晰、接口明确�
 
 ## 系统全景
 
-```
-                           用户交互层
-┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
-│   CLI    │ │   TUI    │ │  Web UI  │ │ Desktop  │ │  Feishu  │
-│ Channel  │ │ Channel  │ │ Channel  │ │  (Electron)│ │ Channel │
-└─────┬────┘ └────┬─────┘ └─────┬────┘ └─────┬────┘ └────┬─────┘
-      │           │             │             │           │
-      └───────────┴──────┬──────┴─────────────┴───────────┘
-                         │
-                    ┌────▼─────┐
-                    │ Gateway  │  ← 消息网关层
-                    │ (WS/HTTP)│
-                    └────┬─────┘
-                         │
-              ┌──────────▼──────────┐
-              │   SessionRouter     │  ← 会话路由层
-              │   (创建/查找/管理)    │
-              └──────────┬──────────┘
-                         │
-              ┌──────────▼──────────┐
-              │   AgentSession      │  ← Agent 执行层
-              │   ┌───────────────┐ │
-              │   │  TurnRunner   │ │
-              │   │  ┌──────────┐ │ │
-              │   │  │AgentLoop │ │ │
-              │   │  └──────────┘ │ │
-              │   └───────────────┘ │
-              └──────────┬──────────┘
-                         │
-    ┌────────┬───────────┼──────────┬─────────┐
-    │        │           │          │         │
-┌───▼──┐ ┌──▼───┐ ┌─────▼────┐ ┌──▼───┐ ┌──▼─────┐
-│Router│ │Model │ │ Context  │ │ Tool │ │Session │
-│      │ │      │ │ (Memory) │ │      │ │(Store) │
-└──────┘ └──────┘ └──────────┘ └──────┘ └────────┘
-```
+<div className="architectureDiagram">
+  <svg viewBox="0 0 960 760" role="img" aria-label="PilotDeck 系统全景架构图">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+      </marker>
+      <style>{`
+        .architectureDiagram svg {
+          width: 100%;
+          height: auto;
+          display: block;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+        }
+        .architectureDiagram text {
+          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          fill: #1e293b;
+        }
+        .architectureDiagram .layer {
+          fill: #eaf2ff;
+          stroke: #d5e4f7;
+        }
+        .architectureDiagram .box {
+          fill: #ffffff;
+          stroke: #94a3b8;
+          stroke-width: 2;
+          rx: 12;
+        }
+        .architectureDiagram .innerBox {
+          fill: #f8fafc;
+          stroke: #94a3b8;
+          stroke-width: 2;
+          rx: 10;
+        }
+        .architectureDiagram .line {
+          stroke: #64748b;
+          stroke-width: 2;
+          fill: none;
+        }
+        .architectureDiagram .label {
+          fill: #475569;
+          font-size: 18px;
+          font-weight: 600;
+        }
+        .architectureDiagram .title {
+          font-size: 20px;
+          font-weight: 700;
+        }
+        .architectureDiagram .subtitle {
+          fill: #64748b;
+          font-size: 15px;
+        }
+        .architectureDiagram .side {
+          fill: #475569;
+          font-size: 16px;
+          font-weight: 600;
+        }
+      `}</style>
+    </defs>
+
+    <rect x="24" y="24" width="912" height="700" className="layer" rx="18" />
+    <text x="480" y="64" textAnchor="middle" className="label">用户交互层</text>
+
+    <g>
+      <rect x="56" y="92" width="136" height="82" className="box" />
+      <text x="124" y="124" textAnchor="middle" className="title">CLI</text>
+      <text x="124" y="150" textAnchor="middle" className="subtitle">Channel</text>
+
+      <rect x="218" y="92" width="136" height="82" className="box" />
+      <text x="286" y="124" textAnchor="middle" className="title">TUI</text>
+      <text x="286" y="150" textAnchor="middle" className="subtitle">Channel</text>
+
+      <rect x="380" y="92" width="136" height="82" className="box" />
+      <text x="448" y="124" textAnchor="middle" className="title">Web UI</text>
+      <text x="448" y="150" textAnchor="middle" className="subtitle">Channel</text>
+
+      <rect x="542" y="92" width="136" height="82" className="box" />
+      <text x="610" y="122" textAnchor="middle" className="title">Desktop</text>
+      <text x="610" y="148" textAnchor="middle" className="subtitle">Electron</text>
+
+      <rect x="704" y="92" width="136" height="82" className="box" />
+      <text x="772" y="124" textAnchor="middle" className="title">Feishu</text>
+      <text x="772" y="150" textAnchor="middle" className="subtitle">Channel</text>
+    </g>
+
+    <path d="M124 174 V214 H480" className="line" />
+    <path d="M286 174 V214 H480" className="line" />
+    <path d="M448 174 V214 H480" className="line" />
+    <path d="M610 174 V214 H480" className="line" />
+    <path d="M772 174 V214 H480" className="line" />
+    <path d="M480 214 V252" className="line" markerEnd="url(#arrow)" />
+
+    <g>
+      <rect x="374" y="252" width="212" height="82" className="box" />
+      <text x="480" y="286" textAnchor="middle" className="title">Gateway</text>
+      <text x="480" y="312" textAnchor="middle" className="subtitle">WS / HTTP</text>
+      <text x="618" y="302" className="side">消息网关层</text>
+    </g>
+
+    <path d="M480 334 V382" className="line" markerEnd="url(#arrow)" />
+
+    <g>
+      <rect x="330" y="382" width="300" height="84" className="box" />
+      <text x="480" y="416" textAnchor="middle" className="title">SessionRouter</text>
+      <text x="480" y="442" textAnchor="middle" className="subtitle">创建 / 查找 / 管理</text>
+      <text x="662" y="432" className="side">会话路由层</text>
+    </g>
+
+    <path d="M480 466 V516" className="line" markerEnd="url(#arrow)" />
+
+    <g>
+      <rect x="310" y="516" width="340" height="142" className="box" />
+      <text x="480" y="548" textAnchor="middle" className="title">AgentSession</text>
+      <rect x="368" y="566" width="224" height="70" className="innerBox" />
+      <text x="480" y="594" textAnchor="middle" className="title">TurnRunner</text>
+      <rect x="416" y="608" width="128" height="42" className="innerBox" />
+      <text x="480" y="636" textAnchor="middle" className="subtitle">AgentLoop</text>
+      <text x="682" y="594" className="side">Agent 执行层</text>
+    </g>
+
+    <path d="M480 658 V688" className="line" />
+    <path d="M124 688 H836" className="line" />
+    <path d="M124 688 V704" className="line" markerEnd="url(#arrow)" />
+    <path d="M286 688 V704" className="line" markerEnd="url(#arrow)" />
+    <path d="M448 688 V704" className="line" markerEnd="url(#arrow)" />
+    <path d="M610 688 V704" className="line" markerEnd="url(#arrow)" />
+    <path d="M772 688 V704" className="line" markerEnd="url(#arrow)" />
+
+    <g>
+      <rect x="58" y="704" width="132" height="46" className="box" />
+      <text x="124" y="733" textAnchor="middle" className="title">Router</text>
+
+      <rect x="220" y="704" width="132" height="46" className="box" />
+      <text x="286" y="733" textAnchor="middle" className="title">Model</text>
+
+      <rect x="374" y="704" width="148" height="46" className="box" />
+      <text x="448" y="724" textAnchor="middle" className="title">Context</text>
+      <text x="448" y="744" textAnchor="middle" className="subtitle">Memory</text>
+
+      <rect x="544" y="704" width="132" height="46" className="box" />
+      <text x="610" y="733" textAnchor="middle" className="title">Tool</text>
+
+      <rect x="706" y="704" width="132" height="46" className="box" />
+      <text x="772" y="724" textAnchor="middle" className="title">Session</text>
+      <text x="772" y="744" textAnchor="middle" className="subtitle">Store</text>
+    </g>
+  </svg>
+</div>
 
 ## 模块清单
 
