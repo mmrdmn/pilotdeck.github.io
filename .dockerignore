@@ -1,0 +1,46 @@
+# What NOT to send to the docker build context. Keeps the COPY . . in
+# the Dockerfile small + fast and avoids accidentally shipping local
+# build artifacts, secrets, or developer junk.
+
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# CI configs are not needed inside the image
+.github
+
+# IDE / OS noise
+.cursor
+.idea
+.vscode
+.DS_Store
+*.swp
+
+# Local install / build artifacts — the builder stage produces fresh ones
+node_modules
+**/node_modules
+.docusaurus
+build
+pilotdeck-ui/dist
+static/demo
+
+# Local reference checkouts (gitignored, not shipped)
+reference
+resource
+
+# Local content not meant for the public site
+photos
+
+# Env files and logs
+.env
+.env.*
+*.log
+npm-debug.log*
+
+# Plans and scratch
+.cursor
+.playwright-mcp
+
+# Cursor agent transcripts cache directory if it ever appears at root
+.agents
