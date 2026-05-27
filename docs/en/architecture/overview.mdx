@@ -10,41 +10,155 @@ PilotDeck uses a layered modular architecture. Each module has a clear responsib
 
 ## System View
 
-```
-                           User Interaction Layer
-┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
-│   CLI    │ │   TUI    │ │  Web UI  │ │ Desktop  │ │  Feishu  │
-│ Channel  │ │ Channel  │ │ Channel  │ │(Electron)│ │ Channel  │
-└─────┬────┘ └────┬─────┘ └─────┬────┘ └─────┬────┘ └────┬─────┘
-      │           │             │             │           │
-      └───────────┴──────┬──────┴─────────────┴───────────┘
-                         │
-                    ┌────▼─────┐
-                    │ Gateway  │  ← message gateway
-                    │ (WS/HTTP)│
-                    └────┬─────┘
-                         │
-              ┌──────────▼──────────┐
-              │   SessionRouter     │  ← session routing
-              └──────────┬──────────┘
-                         │
-              ┌──────────▼──────────┐
-              │   AgentSession      │  ← agent execution
-              │   ┌───────────────┐ │
-              │   │  TurnRunner   │ │
-              │   │  ┌──────────┐ │ │
-              │   │  │AgentLoop │ │ │
-              │   │  └──────────┘ │ │
-              │   └───────────────┘ │
-              └──────────┬──────────┘
-                         │
-    ┌────────┬───────────┼──────────┬─────────┐
-    │        │           │          │         │
-┌───▼──┐ ┌──▼───┐ ┌─────▼────┐ ┌──▼───┐ ┌──▼─────┐
-│Router│ │Model │ │ Context  │ │ Tool │ │Session │
-│      │ │      │ │ (Memory) │ │      │ │ Store  │
-└──────┘ └──────┘ └──────────┘ └──────┘ └────────┘
-```
+<div className="architectureDiagram">
+  <svg viewBox="0 0 960 820" role="img" aria-label="PilotDeck system architecture overview">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+      </marker>
+      <style>{`
+        .architectureDiagram svg {
+          width: 100%;
+          height: auto;
+          display: block;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+        }
+        .architectureDiagram text {
+          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          fill: #1e293b;
+        }
+        .architectureDiagram .layer {
+          fill: #eaf2ff;
+          stroke: #d5e4f7;
+        }
+        .architectureDiagram .box {
+          fill: #ffffff;
+          stroke: #94a3b8;
+          stroke-width: 2;
+          rx: 12;
+        }
+        .architectureDiagram .innerBox {
+          fill: #f8fafc;
+          stroke: #94a3b8;
+          stroke-width: 2;
+          rx: 10;
+        }
+        .architectureDiagram .line {
+          stroke: #64748b;
+          stroke-width: 2;
+          fill: none;
+        }
+        .architectureDiagram .label {
+          fill: #475569;
+          font-size: 18px;
+          font-weight: 600;
+        }
+        .architectureDiagram .title {
+          font-size: 20px;
+          font-weight: 700;
+        }
+        .architectureDiagram .subtitle {
+          fill: #64748b;
+          font-size: 15px;
+        }
+        .architectureDiagram .side {
+          fill: #475569;
+          font-size: 16px;
+          font-weight: 600;
+        }
+      `}</style>
+    </defs>
+
+    <rect x="24" y="24" width="912" height="784" className="layer" rx="18" />
+    <text x="480" y="64" textAnchor="middle" className="label">User Interaction Layer</text>
+
+    <g>
+      <rect x="56" y="92" width="136" height="82" className="box" />
+      <text x="124" y="124" textAnchor="middle" className="title">CLI</text>
+      <text x="124" y="150" textAnchor="middle" className="subtitle">Channel</text>
+
+      <rect x="218" y="92" width="136" height="82" className="box" />
+      <text x="286" y="124" textAnchor="middle" className="title">TUI</text>
+      <text x="286" y="150" textAnchor="middle" className="subtitle">Channel</text>
+
+      <rect x="380" y="92" width="136" height="82" className="box" />
+      <text x="448" y="124" textAnchor="middle" className="title">Web UI</text>
+      <text x="448" y="150" textAnchor="middle" className="subtitle">Channel</text>
+
+      <rect x="542" y="92" width="136" height="82" className="box" />
+      <text x="610" y="122" textAnchor="middle" className="title">Desktop</text>
+      <text x="610" y="148" textAnchor="middle" className="subtitle">Electron</text>
+
+      <rect x="704" y="92" width="136" height="82" className="box" />
+      <text x="772" y="124" textAnchor="middle" className="title">Feishu</text>
+      <text x="772" y="150" textAnchor="middle" className="subtitle">Channel</text>
+    </g>
+
+    <path d="M124 174 V218 H480" className="line" />
+    <path d="M286 174 V218 H480" className="line" />
+    <path d="M448 174 V218 H480" className="line" />
+    <path d="M610 174 V218 H480" className="line" />
+    <path d="M772 174 V218 H480" className="line" />
+    <path d="M480 218 V258" className="line" markerEnd="url(#arrow)" />
+
+    <g>
+      <rect x="374" y="258" width="212" height="82" className="box" />
+      <text x="480" y="292" textAnchor="middle" className="title">Gateway</text>
+      <text x="480" y="318" textAnchor="middle" className="subtitle">WS / HTTP</text>
+      <text x="744" y="304" textAnchor="middle" className="side">Message Gateway Layer</text>
+    </g>
+
+    <path d="M480 340 V394" className="line" markerEnd="url(#arrow)" />
+
+    <g>
+      <rect x="330" y="394" width="300" height="84" className="box" />
+      <text x="480" y="428" textAnchor="middle" className="title">SessionRouter</text>
+      <text x="480" y="454" textAnchor="middle" className="subtitle">Create / Find / Manage</text>
+      <text x="744" y="444" textAnchor="middle" className="side">Session Routing Layer</text>
+    </g>
+
+    <path d="M480 478 V538" className="line" markerEnd="url(#arrow)" />
+
+    <g>
+      <rect x="310" y="538" width="340" height="148" className="box" />
+      <text x="480" y="570" textAnchor="middle" className="title">AgentSession</text>
+      <rect x="368" y="590" width="224" height="72" className="innerBox" />
+      <text x="480" y="618" textAnchor="middle" className="title">TurnRunner</text>
+      <rect x="416" y="634" width="128" height="42" className="innerBox" />
+      <text x="480" y="662" textAnchor="middle" className="subtitle">AgentLoop</text>
+      <text x="744" y="622" textAnchor="middle" className="side">Agent Runtime Layer</text>
+    </g>
+
+    <path d="M480 686 V718" className="line" />
+    <path d="M124 718 H836" className="line" />
+    <path d="M124 718 V754" className="line" markerEnd="url(#arrow)" />
+    <path d="M286 718 V754" className="line" markerEnd="url(#arrow)" />
+    <path d="M448 718 V754" className="line" markerEnd="url(#arrow)" />
+    <path d="M610 718 V754" className="line" markerEnd="url(#arrow)" />
+    <path d="M772 718 V754" className="line" markerEnd="url(#arrow)" />
+
+    <g>
+      <rect x="58" y="754" width="132" height="52" className="box" />
+      <text x="124" y="787" textAnchor="middle" className="title">Router</text>
+
+      <rect x="220" y="754" width="132" height="52" className="box" />
+      <text x="286" y="787" textAnchor="middle" className="title">Model</text>
+
+      <rect x="374" y="754" width="148" height="52" className="box" />
+      <text x="448" y="777" textAnchor="middle" className="title">Context</text>
+      <text x="448" y="798" textAnchor="middle" className="subtitle">Memory</text>
+
+      <rect x="544" y="754" width="132" height="52" className="box" />
+      <text x="610" y="787" textAnchor="middle" className="title">Tool</text>
+
+      <rect x="706" y="754" width="132" height="52" className="box" />
+      <text x="772" y="777" textAnchor="middle" className="title">Session</text>
+      <text x="772" y="798" textAnchor="middle" className="subtitle">Store</text>
+    </g>
+  </svg>
+</div>
 
 ## Module List
 

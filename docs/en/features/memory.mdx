@@ -29,28 +29,135 @@ PilotDeck includes a **PilotDeck Memory Core** long-term memory system. It captu
 
 Memory has two stages: **Capture** and **Retrieve**.
 
-```
-                    ┌────────────────────────┐
-  End of each turn ─▶│   Capture              │
-                    │  Extract knowledge      │
-                    │  Add session/timestamp  │
-                    └───────────┬────────────┘
-                                │
-                                ▼
-                    ┌────────────────────────┐
-                    │   PilotDeck Memory     │
-                    │   Persistent storage   │
-                    │   ~/.pilotdeck/memory  │
-                    └───────────┬────────────┘
-                                │
-                                ▲
-  New session/turn ────────────▶│
-                    ┌───────────┴────────────┐
-                    │   Retrieve             │
-                    │  Search by query        │
-                    │  Inject System Context  │
-                    └────────────────────────┘
-```
+<div className="memoryFlowDiagram">
+  <svg viewBox="0 0 960 560" role="img" aria-label="PilotDeck Memory capture and retrieve workflow">
+    <defs>
+      <marker id="memoryArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+      </marker>
+      <style>{`
+        .memoryFlowDiagram svg {
+          width: 100%;
+          height: auto;
+          display: block;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+        }
+        .memoryFlowDiagram text {
+          font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          fill: #1e293b;
+        }
+        .memoryFlowDiagram .panel {
+          fill: #eaf2ff;
+          stroke: #d5e4f7;
+        }
+        .memoryFlowDiagram .capture {
+          fill: #eff6ff;
+          stroke: #93c5fd;
+          stroke-width: 2;
+          rx: 16;
+        }
+        .memoryFlowDiagram .store {
+          fill: #ffffff;
+          stroke: #94a3b8;
+          stroke-width: 2;
+          rx: 18;
+        }
+        .memoryFlowDiagram .retrieve {
+          fill: #ecfdf5;
+          stroke: #86efac;
+          stroke-width: 2;
+          rx: 16;
+        }
+        .memoryFlowDiagram .context {
+          fill: #fff7ed;
+          stroke: #fdba74;
+          stroke-width: 2;
+          rx: 16;
+        }
+        .memoryFlowDiagram .line {
+          stroke: #64748b;
+          stroke-width: 2;
+          fill: none;
+        }
+        .memoryFlowDiagram .title {
+          font-size: 20px;
+          font-weight: 700;
+        }
+        .memoryFlowDiagram .subtitle {
+          fill: #64748b;
+          font-size: 15px;
+        }
+        .memoryFlowDiagram .label {
+          fill: #475569;
+          font-size: 16px;
+          font-weight: 600;
+        }
+        .memoryFlowDiagram .small {
+          fill: #64748b;
+          font-size: 14px;
+        }
+      `}</style>
+    </defs>
+
+    <rect x="24" y="24" width="912" height="512" className="panel" rx="18" />
+
+    <g>
+      <rect x="72" y="90" width="220" height="76" className="capture" />
+      <text x="182" y="121" textAnchor="middle" className="title">Turn Completed</text>
+      <text x="182" y="146" textAnchor="middle" className="subtitle">conversation transcript</text>
+    </g>
+
+    <path d="M292 128 H344" className="line" markerEnd="url(#memoryArrow)" />
+
+    <g>
+      <rect x="344" y="72" width="272" height="112" className="capture" />
+      <text x="480" y="108" textAnchor="middle" className="title">Capture</text>
+      <text x="480" y="133" textAnchor="middle" className="subtitle">extract key facts</text>
+      <text x="480" y="156" textAnchor="middle" className="subtitle">tag session / timestamp</text>
+    </g>
+
+    <path d="M480 184 V244" className="line" markerEnd="url(#memoryArrow)" />
+
+    <g>
+      <rect x="316" y="244" width="328" height="104" className="store" />
+      <text x="480" y="279" textAnchor="middle" className="title">PilotDeck Memory</text>
+      <text x="480" y="304" textAnchor="middle" className="subtitle">persistent knowledge store</text>
+      <text x="480" y="327" textAnchor="middle" className="small">~/.pilotdeck/memory</text>
+    </g>
+
+    <path d="M480 348 V408" className="line" markerEnd="url(#memoryArrow)" />
+
+    <g>
+      <rect x="72" y="408" width="220" height="76" className="retrieve" />
+      <text x="182" y="438" textAnchor="middle" className="title">New Turn</text>
+      <text x="182" y="463" textAnchor="middle" className="subtitle">latest query + context</text>
+    </g>
+
+    <path d="M292 446 H344" className="line" markerEnd="url(#memoryArrow)" />
+
+    <g>
+      <rect x="344" y="390" width="272" height="112" className="retrieve" />
+      <text x="480" y="426" textAnchor="middle" className="title">Retrieve</text>
+      <text x="480" y="451" textAnchor="middle" className="subtitle">search relevant memory</text>
+      <text x="480" y="474" textAnchor="middle" className="subtitle">rank by query and workspace</text>
+    </g>
+
+    <path d="M616 446 H668" className="line" markerEnd="url(#memoryArrow)" />
+
+    <g>
+      <rect x="668" y="390" width="220" height="112" className="context" />
+      <text x="778" y="426" textAnchor="middle" className="title">System Context</text>
+      <text x="778" y="451" textAnchor="middle" className="subtitle">inject retrieved facts</text>
+      <text x="778" y="474" textAnchor="middle" className="subtitle">before model request</text>
+    </g>
+
+    <path d="M644 296 H778 V390" className="line" markerEnd="url(#memoryArrow)" />
+    <text x="724" y="284" textAnchor="middle" className="label">read path</text>
+    <text x="480" y="222" textAnchor="middle" className="label">write path</text>
+  </svg>
+</div>
 
 ### Capture
 
