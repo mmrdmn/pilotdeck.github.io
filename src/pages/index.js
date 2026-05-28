@@ -534,9 +534,6 @@ function UseCasesSection() {
 function QuickStartSection() {
   const isZh = useIsZh();
   const t = isZh ? QUICKSTART.zh : QUICKSTART.en;
-  const release = useLatestRelease();
-  const macUrl = release?.macUrl || RELEASES_FALLBACK;
-  const winUrl = release?.winUrl || RELEASES_FALLBACK;
 
   return (
     <section id="quick-start" className={styles.quickStartSection}>
@@ -565,24 +562,6 @@ pilotdeck status     # check runtime status`}
             <Link className={styles.btnPrimary} to={t.ctaTo}>
               {t.cta}
             </Link>
-            <a
-              className={styles.btnSecondary}
-              href={macUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <DownloadIcon />
-              {t.downloadMac}
-            </a>
-            <a
-              className={styles.btnSecondary}
-              href={winUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <DownloadIcon />
-              {t.downloadWin}
-            </a>
           </div>
         </div>
       </div>
