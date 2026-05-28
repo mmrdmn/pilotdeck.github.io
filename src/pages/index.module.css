@@ -730,6 +730,17 @@
   line-height: 1.6;
   margin-bottom: 40px;
 }
+.quickStartActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+.quickStartActions .btnPrimary,
+.quickStartActions .btnSecondary {
+  padding: 10px 16px;
+  font-size: 14px;
+}
 
 .quickStartImageWrapper {
   flex: 1.2;
@@ -884,6 +895,7 @@
   .quickStartCode { width: 100%; text-align: left; }
   .quickStartTitle { font-size: 32px; }
   .quickStartDesc { font-size: 16px; }
+  .quickStartActions { justify-content: center; flex-wrap: wrap; }
 
   .partnersGrid { gap: 24px 40px; }
   .partnerLogo { height: 36px; }
@@ -914,6 +926,7 @@
   }
 
   .heroButtons { flex-direction: column; width: 100%; gap: 10px; }
+  .quickStartActions { flex-direction: column; width: 100%; gap: 10px; }
   .btnPrimary, .btnSecondary {
     width: 100%;
     justify-content: center;

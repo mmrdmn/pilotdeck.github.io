@@ -198,6 +198,8 @@ const QUICKSTART = {
     desc: 'One-line install on macOS / Linux. Node.js, dependencies and frontend are taken care of.',
     cta: 'Get Started',
     ctaTo: 'https://github.com/OpenBMB/PilotDeck#-installation--quick-start',
+    downloadMac: 'macOS',
+    downloadWin: 'Windows',
     uiTitle: 'Visual WorkSpace Cockpit',
     uiDesc: 'Manage every WorkSpace, inspect white-box memory, and watch multi-agent collaboration in a single browser tab.',
     uiCta: 'Open Demo',
@@ -208,6 +210,8 @@ const QUICKSTART = {
     desc: '一行命令安装（macOS / Linux）。Node.js、依赖、前端一并搞定。',
     cta: '即刻上手',
     ctaTo: 'https://github.com/OpenBMB/PilotDeck#-installation--quick-start',
+    downloadMac: 'macOS',
+    downloadWin: 'Windows',
     uiTitle: '可视化 WorkSpace 驾驶舱',
     uiDesc: '在一个浏览器标签里管理所有 WorkSpace、查看白盒记忆、观察多智能体协作。',
     uiCta: '在线试玩',
@@ -246,13 +250,6 @@ const PARTNERS = {
 const GITHUB_RELEASES_API = 'https://api.github.com/repos/OpenBMB/PilotDeck/releases/latest';
 const RELEASES_FALLBACK = 'https://github.com/OpenBMB/PilotDeck/releases/latest';
 
-function detectOS() {
-  if (typeof navigator === 'undefined') return 'mac';
-  const ua = navigator.userAgent || '';
-  if (/Windows/.test(ua)) return 'win';
-  return 'mac';
-}
-
 function useLatestRelease() {
   const [release, setRelease] = React.useState(null);
 
@@ -280,6 +277,16 @@ function useLatestRelease() {
   return release;
 }
 
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+  );
+}
+
 // ============================================================
 // SECTIONS
 // ============================================================
@@ -287,22 +294,6 @@ function useLatestRelease() {
 function HeroSection() {
   const isZh = useIsZh();
   const t = isZh ? HERO.zh : HERO.en;
-  const release = useLatestRelease();
-  const [os, setOs] = React.useState('mac');
-
-  React.useEffect(() => {
-    setOs(detectOS());
-  }, []);
-
-  const primaryUrl = os === 'win'
-    ? (release?.winUrl || RELEASES_FALLBACK)
-    : (release?.macUrl || RELEASES_FALLBACK);
-  const primaryLabel = os === 'win' ? t.downloadWin : t.downloadMac;
-
-  const secondaryUrl = os === 'win'
-    ? (release?.macUrl || RELEASES_FALLBACK)
-    : (release?.winUrl || RELEASES_FALLBACK);
-  const secondaryLabel = os === 'win' ? t.downloadMac : t.downloadWin;
 
   return (
     <header className={styles.heroSection}>
@@ -338,35 +329,6 @@ function HeroSection() {
           </p>
 
           <div className={styles.heroButtons}>
-            <a
-              className={styles.btnPrimary}
-              href={primaryUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              {primaryLabel}
-              {release?.version && (
-                <span className={styles.versionBadge}>{release.version}</span>
-              )}
-            </a>
-            <a
-              className={styles.btnSecondary}
-              href={secondaryUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}>
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              {secondaryLabel}
-            </a>
             {/* Static SPA microsite at static/demo/index.html — use a plain
                 anchor so Docusaurus's link checker doesn't flag it. */}
             <a className={styles.btnSecondary} href={useBaseUrl('/demo/')}>
@@ -572,6 +534,9 @@ function UseCasesSection() {
 function QuickStartSection() {
   const isZh = useIsZh();
   const t = isZh ? QUICKSTART.zh : QUICKSTART.en;
+  const release = useLatestRelease();
+  const macUrl = release?.macUrl || RELEASES_FALLBACK;
+  const winUrl = release?.winUrl || RELEASES_FALLBACK;
 
   return (
     <section id="quick-start" className={styles.quickStartSection}>
@@ -596,9 +561,29 @@ pilotdeck status     # check runtime status`}
         <div className={styles.quickStartContent}>
           <h2 className={styles.quickStartTitle}>{t.title}</h2>
           <p className={styles.quickStartDesc}>{t.desc}</p>
-          <Link className={styles.btnPrimary} to={t.ctaTo}>
-            {t.cta}
-          </Link>
+          <div className={styles.quickStartActions}>
+            <Link className={styles.btnPrimary} to={t.ctaTo}>
+              {t.cta}
+            </Link>
+            <a
+              className={styles.btnSecondary}
+              href={macUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <DownloadIcon />
+              {t.downloadMac}
+            </a>
+            <a
+              className={styles.btnSecondary}
+              href={winUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <DownloadIcon />
+              {t.downloadWin}
+            </a>
+          </div>
         </div>
       </div>
 
