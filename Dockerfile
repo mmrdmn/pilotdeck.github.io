@@ -12,7 +12,9 @@
 #
 # Final image is ~30 MB (nginx-alpine + a few MB of static assets).
 
-ARG MIRROR=docker.1ms.run
+# Use Docker Hub by default for CI reliability. Builders in regions that need
+# a registry mirror can still override this with `--build-arg MIRROR=...`.
+ARG MIRROR=docker.io
 ARG NODE_VERSION=22-alpine
 ARG NGINX_VERSION=1.27-alpine
 
