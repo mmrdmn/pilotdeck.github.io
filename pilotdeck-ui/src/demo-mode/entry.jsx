@@ -5,31 +5,14 @@
 // Importing the mocks at the very top relies on Vite's static-import
 // evaluation order: they finish executing BEFORE `App` is pulled in below.
 
+// Seed persisted localStorage (language / activeTab / theme) FIRST — this
+// import must stay above the App / i18n imports so i18next initialises in the
+// right locale. See seed-state.js for the why.
+import './seed-state.js';
 import './mock-fetch.js';
 import './mock-websocket.js';
 import './demo-block.js';
-
-// Pin the demo's persisted state to a known-good baseline on every boot.
-// Without this:
-//   - activeTab: a returning visitor who clicked Dashboard/Memory/Always-on
-//     before the click-block landed would re-mount that (now-blocked)
-//     panel on reload and crash before our shim could intervene.
-//   - userLanguage: i18next's browser language detector picks ZH/EN
-//     based on the visitor's OS locale. The demo's canned copy is
-//     English-only, so a ZH visitor would see a half-translated UI.
-//   - theme: the V2 ThemeContext falls back to prefers-color-scheme on
-//     first visit. We want every screenshot / share / repeat visit to
-//     look the same in light mode.
-try {
-  window.localStorage.setItem('activeTab', 'chat');
-  window.localStorage.setItem('userLanguage', 'en');
-  window.localStorage.setItem('theme', 'light');
-  // Drop the dark-mode class eagerly so we never flash dark before the
-  // ThemeProvider's effect runs on the very first paint.
-  document.documentElement.classList.remove('dark');
-} catch {
-  // private mode / disabled storage — fine.
-}
+import './demo-lang-switcher.js';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';

@@ -16,9 +16,34 @@
 const GITHUB_REPO_URL = 'https://github.com/OpenBMB/PilotDeck';
 const GITHUB_INSTALL_URL = 'https://github.com/OpenBMB/PilotDeck#-installation--quick-start';
 
+// The demo's active locale is persisted under `userLanguage` by the i18n
+// layer (see i18n/config.js) / seed-state.js. We read it here so the block
+// modal + the "Back to website" button match the rest of the UI chrome.
+function currentLang() {
+  try {
+    return localStorage.getItem('userLanguage') === 'zh-CN' ? 'zh-CN' : 'en';
+  } catch {
+    return 'en';
+  }
+}
+
+// Chrome strings shown around every block modal (locale-picked at open time).
+const UI_TEXT = {
+  eyebrow: { en: 'Demo Sandbox', 'zh-CN': '演示沙盒' },
+  dismiss: { en: 'Got it', 'zh-CN': '知道了' },
+  install: { en: 'Install locally →', 'zh-CN': '在本地安装 →' },
+  backToWebsite: { en: 'Back to website', 'zh-CN': '返回官网' },
+};
+
+function tr(entry) {
+  const lang = currentLang();
+  return (entry && (entry[lang] || entry.en)) || '';
+}
+
 // ─── Block rules ──────────────────────────────────────────────────────────
 // Each rule has a `test(el)` predicate run on every captured click target,
-// and a localized headline + body shown in the modal. First match wins.
+// and a localized headline + body ({ en, 'zh-CN' }) shown in the modal.
+// First match wins.
 
 const BLOCK_RULES = [
   {
@@ -30,18 +55,24 @@ const BLOCK_RULES = [
     // now navigates to the docs site root, not the Settings dialog.
     test: (el) =>
       el.closest('[aria-label="Settings"], [aria-label*="设置"]') !== null,
-    title: 'Settings — Demo Sandbox',
-    body:
-      'Provider configuration, appearance options, the smart-routing setup, plugin management, and the memory inspector all require a real local PilotDeck instance — they\'re hidden here so nothing pretends to save.',
+    title: { en: 'Settings — Demo Sandbox', 'zh-CN': '设置 —— 演示沙盒' },
+    body: {
+      en: 'Provider configuration, appearance options, the smart-routing setup, plugin management, and the memory inspector all require a real local PilotDeck instance — they\'re hidden here so nothing pretends to save.',
+      'zh-CN':
+        '模型提供方配置、外观选项、智能路由设置、插件管理以及记忆检查器都需要在本地运行真实的 PilotDeck 实例 —— 这里已将它们隐藏，以免任何设置被伪装成“已保存”。',
+    },
   },
   {
     id: 'new-project',
     // "+" button next to the Projects header in the sidebar.
     test: (el) =>
       el.closest('[aria-label*="New Project" i], [aria-label*="新建项目"], [aria-label*="新建工作"]') !== null,
-    title: 'New WorkSpace — Demo Sandbox',
-    body:
-      'WorkSpaces are isolated project containers backed by a real filesystem and memory store. Spinning one up needs the local PilotDeck server.',
+    title: { en: 'New WorkSpace — Demo Sandbox', 'zh-CN': '新建 WorkSpace —— 演示沙盒' },
+    body: {
+      en: 'WorkSpaces are isolated project containers backed by a real filesystem and memory store. Spinning one up needs the local PilotDeck server.',
+      'zh-CN':
+        'WorkSpace 工作舱是由真实文件系统与记忆存储支撑的隔离项目容器。创建一个需要本地的 PilotDeck 服务。',
+    },
   },
   {
     id: 'new-chat',
@@ -50,9 +81,12 @@ const BLOCK_RULES = [
     // Chat" in the V2 sidebar.
     test: (el) =>
       el.closest('[aria-label*="New Chat" i], [aria-label*="新建对话"]') !== null,
-    title: 'New Conversation — Demo Sandbox',
-    body:
-      'Starting a fresh chat would normally spin up a clean PilotDeck session against a real model. This sandbox only ships the canned tutorial transcript — open the existing session in the sidebar or install PilotDeck locally to start your own.',
+    title: { en: 'New Conversation — Demo Sandbox', 'zh-CN': '新建对话 —— 演示沙盒' },
+    body: {
+      en: 'Starting a fresh chat would normally spin up a clean PilotDeck session against a real model. This sandbox only ships the canned tutorial transcript — open the existing session in the sidebar or install PilotDeck locally to start your own.',
+      'zh-CN':
+        '开启新对话通常会针对真实模型创建一个全新的 PilotDeck 会话。本沙盒仅提供预置的教程对话 —— 请在侧边栏打开已有会话，或在本地安装 PilotDeck 来开始你自己的会话。',
+    },
   },
   {
     id: 'tool-tab',
@@ -72,9 +106,12 @@ const BLOCK_RULES = [
       // Chat = first tab. Everything else needs a real backend.
       return index > 0;
     },
-    title: 'Tool tab — Demo Sandbox',
-    body:
-      'Files, Skills, Dashboard, Memory, and Always-on each render live data from the PilotDeck server. They\'d be empty here. Try the chat tab instead, or install PilotDeck locally to see the full cockpit.',
+    title: { en: 'Tool tab — Demo Sandbox', 'zh-CN': '工具标签 —— 演示沙盒' },
+    body: {
+      en: 'Files, Skills, Dashboard, Memory, and Always-on each render live data from the PilotDeck server. They\'d be empty here. Try the chat tab instead, or install PilotDeck locally to see the full cockpit.',
+      'zh-CN':
+        '文件、技能、仪表盘、记忆与后台常驻都会展示来自 PilotDeck 服务的实时数据，在这里它们是空的。请改用聊天标签，或在本地安装 PilotDeck 体验完整的驾驶舱。',
+    },
   },
   {
     id: 'delete-action',
@@ -86,9 +123,12 @@ const BLOCK_RULES = [
       // lucide-react v0.515 renders icons with a `lucide-trash-2` class.
       return btn.querySelector('svg.lucide-trash-2, svg[class*="lucide-trash"]') !== null;
     },
-    title: 'Delete — Demo Sandbox',
-    body:
-      'Deleting projects or sessions writes through to the PilotDeck server and removes data from your local filesystem. We block that here so a reload always brings back the same canned sandbox.',
+    title: { en: 'Delete — Demo Sandbox', 'zh-CN': '删除 —— 演示沙盒' },
+    body: {
+      en: 'Deleting projects or sessions writes through to the PilotDeck server and removes data from your local filesystem. We block that here so a reload always brings back the same canned sandbox.',
+      'zh-CN':
+        '删除项目或会话会写入 PilotDeck 服务，并从本地文件系统移除数据。这里已将其屏蔽，以便每次刷新都能回到相同的预置沙盒。',
+    },
   },
 ];
 
@@ -228,7 +268,7 @@ function buildModal() {
   backdrop.innerHTML = `
     <div class="pd-demo-modal-card" role="document">
       <div class="pd-demo-modal-header">
-        <span class="pd-demo-modal-eyebrow">Demo Sandbox</span>
+        <span class="pd-demo-modal-eyebrow" data-role="eyebrow">Demo Sandbox</span>
         <h2 class="pd-demo-modal-title" data-role="title"></h2>
       </div>
       <div class="pd-demo-modal-body" data-role="body"></div>
@@ -256,11 +296,16 @@ function closeModal(backdrop) {
 }
 
 function openModal(backdrop, rule) {
-  backdrop.querySelector('[data-role="title"]').textContent = rule.title;
-  backdrop.querySelector('[data-role="body"]').textContent = rule.body;
+  backdrop.querySelector('[data-role="title"]').textContent = tr(rule.title);
+  backdrop.querySelector('[data-role="body"]').textContent = tr(rule.body);
+  // Localize the static chrome each open — cheap, and the demo locale can
+  // only change via a full reload so there's no stale-language risk.
+  backdrop.querySelector('[data-role="eyebrow"]').textContent = tr(UI_TEXT.eyebrow);
+  const dismiss = backdrop.querySelector('[data-role="dismiss"]');
+  dismiss.textContent = tr(UI_TEXT.dismiss);
+  backdrop.querySelector('[data-role="install"]').textContent = tr(UI_TEXT.install);
   backdrop.dataset.open = 'true';
   // Focus the dismiss button so Escape works naturally.
-  const dismiss = backdrop.querySelector('[data-role="dismiss"]');
   setTimeout(() => dismiss.focus(), 50);
 }
 
@@ -357,7 +402,7 @@ function transformSettingsButton(btn) {
   if (!btn || btn.dataset.pdDemoBackPatched === '1') return;
   btn.dataset.pdDemoBackPatched = '1';
 
-  const label = 'Back to website';
+  const label = tr(UI_TEXT.backToWebsite);
   btn.setAttribute('aria-label', label);
   btn.setAttribute('title', label);
 
@@ -390,19 +435,21 @@ function transformSettingsButton(btn) {
 }
 
 (function installSettingsButtonTransform() {
+  // Match both the EN ("Settings") and ZH ("设置") sidebar-footer button so
+  // the "Back to website" rewrite lands regardless of the demo's locale.
+  const SETTINGS_SELECTOR = '[aria-label="Settings"], [aria-label="设置"]';
+
   // Patch anything already rendered (rare — usually the observer beats this).
-  document
-    .querySelectorAll('[aria-label="Settings"]')
-    .forEach(transformSettingsButton);
+  document.querySelectorAll(SETTINGS_SELECTOR).forEach(transformSettingsButton);
 
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (!(node instanceof Element)) continue;
-        if (node.matches?.('[aria-label="Settings"]')) {
+        if (node.matches?.(SETTINGS_SELECTOR)) {
           transformSettingsButton(node);
         }
-        node.querySelectorAll?.('[aria-label="Settings"]').forEach(
+        node.querySelectorAll?.(SETTINGS_SELECTOR).forEach(
           transformSettingsButton,
         );
       }

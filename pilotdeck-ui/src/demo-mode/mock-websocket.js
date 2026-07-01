@@ -7,7 +7,7 @@
 // Must run BEFORE any V2 module reads `WebSocket` — entry.jsx imports this
 // file at the top, before importing App.
 
-import { DEMO_REPLY_TEXT, DEMO_PROVIDER } from './canned-data.js';
+import { getDemoReplyText, DEMO_PROVIDER } from './canned-data.js';
 
 const realWebSocket = window.WebSocket;
 
@@ -192,7 +192,7 @@ class MockWebSocket {
 
     // Stream the canned reply in small chunks. We deliberately omit any
     // tool_use frames so the demo response feels like plain assistant text.
-    const fullText = DEMO_REPLY_TEXT;
+    const fullText = getDemoReplyText();
     let offset = 0;
 
     const pushNextChunk = () => {
