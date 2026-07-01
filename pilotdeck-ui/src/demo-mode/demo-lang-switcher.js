@@ -43,8 +43,8 @@ function injectStyles() {
   style.textContent = `
     .pd-demo-lang {
       position: fixed;
-      top: 12px;
-      right: 12px;
+      bottom: 16px;
+      right: 16px;
       z-index: 99990;
       display: inline-flex;
       align-items: center;
