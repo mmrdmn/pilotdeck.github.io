@@ -294,6 +294,10 @@ function DownloadIcon() {
 function HeroSection() {
   const isZh = useIsZh();
   const t = isZh ? HERO.zh : HERO.en;
+  const latestRelease = useLatestRelease();
+  const macDownloadUrl = latestRelease?.macUrl || RELEASES_FALLBACK;
+  const winDownloadUrl = latestRelease?.winUrl || RELEASES_FALLBACK;
+  const releasesUrl = latestRelease?.htmlUrl || RELEASES_FALLBACK;
 
   return (
     <header className={styles.heroSection}>
@@ -329,6 +333,18 @@ function HeroSection() {
           </p>
 
           <div className={styles.heroButtons}>
+            <a className={styles.btnPrimary} href={macDownloadUrl}>
+              <DownloadIcon />
+              {t.downloadMac}
+              {latestRelease?.version && <span className={styles.versionBadge}>{latestRelease.version}</span>}
+            </a>
+            <a className={styles.btnSecondary} href={winDownloadUrl}>
+              <DownloadIcon />
+              {t.downloadWin}
+            </a>
+            <a className={styles.btnSecondary} href={releasesUrl}>
+              {t.allDownloads}
+            </a>
             {/* Static SPA microsite at static/demo/index.html — use a plain
                 anchor so Docusaurus's link checker doesn't flag it. */}
             <a className={styles.btnSecondary} href={useBaseUrl('/demo/')}>
