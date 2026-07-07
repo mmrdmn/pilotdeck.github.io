@@ -734,7 +734,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 .quickStartActions .btnPrimary,
 .quickStartActions .btnSecondary {
