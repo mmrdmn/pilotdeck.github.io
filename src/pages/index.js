@@ -287,6 +287,23 @@ function DownloadIcon() {
   );
 }
 
+function AppleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" style={{ marginRight: 6 }}>
+      <path d="M17.05 12.42c-.03-2.25 1.84-3.34 1.92-3.39-1.05-1.54-2.68-1.75-3.25-1.77-1.38-.14-2.7.81-3.4.81-.71 0-1.78-.79-2.93-.77-1.51.02-2.9.88-3.68 2.23-1.57 2.73-.4 6.77 1.13 8.99.75 1.08 1.64 2.3 2.81 2.25 1.13-.04 1.56-.73 2.92-.73 1.36 0 1.75.73 2.95.71 1.22-.02 1.99-1.1 2.73-2.19.86-1.26 1.22-2.48 1.24-2.54-.03-.01-2.39-.92-2.44-3.6z" />
+      <path d="M14.81 5.81c.62-.75 1.04-1.8.93-2.84-.9.04-1.98.6-2.62 1.35-.57.66-1.08 1.73-.94 2.75 1 .08 2.02-.51 2.63-1.26z" />
+    </svg>
+  );
+}
+
+function WindowsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true" style={{ marginRight: 6 }}>
+      <path d="M3 5.1 10.7 4v7.35H3V5.1zm8.6-1.23L21 2.5v8.85h-9.4V3.87zM3 12.25h7.7V20L3 18.9v-6.65zm8.6 0H21v9.25l-9.4-1.33v-7.92z" />
+    </svg>
+  );
+}
+
 // ============================================================
 // SECTIONS
 // ============================================================
@@ -347,11 +364,11 @@ function HeroSection() {
               {t.github}
             </Link>
             <a className={styles.btnSecondary} href={macDownloadUrl}>
-              <DownloadIcon />
+              <AppleIcon />
               {t.downloadMac}
             </a>
             <a className={styles.btnSecondary} href={winDownloadUrl}>
-              <DownloadIcon />
+              <WindowsIcon />
               {t.downloadWin}
             </a>
           </div>
@@ -568,12 +585,12 @@ pilotdeck status     # check runtime status`}
               {t.cta}
             </Link>
             <a className={styles.btnSecondary} href={macDownloadUrl}>
-              <DownloadIcon />
+              <AppleIcon />
               {heroText.downloadMac}
               {latestRelease?.version && <span className={styles.versionBadge}>{latestRelease.version}</span>}
             </a>
             <a className={styles.btnSecondary} href={winDownloadUrl}>
-              <DownloadIcon />
+              <WindowsIcon />
               {heroText.downloadWin}
             </a>
           </div>
