@@ -538,7 +538,6 @@ function QuickStartSection() {
   const latestRelease = useLatestRelease();
   const macDownloadUrl = latestRelease?.macUrl || RELEASES_FALLBACK;
   const winDownloadUrl = latestRelease?.winUrl || RELEASES_FALLBACK;
-  const releasesUrl = latestRelease?.htmlUrl || RELEASES_FALLBACK;
 
   return (
     <section id="quick-start" className={styles.quickStartSection}>
@@ -575,9 +574,6 @@ pilotdeck status     # check runtime status`}
             <a className={styles.btnSecondary} href={winDownloadUrl}>
               <DownloadIcon />
               {heroText.downloadWin}
-            </a>
-            <a className={styles.btnSecondary} href={releasesUrl}>
-              {heroText.allDownloads}
             </a>
           </div>
         </div>
