@@ -249,6 +249,10 @@ const PARTNERS = {
 
 const GITHUB_RELEASES_API = 'https://api.github.com/repos/OpenBMB/PilotDeck/releases/latest';
 const RELEASES_FALLBACK = 'https://github.com/OpenBMB/PilotDeck/releases/latest';
+const DOWNLOAD_ERROR_MESSAGE = {
+  en: 'Unable to get the latest installer. Please try again in a moment.',
+  zh: '暂时无法获取最新版安装包，请稍后重试。',
+};
 
 function pickReleaseAssets(data) {
   const assets = data?.assets || [];
@@ -272,6 +276,8 @@ async function fetchLatestRelease() {
 }
 
 function useDirectDownload() {
+  const isZh = useIsZh();
+
   return React.useCallback(async (url, platform) => {
     if (url) {
       window.location.href = url;
@@ -281,11 +287,12 @@ function useDirectDownload() {
     try {
       const release = await fetchLatestRelease();
       const downloadUrl = platform === 'mac' ? release.macUrl : release.winUrl;
-      window.location.href = downloadUrl || RELEASES_FALLBACK;
+      if (!downloadUrl) throw new Error('Installer asset not found');
+      window.location.href = downloadUrl;
     } catch {
-      window.location.href = RELEASES_FALLBACK;
+      window.alert(isZh ? DOWNLOAD_ERROR_MESSAGE.zh : DOWNLOAD_ERROR_MESSAGE.en);
     }
-  }, []);
+  }, [isZh]);
 }
 
 function useLatestRelease() {
