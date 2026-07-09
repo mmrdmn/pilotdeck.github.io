@@ -247,35 +247,30 @@ const PARTNERS = {
 // HOOKS
 // ============================================================
 
-const GITHUB_RELEASES_API = 'https://api.github.com/repos/OpenBMB/PilotDeck/releases/latest';
 const RELEASES_FALLBACK = 'https://github.com/OpenBMB/PilotDeck/releases/latest';
+const DOWNLOAD_MANIFEST_PATH = 'downloads/latest.json';
 const DOWNLOAD_ERROR_MESSAGE = {
   en: 'Unable to get the latest installer. Please try again in a moment.',
   zh: '暂时无法获取最新版安装包，请稍后重试。',
 };
 
-function pickReleaseAssets(data) {
-  const assets = data?.assets || [];
-  const macDmg = assets.find((a) => a.name.endsWith('arm64.dmg'));
-  const winX64 = assets.find((a) => a.name.endsWith('win-x64.exe'));
-  const winArm64 = assets.find((a) => a.name.endsWith('win-arm64.exe'));
-
+function normalizeDownloadManifest(data) {
   return {
-    version: data?.tag_name,
-    macUrl: macDmg ? macDmg.browser_download_url : null,
-    winUrl: winX64 ? winX64.browser_download_url : null,
-    winArm64Url: winArm64 ? winArm64.browser_download_url : null,
+    version: data?.version,
+    macUrl: data?.downloads?.mac || null,
+    winUrl: data?.downloads?.windows || null,
+    winArm64Url: data?.downloads?.windowsArm64 || null,
     htmlUrl: data?.html_url,
   };
 }
 
-async function fetchLatestRelease() {
-  const response = await fetch(GITHUB_RELEASES_API);
-  if (!response.ok) throw new Error('Unable to fetch latest release');
-  return pickReleaseAssets(await response.json());
+async function fetchDownloadManifest(manifestUrl) {
+  const response = await fetch(manifestUrl, { cache: 'no-cache' });
+  if (!response.ok) throw new Error('Unable to fetch download manifest');
+  return normalizeDownloadManifest(await response.json());
 }
 
-function useDirectDownload() {
+function useDirectDownload(manifestUrl) {
   const isZh = useIsZh();
 
   return React.useCallback(async (url, platform) => {
@@ -285,30 +280,29 @@ function useDirectDownload() {
     }
 
     try {
-      const release = await fetchLatestRelease();
-      const downloadUrl = platform === 'mac' ? release.macUrl : release.winUrl;
+      const manifest = await fetchDownloadManifest(manifestUrl);
+      const downloadUrl = platform === 'mac' ? manifest.macUrl : manifest.winUrl;
       if (!downloadUrl) throw new Error('Installer asset not found');
       window.location.href = downloadUrl;
     } catch {
       window.alert(isZh ? DOWNLOAD_ERROR_MESSAGE.zh : DOWNLOAD_ERROR_MESSAGE.en);
     }
-  }, [isZh]);
+  }, [isZh, manifestUrl]);
 }
 
-function useLatestRelease() {
+function useLatestRelease(manifestUrl) {
   const [release, setRelease] = React.useState(null);
 
   React.useEffect(() => {
     let cancelled = false;
-    fetch(GITHUB_RELEASES_API)
-      .then((r) => r.json())
-      .then((data) => {
-        if (cancelled || !data.assets) return;
-        setRelease(pickReleaseAssets(data));
+    fetchDownloadManifest(manifestUrl)
+      .then((manifest) => {
+        if (cancelled) return;
+        setRelease(manifest);
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, []);
+  }, [manifestUrl]);
 
   return release;
 }
@@ -347,8 +341,9 @@ function WindowsIcon() {
 function HeroSection() {
   const isZh = useIsZh();
   const t = isZh ? HERO.zh : HERO.en;
-  const latestRelease = useLatestRelease();
-  const download = useDirectDownload();
+  const manifestUrl = useBaseUrl(DOWNLOAD_MANIFEST_PATH);
+  const latestRelease = useLatestRelease(manifestUrl);
+  const download = useDirectDownload(manifestUrl);
   const macDownloadUrl = latestRelease?.macUrl;
   const winDownloadUrl = latestRelease?.winUrl;
 
@@ -590,8 +585,9 @@ function QuickStartSection() {
   const isZh = useIsZh();
   const t = isZh ? QUICKSTART.zh : QUICKSTART.en;
   const heroText = isZh ? HERO.zh : HERO.en;
-  const latestRelease = useLatestRelease();
-  const download = useDirectDownload();
+  const manifestUrl = useBaseUrl(DOWNLOAD_MANIFEST_PATH);
+  const latestRelease = useLatestRelease(manifestUrl);
+  const download = useDirectDownload(manifestUrl);
   const macDownloadUrl = latestRelease?.macUrl;
   const winDownloadUrl = latestRelease?.winUrl;
 

@@ -5,7 +5,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
-    "build": "docusaurus build",
+    "build": "node scripts/update-download-manifest.mjs && docusaurus build",
     "build:demo": "node scripts/build-demo.mjs",
     "build:all": "npm run build:demo && docusaurus build",
     "swizzle": "docusaurus swizzle",
