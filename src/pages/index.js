@@ -250,6 +250,44 @@ const PARTNERS = {
 const GITHUB_RELEASES_API = 'https://api.github.com/repos/OpenBMB/PilotDeck/releases/latest';
 const RELEASES_FALLBACK = 'https://github.com/OpenBMB/PilotDeck/releases/latest';
 
+function pickReleaseAssets(data) {
+  const assets = data?.assets || [];
+  const macDmg = assets.find((a) => a.name.endsWith('arm64.dmg'));
+  const winX64 = assets.find((a) => a.name.endsWith('win-x64.exe'));
+  const winArm64 = assets.find((a) => a.name.endsWith('win-arm64.exe'));
+
+  return {
+    version: data?.tag_name,
+    macUrl: macDmg ? macDmg.browser_download_url : null,
+    winUrl: winX64 ? winX64.browser_download_url : null,
+    winArm64Url: winArm64 ? winArm64.browser_download_url : null,
+    htmlUrl: data?.html_url,
+  };
+}
+
+async function fetchLatestRelease() {
+  const response = await fetch(GITHUB_RELEASES_API);
+  if (!response.ok) throw new Error('Unable to fetch latest release');
+  return pickReleaseAssets(await response.json());
+}
+
+function useDirectDownload() {
+  return React.useCallback(async (url, platform) => {
+    if (url) {
+      window.location.href = url;
+      return;
+    }
+
+    try {
+      const release = await fetchLatestRelease();
+      const downloadUrl = platform === 'mac' ? release.macUrl : release.winUrl;
+      window.location.href = downloadUrl || RELEASES_FALLBACK;
+    } catch {
+      window.location.href = RELEASES_FALLBACK;
+    }
+  }, []);
+}
+
 function useLatestRelease() {
   const [release, setRelease] = React.useState(null);
 
@@ -259,16 +297,7 @@ function useLatestRelease() {
       .then((r) => r.json())
       .then((data) => {
         if (cancelled || !data.assets) return;
-        const macDmg = data.assets.find((a) => a.name.endsWith('arm64.dmg'));
-        const winX64 = data.assets.find((a) => a.name.endsWith('win-x64.exe'));
-        const winArm64 = data.assets.find((a) => a.name.endsWith('win-arm64.exe'));
-        setRelease({
-          version: data.tag_name,
-          macUrl: macDmg ? macDmg.browser_download_url : null,
-          winUrl: winX64 ? winX64.browser_download_url : null,
-          winArm64Url: winArm64 ? winArm64.browser_download_url : null,
-          htmlUrl: data.html_url,
-        });
+        setRelease(pickReleaseAssets(data));
       })
       .catch(() => {});
     return () => { cancelled = true; };
@@ -312,8 +341,9 @@ function HeroSection() {
   const isZh = useIsZh();
   const t = isZh ? HERO.zh : HERO.en;
   const latestRelease = useLatestRelease();
-  const macDownloadUrl = latestRelease?.macUrl || RELEASES_FALLBACK;
-  const winDownloadUrl = latestRelease?.winUrl || RELEASES_FALLBACK;
+  const download = useDirectDownload();
+  const macDownloadUrl = latestRelease?.macUrl;
+  const winDownloadUrl = latestRelease?.winUrl;
 
   return (
     <header className={styles.heroSection}>
@@ -363,14 +393,14 @@ function HeroSection() {
               </svg>
               {t.github}
             </Link>
-            <a className={styles.btnSecondary} href={macDownloadUrl}>
+            <button className={styles.btnSecondary} type="button" onClick={() => download(macDownloadUrl, 'mac')}>
               <AppleIcon />
               {t.downloadMac}
-            </a>
-            <a className={styles.btnSecondary} href={winDownloadUrl}>
+            </button>
+            <button className={styles.btnSecondary} type="button" onClick={() => download(winDownloadUrl, 'win')}>
               <WindowsIcon />
               {t.downloadWin}
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -554,8 +584,9 @@ function QuickStartSection() {
   const t = isZh ? QUICKSTART.zh : QUICKSTART.en;
   const heroText = isZh ? HERO.zh : HERO.en;
   const latestRelease = useLatestRelease();
-  const macDownloadUrl = latestRelease?.macUrl || RELEASES_FALLBACK;
-  const winDownloadUrl = latestRelease?.winUrl || RELEASES_FALLBACK;
+  const download = useDirectDownload();
+  const macDownloadUrl = latestRelease?.macUrl;
+  const winDownloadUrl = latestRelease?.winUrl;
 
   return (
     <section id="quick-start" className={styles.quickStartSection}>
@@ -584,15 +615,15 @@ pilotdeck status     # check runtime status`}
             <Link className={styles.btnPrimary} to={t.ctaTo}>
               {t.cta}
             </Link>
-            <a className={styles.btnSecondary} href={macDownloadUrl}>
+            <button className={styles.btnSecondary} type="button" onClick={() => download(macDownloadUrl, 'mac')}>
               <AppleIcon />
               {heroText.downloadMac}
               {latestRelease?.version && <span className={styles.versionBadge}>{latestRelease.version}</span>}
-            </a>
-            <a className={styles.btnSecondary} href={winDownloadUrl}>
+            </button>
+            <button className={styles.btnSecondary} type="button" onClick={() => download(winDownloadUrl, 'win')}>
               <WindowsIcon />
               {heroText.downloadWin}
-            </a>
+            </button>
           </div>
         </div>
       </div>
