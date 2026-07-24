@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { access, mkdir, writeFile } from 'node:fs/promises';
+import { access, mkdir, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const API_URL = 'https://api.github.com/repos/OpenBMB/PilotDeck/releases/latest';
@@ -13,6 +13,7 @@ const response = await fetch(API_URL, {
   headers: {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'pilotdeck-website-build',
+    ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
   },
 });
 
@@ -28,8 +29,8 @@ if (!response.ok) {
 
 const release = await response.json();
 const assets = release.assets || [];
-const macDmg = findAsset(assets, /mac-arm64\.dmg$/);
-const winX64 = findAsset(assets, /win-x64\.exe$/);
+const macDmg = findAsset(assets, /mac-(?:universal|arm64)\.dmg$/);
+const winX64 = findAsset(assets, /win-x64(?:-setup)?\.exe$/);
 const winArm64 = findAsset(assets, /win-arm64\.exe$/);
 
 const manifest = {
@@ -45,7 +46,7 @@ const manifest = {
 
 await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
 await writeFile(`${OUTPUT_PATH}.tmp`, `${JSON.stringify(manifest, null, 2)}\n`);
-await writeFile(OUTPUT_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
+await rename(`${OUTPUT_PATH}.tmp`, OUTPUT_PATH);
 
 console.log(`Wrote ${OUTPUT_PATH}`);
 console.log(`mac: ${manifest.downloads.mac || 'missing'}`);
