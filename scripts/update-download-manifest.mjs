@@ -29,7 +29,7 @@ if (!response.ok) {
 
 const release = await response.json();
 const assets = release.assets || [];
-const macDmg = findAsset(assets, /mac-(?:universal|arm64)\.dmg$/);
+const macDmg = findAsset(assets, /mac-arm64\.dmg$/);
 const winX64 = findAsset(assets, /win-x64(?:-setup)?\.exe$/);
 const winArm64 = findAsset(assets, /win-arm64\.exe$/);
 
