@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+  # Refresh the download manifest after PilotDeck's daily release.
+  schedule:
+    - cron: '30 18 * * *'
+
+  workflow_dispatch:
+
 permissions:
   contents: write
 
@@ -48,6 +54,8 @@ jobs:
         run: npm run build:demo
 
       - name: Build website
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: npm run build
 
       - name: Deploy to GitHub Pages
