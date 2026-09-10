@@ -1,10 +1,10 @@
 {
-  "version": "v2026.09.09",
-  "htmlUrl": "https://github.com/OpenBMB/PilotDeck/releases/tag/v2026.09.09",
-  "generatedAt": "2026-09-09T21:02:06.705Z",
+  "version": "v2026.09.10",
+  "htmlUrl": "https://github.com/OpenBMB/PilotDeck/releases/tag/v2026.09.10",
+  "generatedAt": "2026-09-10T21:00:42.107Z",
   "downloads": {
-    "mac": "https://github.com/OpenBMB/PilotDeck/releases/download/v2026.09.09/PilotDeck-2026.909.0-mac-arm64.dmg",
-    "windows": "https://github.com/OpenBMB/PilotDeck/releases/download/v2026.09.09/PilotDeck-2026.909.0-win-x64-setup.exe",
+    "mac": "https://github.com/OpenBMB/PilotDeck/releases/download/v2026.09.10/PilotDeck-2026.910.0-mac-arm64.dmg",
+    "windows": "https://github.com/OpenBMB/PilotDeck/releases/download/v2026.09.10/PilotDeck-2026.910.0-win-x64-setup.exe",
     "windowsArm64": null
   }
 }
